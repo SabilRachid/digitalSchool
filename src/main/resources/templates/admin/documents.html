@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Gestion des Documents - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+     <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/topbar.css}">
+    <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+    <link rel="stylesheet" th:href="@{/css/components/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+    <link rel="stylesheet" th:href="@{/css/components/modals.css}">
+    <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h3 class="dashboard-title">
+                <span class="page-title-icon bg-theme text-white mr-2">
+                    <i class="fas fa-books"></i>
+                </span> Gestion des documents
+            </h3>
+            <button class="action-button" onclick="documentsPage.openModal()">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter un document</span>
+            </button>
+        </div>
+
+        <div class="content-card">
+            <div class="filters mb-4">
+                <div class="row">
+                    <div class="col-md-3">
+                        <select id="typeFilter" class="form-select">
+                            <option value="">Tous les types</option>
+                            <option value="ADMINISTRATIVE">Administratif</option>
+                            <option value="MEDICAL">Médical</option>
+                            <option value="ACADEMIC">Académique</option>
+                            <option value="OTHER">Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="categoryFilter" class="form-select">
+                            <option value="">Toutes les catégories</option>
+                            <option value="INSCRIPTION">Inscription</option>
+                            <option value="CERTIFICATE">Certificat</option>
+                            <option value="REPORT">Bulletin</option>
+                            <option value="OTHER">Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="validationFilter" class="form-select">
+                            <option value="">Tous les statuts</option>
+                            <option value="true">Validé</option>
+                            <option value="false">En attente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <table id="documentsTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Catégorie</th>
+                        <th>Déposé par</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Document -->
+    <div class="modal fade" id="documentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un document</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="documentForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="id" name="id">
+                        
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Document</label>
+                            <input type="file" class="form-control" id="file" name="file" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="type" class="form-label">Type</label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="">Sélectionner un type</option>
+                                    <option value="ADMINISTRATIVE">Administratif</option>
+                                    <option value="MEDICAL">Médical</option>
+                                    <option value="ACADEMIC">Académique</option>
+                                    <option value="OTHER">Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label">Catégorie</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Sélectionner une catégorie</option>
+                                    <option value="INSCRIPTION">Inscription</option>
+                                    <option value="CERTIFICATE">Certificat</option>
+                                    <option value="REPORT">Bulletin</option>
+                                    <option value="OTHER">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="student" class="form-label">Élève</label>
+                                <select class="form-select" id="student" name="studentId">
+                                    <option value="">Sélectionner un élève</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="parent" class="form-label">Parent</label>
+                                <select class="form-select" id="parent" name="parentId">
+                                    <option value="">Sélectionner un parent</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script th:src="@{/js/admin/common.js}"></script>
+    <script th:src="@{/js/admin/documents.js}"></script>
+    <script th:src="@{/js/sidebar.js}"></script>
+    <script th:src="@{/js/topbar.js}"></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tableau de Bord Facturation - Digital School</title>
+    <!-- Include necessary CSS -->
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Tableau de Bord Facturation</h1>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Chiffre d'affaires</h3>
+                    <div class="stat-value" 
+                         th:text="${stats.revenue + ' MAD'}">
+                        100,000 MAD
+                    </div>
+                    <div class="stat-change" 
+                         th:classappend="${stats.revenueChange >= 0 ? 'positive' : 'negative'}">
+                        <i th:class="${'fas fa-arrow-' + (stats.revenueChange >= 0 ? 'up' : 'down')}"></i>
+                        <span th:text="${Math.abs(stats.revenueChange) + '% vs mois dernier'}">
+                            +15% vs mois dernier
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>En attente</h3>
+                    <div class="stat-value" 
+                         th:text="${stats.pendingAmount + ' MAD'}">
+                        25,000 MAD
+                    </div>
+                    <div class="stat-label" 
+                         th:text="${stats.pendingCount + ' factures'}">
+                        10 factures
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon overdue">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>En retard</h3>
+                    <div class="stat-value" 
+                         th:text="${stats.overdueAmount + ' MAD'}">
+                        15,000 MAD
+                    </div>
+                    <div class="stat-label" 
+                         th:text="${stats.overdueCount + ' factures'}">
+                        5 factures
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Taux de recouvrement</h3>
+                    <div class="stat-value" 
+                         th:text="${stats.recoveryRate + '%'}">
+                        85%
+                    </div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5% ce mois</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Évolution des paiements</h3>
+                    <div class="chart-actions">
+                        <button class="btn-outline active">Mois</button>
+                        <button class="btn-outline">Année</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="paymentsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Répartition par mode de paiement</h3>
+                </div>
+                <div class="chart-body">
+                    <canvas id="paymentMethodsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Invoices -->
+        <div class="recent-section">
+            <div class="section-header">
+                <h3>Factures récentes</h3>
+                <a href="/admin/billing/invoices" class="btn-link">
+                    Voir tout
+                </a>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Élève</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                            <th>Échéance</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="invoice : ${recentInvoices}">
+                            <td th:text="${invoice.invoiceNumber}">INV-001</td>
+                            <td th:text="${invoice.student.firstName + ' ' + invoice.student.lastName}">
+                                John Doe
+                            </td>
+                            <td th:text="${invoice.totalAmount + ' MAD'}">1000 MAD</td>
+                            <td th:text="${#temporals.format(invoice.issueDate, 'dd/MM/yyyy')}">
+                                01/01/2024
+                            </td>
+                            <td th:text="${#temporals.format(invoice.dueDate, 'dd/MM/yyyy')}">
+                                31/01/2024
+                            </td>
+                            <td>
+                                <span th:class="${'status-badge status-' + invoice.status.toLowerCase()}"
+                                      th:text="${invoice.status}">
+                                    Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{'/admin/billing/invoices/' + ${invoice.id}}"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button th:if="${invoice.status == 'PENDING' || invoice.status == 'OVERDUE'}"
+                                            th:onclick="'sen ```html
+                                            th:onclick="'sendReminder(' + ${invoice.id} + ')'"
+                                            class="btn btn-sm btn-warning">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                    <button th:if="${invoice.status == 'PENDING'}"
+                                            th:onclick="'markAsPaid(' + ${invoice.id} + ')'"
+                                            class="btn btn-sm btn-success">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">
+        // Initialize charts with data from model
+        const stats = /*[[${stats}]]*/ {};
+        
+        // Payments Evolution Chart
+        new Chart(document.getElementById('paymentsChart'), {
+            type: 'line',
+            data: {
+                labels: stats.paymentLabels,
+                datasets: [{
+                    label: 'Paiements',
+                    data: stats.paymentAmounts,
+                    borderColor: '#4C51BF',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' MAD';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Payment Methods Chart
+        new Chart(document.getElementById('paymentMethodsChart'), {
+            type: 'doughnut',
+            data: {
+                labels: stats.paymentMethodLabels,
+                datasets: [{
+                    data: stats.paymentMethodAmounts,
+                    backgroundColor: [
+                        '#4C51BF',
+                        '#48BB78',
+                        '#ED8936'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        async function sendReminder(invoiceId) {
+            try {
+                const response = await fetch(`/admin/billing/invoices/${invoiceId}/remind`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Erreur lors de l\'envoi du rappel');
+                
+                showNotification('Rappel envoyé avec succès', 'success');
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+        
+        async function markAsPaid(invoiceId) {
+            if (!confirm('Êtes-vous sûr de vouloir marquer cette facture comme payée ?')) return;
+            
+            try {
+                const response = await fetch(`/admin/billing/invoices/${invoiceId}/mark-paid`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Erreur lors de la mise à jour du statut');
+                
+                location.reload();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+```css
+/* Notifications Component */
+.notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: var(--shadow-md);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1100;
+    max-width: 400px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.notification.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.notification.success i {
+    color: var(--success-color);
+}
+
+.notification.error {
+    border-left: 4px solid var(--danger-color);
+}
+
+.notification.error i {
+    color: var(--danger-color);
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+.notification span {
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.notification-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+.notification-close:hover {
+    color: var(--text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .notification {
+        left: 1rem;
+        right: 1rem;
+        top: 1rem;
+    }
+}
+```

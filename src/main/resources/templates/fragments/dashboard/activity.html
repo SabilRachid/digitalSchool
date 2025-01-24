@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Activités Admin -->
+    <div th:fragment="adminActivity">
+        <div class="activity-section">
+            <div class="section-header">
+                <h2 class="section-title">Activités Récentes</h2>
+                <a href="#" class="view-all">Voir tout</a>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon bg-primary">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Nouvel étudiant inscrit en classe de 3ème A</p>
+                        <span class="activity-time">Il y a 5 minutes</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button approve">Valider</button>
+                        <button class="action-button view">Voir</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-success">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Nouveau cours ajouté : Mathématiques Avancées</p>
+                        <span class="activity-time">Il y a 30 minutes</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Voir</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Signalement d'absence massive en 4ème B</p>
+                        <span class="activity-time">Il y a 1 heure</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button warning">Vérifier</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-info">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Réunion des professeurs programmée</p>
+                        <span class="activity-time">Il y a 2 heures</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Détails</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activités Professeur -->
+    <div th:fragment="professorActivity">
+        <div class="activity-section">
+            <div class="section-header">
+                <h2 class="section-title">Activités Récentes</h2>
+                <a href="#" class="view-all">Voir tout</a>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon bg-warning">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Marie Dubois a signalé une absence pour demain</p>
+                        <span class="activity-time">Il y a 10 minutes</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button approve">Approuver</button>
+                        <button class="action-button reject">Refuser</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-success">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">15 devoirs rendus en Mathématiques - 3ème A</p>
+                        <span class="activity-time">Il y a 30 minutes</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Corriger</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-info">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Question sur le devoir de géométrie</p>
+                        <span class="activity-time">Il y a 1 heure</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Répondre</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activités Étudiant -->
+    <div th:fragment="studentActivity">
+        <div class="activity-section">
+            <div class="section-header">
+                <h2 class="section-title">Activités Récentes</h2>
+                <a href="#" class="view-all">Voir tout</a>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Note de Mathématiques : 16/20</p>
+                        <span class="activity-time">Il y a 15 minutes</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Voir détails</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-warning">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Nouveau devoir en Histoire</p>
+                        <span class="activity-time">Il y a 1 heure</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Voir</button>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-info">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Commentaire du professeur sur votre devoir</p>
+                        <span class="activity-time">Il y a 2 heures</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="action-button view">Lire</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

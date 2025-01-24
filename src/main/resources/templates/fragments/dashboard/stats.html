@@ -1,0 +1,326 @@
+    <!-- Stats Admin -->
+    <div th:fragment="adminStats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon students">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Étudiants</div>
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12% vs mois dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Actifs</span>
+                        <span>1,180</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>En attente</span>
+                        <span>54</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon professors">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Professeurs</div>
+                        <div class="stat-value">87</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>5% vs mois dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Temps plein</span>
+                        <span>65</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Temps partiel</span>
+                        <span>22</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon classes">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Classes</div>
+                        <div class="stat-value">45</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8% vs mois dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Taux de remplissage</span>
+                        <span>92%</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Places disponibles</span>
+                        <span>108</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon attendance">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Taux de présence</div>
+                        <div class="stat-value">95%</div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>2% vs mois dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Absences justifiées</span>
+                        <span>3%</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Absences injustifiées</span>
+                        <span>2%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Professeur -->
+    <div th:fragment="professorStats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon students">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Élèves</div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-change neutral">
+                            <i class="fas fa-minus"></i>
+                            <span>Stable</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Classes</span>
+                        <span>6</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Moyenne d'élèves</span>
+                        <span>26</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon assignments">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Devoirs</div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-change warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>12 à corriger</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>En cours</span>
+                        <span>8</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>À venir</span>
+                        <span>3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon performance">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Performance</div>
+                        <div class="stat-value">14.5/20</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0.5 pts vs trimestre dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Meilleure classe</span>
+                        <span>15.8</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Taux de réussite</span>
+                        <span>87%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon schedule">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Planning</div>
+                        <div class="stat-value">18h/20h</div>
+                        <div class="stat-change info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Cette semaine</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Cours donnés</span>
+                        <span>45</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>À venir</span>
+                        <span>12</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Étudiant -->
+    <div th:fragment="studentStats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon grades">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Moyenne Générale</div>
+                        <div class="stat-value">15.5/20</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0.8 pts vs trimestre dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Meilleure note</span>
+                        <span>18/20</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>À améliorer</span>
+                        <span>12/20</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon attendance">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Assiduité</div>
+                        <div class="stat-value">98%</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>2% vs mois dernier</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Retards</span>
+                        <span>2</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Absences</span>
+                        <span>1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon assignments">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Devoirs</div>
+                        <div class="stat-value">4</div>
+                        <div class="stat-change warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>2 cette semaine</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Rendus</span>
+                        <span>15</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>En attente</span>
+                        <span>4</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon rank">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Classement</div>
+                        <div class="stat-value">3/28</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+2 places</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-detail-item">
+                        <span>Meilleur rang</span>
+                        <span>2/28</span>
+                    </div>
+                    <div class="stat-detail-item">
+                        <span>Points mérite</span>
+                        <span>450</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

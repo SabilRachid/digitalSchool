@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/charts.css}">
+    <link rel="stylesheet" th:href="@{/css/superadmin/dashboard.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-chart-line"></i>
+                Tableau de Bord Super Admin
+            </h1>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon schools">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Écoles Actives</h3>
+                    <div class="stat-value">125</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +15% ce mois
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Revenus Mensuels</h3>
+                    <div class="stat-value">€45,250</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +8% vs dernier mois
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Utilisateurs Totaux</h3>
+                    <div class="stat-value">15,420</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +12% ce mois
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon storage">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Stockage Utilisé</h3>
+                    <div class="stat-value">1.2 TB</div>
+                    <div class="stat-change warning">
+                        <i class="fas fa-arrow-up"></i>
+                        75% capacité
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Croissance des Écoles</h3>
+                    <div class="chart-actions">
+                        <button class="btn-outline">Mois</button>
+                        <button class="btn-outline active">Année</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="schoolGrowthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Revenus par Plan</h3>
+                    <div class="chart-actions">
+                        <button class="btn-outline">Trimestre</button>
+                        <button class="btn-outline active">Année</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="revenueByPlanChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Schools -->
+        <div class="recent-schools-section">
+            <div class="section-header">
+                <h3>Écoles Récentes</h3>
+                <a href="/superadmin/schools" class="btn-link">Voir tout</a>
+            </div>
+            <div class="schools-grid">
+                <div th:each="school : ${recentSchools}" class="school-card">
+                    <div class="school-logo">
+                        <img th:src="${school.logoUrl}" alt="School logo">
+                    </div>
+                    <div class="school-info">
+                        <h4 th:text="${school.name}">Nom de l'école</h4>
+                        <p th:text="${school.city + ', ' + school.country}">Ville, Pays</p>
+                        <div class="school-stats">
+                            <div class="stat">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>250 élèves</span>
+                            </div>
+                            <div class div class="stat">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>25 professeurs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="school-status" th:classappend="${school.status == 'ACTIVE' ? 'active' : 'inactive'}">
+                        <span th:text="${school.status}">Status</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription Overview -->
+        <div class="subscription-overview">
+            <div class="section-header">
+                <h3>Aperçu des Abonnements</h3>
+                <a href="/superadmin/subscriptions" class="btn-link">Gérer</a>
+            </div>
+            <div class="subscription-cards">
+                <div class="subscription-card">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-stats">
+                        <div class="stat">
+                            <span class="value">45</span>
+                            <span class="label">Écoles</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">€8,550</span>
+                            <span class="label">Revenu</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="subscription-card">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-stats">
+                        <div class="stat">
+                            <span class="value">62</span>
+                            <span class="label">Écoles</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">€24,800</span>
+                            <span class="label">Revenu</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="subscription-card">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-stats">
+                        <div class="stat">
+                            <span class="value">18</span>
+                            <span class="label">Écoles</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">€36,000</span>
+                            <span class="label">Revenu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/superadmin/dashboard.js}"></script>
+</body>
+</html>

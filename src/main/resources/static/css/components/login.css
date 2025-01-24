@@ -1,0 +1,221 @@
+/* Login Component */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #6D28D9 100%);
+    padding: 2rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: loginCardSlideUp 0.5s ease-out;
+}
+
+/* Login Header */
+.login-header {
+    text-align: center;
+    padding: 2rem 2rem 1.5rem;
+}
+
+.login-header img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+}
+
+.login-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Login Form */
+.login-form {
+    padding: 0 2rem 2rem;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid var(--bg-secondary);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    transition: all var(--transition-speed);
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Remember Me */
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--bg-secondary);
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.remember-me label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+/* Login Button */
+.login-button {
+    width: 100%;
+    padding: 0.875rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+.login-button:hover {
+    background: #6D28D9;
+    transform: translateY(-1px);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+/* Login Footer */
+.login-footer {
+    padding: 1.5rem 2rem;
+    background: var(--bg-secondary);
+    text-align: center;
+}
+
+.login-footer p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-speed);
+}
+
+.login-footer a:hover {
+    color: #6D28D9;
+}
+
+/* Messages */
+.error-message,
+.success-message {
+    margin: 0 2rem 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.error-message {
+    background-color: #FEE2E2;
+    color: var(--danger-color);
+}
+
+.success-message {
+    background-color: #DEF7EC;
+    color: var(--success-color);
+}
+
+.error-message i,
+.success-message i {
+    font-size: 1rem;
+}
+
+/* Animations */
+@keyframes loginCardSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .login-card {
+        box-shadow: none;
+    }
+
+    .login-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .login-header img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .login-form {
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .login-footer {
+        padding: 1rem 1.5rem;
+    }
+
+    .error-message,
+    .success-message {
+        margin: 0 1.5rem 1rem;
+    }
+}

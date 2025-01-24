@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragment pour le multi-select avec tags -->
+    <div th:fragment="multiSelectTags(id, name, label, items, selectedItems)">
+        <div class="form-group mb-3">
+            <!-- Label -->
+            <label th:for="${id}" class="form-label" th:text="${label}">Label</label>
+            
+            <!-- Select -->
+            <select th:id="${id}" th:name="${name}" class="form-select multi-select-tags" multiple>
+                <option th:each="item : ${items}"
+                        th:value="${item.id}"
+                        th:text="${item.name}"
+                        th:selected="${selectedItems != null && selectedItems.contains(item)}">
+                </option>
+            </select>
+
+            <!-- Zone des tags -->
+            <div th:id="${id + '-tags'}" class="selected-tags mt-2">
+                <span th:each="item : ${selectedItems}" 
+                      class="badge bg-primary me-2 mb-2 selected-tag" 
+                      th:data-id="${item.id}">
+                    <span th:text="${item.name}"></span>
+                    <button type="button" class="btn-close btn-close-white ms-2" 
+                            onclick="removeTag(this)" 
+                            aria-label="Remove"></button>
+                </span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

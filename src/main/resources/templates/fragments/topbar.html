@@ -1,0 +1,98 @@
+    <div th:fragment="topbar" class="top-bar">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <!-- Placeholder différent selon le rôle -->
+            <input type="text" th:placeholder="${
+                #authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Rechercher un utilisateur, une classe...' :
+                #authorization.expression('hasRole(''ROLE_PROFESSOR'')') ? 'Rechercher un élève, un cours...' :
+                'Rechercher un cours, un devoir...'
+            }">
+        </div>
+        <div class="user-section">
+            <div class="notification-icon" onclick="toggleDropdown('notificationDropdown')">
+                <i class="fas fa-bell"></i>
+                <span class="badge" th:text="${notificationCount}">3</span>
+                <div id="notificationDropdown" class="dropdown-content">
+                    <!-- Notifications spécifiques à l'administrateur -->
+                    <div sec:authorize="hasRole('ROLE_ADMIN')">
+                        <div class="dropdown-item">
+                            <i class="fas fa-user-plus text-primary"></i>
+                            <div class="dropdown-text">
+                                <p>Nouvelle demande d'inscription</p>
+                                <small>Il y a 10 minutes</small>
+                            </div>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-exclamation-circle text-warning"></i>
+                            <div class="dropdown-text">
+                                <p>Maintenance requise - Salle 204</p>
+                                <small>Il y a 30 minutes</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications spécifiques au professeur -->
+                    <div sec:authorize="hasRole('ROLE_PROFESSOR')">
+                        <div class="dropdown-item">
+                            <i class="fas fa-user-clock text-warning"></i>
+                            <div class="dropdown-text">
+                                <p>Absence signalée - Classe de 3ème A</p>
+                                <small>Il y a 5 minutes</small>
+                            </div>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-question-circle text-info"></i>
+                            <div class="dropdown-text">
+                                <p>Question sur le devoir de mathématiques</p>
+                                <small>Il y a 20 minutes</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications spécifiques à l'élève -->
+                    <div sec:authorize="hasRole('ROLE_STUDENT')">
+                        <div class="dropdown-item">
+                            <i class="fas fa-book text-primary"></i>
+                            <div class="dropdown-text">
+                                <p>Nouveau devoir en Mathématiques</p>
+                                <small>Il y a 10 minutes</small>
+                            </div>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-star text-warning"></i>
+                            <div class="dropdown-text">
+                                <p>Note disponible en Histoire</p>
+                                <small>Il y a 1 heure</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-profile" onclick="toggleDropdown('profileDropdown')">
+                <i class="fas fa-user-circle"></i>
+                <span sec:authentication="name">Utilisateur</span>
+                <span class="role">
+                    (<span sec:authorize="hasRole('ROLE_ADMIN')">Administrateur</span>
+                    <span sec:authorize="hasRole('ROLE_PROFESSOR')">Professeur</span>
+                    <span sec:authorize="hasRole('ROLE_STUDENT')" th:text="${studentClass}">Classe de 3ème A</span>)
+                </span>
+                <div id="profileDropdown" class="dropdown-content">
+                    <a href="/profile" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Mon Profil</span>
+                    </a>
+                    <a href="/settings" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <form th:action="@{/logout}" method="post" class="dropdown-item">
+                        <button type="submit" class="btn-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Déconnexion</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

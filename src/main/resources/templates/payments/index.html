@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Paiements - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/payments/index.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-credit-card"></i>
+                Gestion des Paiements
+            </h1>
+            <div sec:authorize="hasRole('ROLE_ADMIN')" class="header-actions">
+                <button class="btn btn-primary" onclick="paymentManager.openPaymentModal()">
+                    <i class="fas fa-plus"></i>
+                    Nouveau Paiement
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon payments">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Total Payé</h3>
+                    <div class="stat-value" th:text="${stats.totalPaid + ' MAD'}">0 MAD</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span th:text="${stats.paymentIncrease + '%'}">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>En Attente</h3>
+                    <div class="stat-value" th:text="${stats.totalPending + ' MAD'}">0 MAD</div>
+                    <div class="stat-count" th:text="${stats.pendingCount + ' paiements'}">0 paiements</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Taux de Réussite</h3>
+                    <div class="stat-value" th:text="${stats.successRate + '%'}">0%</div>
+                    <div class="stat-label">des transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="content-card">
+            <div class="card-header">
+                <div class="filters">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="PAID">Payé</option>
+                        <option value="PENDING">En attente</option>
+                        <option value="FAILED">Échoué</option>
+                    </select>
+                    <select id="periodFilter" class="form-select">
+                        <option value="7">7 derniers jours</option>
+                        <option value="30">30 derniers jours</option>
+                        <option value="90">90 derniers jours</option>
+                        <option value="all">Tout</option>
+                    </select>
+                    <input type="text" id="searchInput" class="form-input" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="paymentsTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Date</th>
+                            <th>Élève</th>
+                            <th>Parent</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${payment.reference}"></td>
+                            <td th:text="${#temporals.format(payment.date, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${payment.student.firstName + ' ' + payment.student.lastName}"></td>
+                            <td th:text="${payment.parent.firstName + ' ' + payment.parent.lastName}"></td>
+                            <td th:text="${payment.amount + ' MAD'}"></td>
+                            <td>
+                                <span class="status-badge" th:classappend="${payment.status.toLowerCase()}"
+                                      th:text="${payment.status}"></span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon view" 
+                                            th:onclick="'paymentManager.viewDetails(\'' + ${payment.id} + '\')'">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn-icon download" 
+                                            th:onclick="'paymentManager.downloadReceipt(\'' + ${payment.id} + '\')'">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button sec:authorize="hasRole('ROLE_ADMIN')" 
+                                            class="btn-icon edit"
+                                            th:if="${payment.status == 'PENDING'}"
+                                            th:onclick="'paymentManager.editPayment(\'' + ${payment.id} + '\')'">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Nouveau Paiement</h3>
+                    <button type="button" class="close-button" onclick="paymentManager.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="paymentForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="student">Élève</label>
+                            <select id="student" name="studentId" class="form-select" required>
+                                <option value="">Sélectionner un élève</option>
+                                <option th:each="student : ${students}" 
+                                        th:value="${student.id}"
+                                        th:text="${student.firstName + ' ' + student.lastName}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent">Parent payeur</label>
+                            <select id="parent" name="parentId" class="form-select" required>
+                                <option value="">Sélectionner un parent</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount">Montant (MAD)</label>
+                            <input type="number" id="amount" name="amount" class="form-input" 
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" class="form-input" 
+                                    rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="paymentManager.closeModal()">
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Procéder au paiement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/payments/index.js}"></script>
+</body>
+</html>

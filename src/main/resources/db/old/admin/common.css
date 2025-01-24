@@ -1,0 +1,242 @@
+/* Variables communes */
+:root {
+    --primary-color: #4C51BF;
+    --secondary-color: #48BB78;
+    --warning-color: #ED8936;
+    --danger-color: #F56565;
+    --info-color: #4299E1;
+    --text-primary: #2D3748;
+    --text-secondary: #718096;
+    --bg-primary: #F7FAFC;
+    --bg-secondary: #EDF2F7;
+    --border-color: #E2E8F0;
+    --transition-speed: 0.3s;
+}
+
+/* Layout de base */
+.dashboard-container {
+    padding: 2rem;
+    background-color: var(--bg-primary);
+    min-height: calc(100vh - var(--topbar-height));
+    margin-top: var(--topbar-height); /* Ajout de la marge pour éviter la superposition */
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+
+/* Carte de contenu */
+.content-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons d'action */
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+.action-button:hover {
+    background-color: #434190;
+    transform: translateY(-1px);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-button {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.icon-button.edit {
+    background-color: #ebf4ff;
+    color: #3182ce;
+}
+
+.icon-button.edit:hover {
+    background-color: #bee3f8;
+}
+
+.icon-button.delete {
+    background-color: #fff5f5;
+    color: #e53e3e;
+}
+
+.icon-button.delete:hover {
+    background-color: #fed7d7;
+}
+
+/* Badges et statuts */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #C6F6D5;
+    color: #2F855A;
+}
+
+.status-inactive {
+    background-color: #FED7D7;
+    color: #C53030;
+}
+
+/* DataTables personnalisé */
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--bg-secondary);
+}
+
+/* Modal */
+.modal {
+    z-index: 1050;
+}
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal-dialog {
+    max-width: 800px;
+}
+
+.modal-content {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Formulaires */
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: all var(--transition-speed);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(76, 81, 191, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Boutons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #434190;
+    border-color: #434190;
+}
+
+.btn-secondary {
+    background-color: var(--bg-secondary);
+    border-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: #E2E8F0;
+    border-color: #E2E8F0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .action-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mes Factures - Digital School</title>
+    <!-- Include necessary CSS -->
+</head>
+<body>
+    <div class="container">
+        <h1>Mes Factures</h1>
+        
+        <div class="invoices-list">
+            <div th:each="invoice : ${invoices}" class="invoice-card">
+                <div class="invoice-header">
+                    <h3 th:text="${'Facture #' + invoice.invoiceNumber}">Facture #123</h3>
+                    <span th:class="${'status-badge status-' + invoice.status.toLowerCase()}"
+                          th:text="${invoice.status}">Status</span>
+                </div>
+                
+                <div class="invoice-details">
+                    <div class="amount">
+                        <span class="label">Montant:</span>
+                        <span class="value" th:text="${invoice.totalAmount + ' MAD'}">1000 MAD</span>
+                    </div>
+                    
+                    <div class="dates">
+                        <div>
+                            <span class="label">Date d'émission:</span>
+                            <span th:text="${#temporals.format(invoice.issueDate, 'dd/MM/yyyy')}">
+                                01/01/2024
+                            </span>
+                        </div>
+                        <div>
+                            <span class="label">Échéance:</span>
+                            <span th:text="${#temporals.format(invoice.dueDate, 'dd/MM/yyyy')}">
+                                31/01/2024
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-actions">
+                    <a th:href="@{'/billing/invoices/' + ${invoice.id}}" 
+                       class="btn btn-primary">
+                        Voir détails
+                    </a>
+                    <a th:href="@{'/billing/invoices/' + ${invoice.id} + '/pdf'}"
+                       class="btn btn-secondary">
+                        Télécharger PDF
+                    </a>
+                    <button th:if="${invoice.status == 'PENDING'}"
+                            th:onclick="'showPaymentModal(' + ${invoice.id} + ')'"
+                            class="btn btn-success">
+                        Payer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h2>Paiement de la facture</h2>
+            <form id="paymentForm">
+                <input type="hidden" id="invoiceId" name="invoiceId">
+                
+                <div class="form-group">
+                    <label for="amount">Montant</label>
+                    <input type="number" id="amount" name="amount" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="paymentMethod">Mode de paiement</label>
+                    <select id="paymentMethod" name="paymentMethod" required>
+                        <option value="CARD">Carte bancaire</option>
+                        <option value="BANK_TRANSFER">Virement bancaire</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="closePaymentModal()"
+                            class="btn btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Procéder au paiement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">
+        function showPaymentModal(invoiceId) {
+            document.getElementById('invoiceId').value = invoiceId;
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+        
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const invoiceId = document.getElementById('invoiceId').value;
+            const amount = document.getElementById('amount').value;
+            const method = document.getElementById('paymentMethod').value;
+            
+            try {
+                const response = await fetch(`/billing/invoices/${invoiceId}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    },
+                    body: JSON.stringify({ amount, method })
+                });
+                
+                if (!response.ok) throw new Error('Erreur lors du paiement');
+                
+                const payment = await response.json();
+                
+                // Redirect to payment gateway
+                window.location.href = payment.gatewayUrl;
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+/* Badge Components */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 9999px;
+    transition: all var(--transition-speed);
+}
+
+/* Badge Variants */
+.badge-primary {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.badge-success {
+    background-color: #DEF7EC;
+    color: var(--success-color);
+}
+
+.badge-warning {
+    background-color: #FEF3C7;
+    color: var(--warning-color);
+}
+
+.badge-danger {
+    background-color: #FEE2E2;
+    color: var(--danger-color);
+}
+
+.badge-info {
+    background-color: #E0F2FE;
+    color: var(--info-color);
+}
+
+/* Badge Sizes */
+.badge-sm {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.675rem;
+}
+
+.badge-lg {
+    padding: 0.35rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Badge with Icon */
+.badge-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.badge-icon i {
+    font-size: 0.875rem;
+}
+
+/* Badge Counter */
+.badge-counter {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge Pill */
+.badge-pill {
+    padding-right: 0.6em;
+    padding-left: 0.6em;
+}
+
+/* Badge Dot */
+.badge-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+/* Badge Positioning */
+.badge-positioned {
+    position: absolute;
+    transform: translate(50%, -50%);
+}
+
+.badge-top-right {
+    top: 0;
+    right: 0;
+}
+
+.badge-bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+.badge-top-left {
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+.badge-bottom-left {
+    bottom: 0;
+    left: 0;
+    transform: translate(-50%, 50%);
+}
+
+/* Badge Animations */
+.badge-pulse {
+    position: relative;
+}
+
+.badge-pulse::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    animation: badge-pulse 2s infinite;
+}
+
+@keyframes badge-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Hover Effects */
+.badge-hover {
+    cursor: pointer;
+    transition: transform var(--transition-speed);
+}
+
+.badge-hover:hover {
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .badge-responsive {
+        font-size: 0.675rem;
+        padding: 0.125rem 0.5rem;
+    }
+}

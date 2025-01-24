@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Graphiques Admin -->
+    <div th:fragment="adminCharts">
+        <div class="charts-grid">
+            <!-- Distribution des utilisateurs -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Distribution des Utilisateurs</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Évolution des inscriptions -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Évolution des Inscriptions</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="registrationTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Performance par niveau -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Performance par Niveau</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="levelPerformanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Taux de réussite -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Taux de Réussite</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="successRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques Professeur -->
+    <div th:fragment="professorCharts">
+        <div class="charts-grid">
+            <!-- Performance par classe -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Performance par Classe</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="classPerformanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Distribution des notes -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Distribution des Notes</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gradesDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Taux de participation -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Taux de Participation</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="participationRateChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Progression des moyennes -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Progression des Moyennes</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="averageProgressionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques Étudiant -->
+    <div th:fragment="studentCharts">
+        <div class="charts-grid">
+            <!-- Notes par matière -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Notes par Matière</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="subjectGradesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Évolution des moyennes -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Évolution des Moyennes</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gradesProgressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Assiduité -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Assiduité</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Temps d'étude -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Temps d'Étude par Matière</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="studyTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

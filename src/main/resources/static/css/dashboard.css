@@ -1,0 +1,246 @@
+/* Variables */
+:root {
+    --primary-color: #4C51BF;
+    --secondary-color: #48BB78;
+    --warning-color: #ED8936;
+    --danger-color: #F56565;
+    --info-color: #4299E1;
+    --text-primary: #2D3748;
+    --text-secondary: #718096;
+    --bg-primary: #F7FAFC;
+    --bg-secondary: #EDF2F7;
+    --transition-speed: 0.3s;
+}
+
+/* Grille de statistiques */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Carte de statistique */
+.stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform var(--transition-speed);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête de la carte */
+.stat-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Couleurs des icônes */
+.stat-icon.students {
+    background-color: rgba(76, 81, 191, 0.1);
+    color: var(--primary-color);
+}
+
+.stat-icon.professors {
+    background-color: rgba(72, 187, 120, 0.1);
+    color: var(--secondary-color);
+}
+
+.stat-icon.classes {
+    background-color: rgba(237, 137, 54, 0.1);
+    color: var(--warning-color);
+}
+
+.stat-icon.attendance {
+    background-color: rgba(66, 153, 225, 0.1);
+    color: var(--info-color);
+}
+
+.stat-icon.grades {
+    background-color: rgba(76, 81, 191, 0.1);
+    color: var(--primary-color);
+}
+
+.stat-icon.assignments {
+    background-color: rgba(72, 187, 120, 0.1);
+    color: var(--secondary-color);
+}
+
+.stat-icon.performance {
+    background-color: rgba(237, 137, 54, 0.1);
+    color: var(--warning-color);
+}
+
+.stat-icon.rank {
+    background-color: rgba(66, 153, 225, 0.1);
+    color: var(--info-color);
+}
+
+/* Contenu de la statistique */
+.stat-title {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+/* Variations */
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stat-change.positive {
+    color: var(--secondary-color);
+}
+
+.stat-change.negative {
+    color: var(--danger-color);
+}
+
+.stat-change.warning {
+    color: var(--warning-color);
+}
+
+.stat-change.info {
+    color: var(--info-color);
+}
+
+.stat-change.neutral {
+    color: var(--text-secondary);
+}
+
+/* Détails de la statistique */
+.stat-details {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--bg-secondary);
+}
+
+.stat-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.stat-detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.stat-detail-item span:first-child {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.stat-detail-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Grille de graphiques */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Carte de graphique */
+.chart-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Digital School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/topbar.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+    <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+    <link rel="stylesheet" th:href="@{/css/calendar.css}">
+    
+    <style>
+        .messages-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            height: calc(100vh - 180px);
+            background: var(--bg-primary);
+        }
+
+        .messages-sidebar {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .compose-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .compose-button:hover {
+            background: #434190;
+            transform: translateY(-1px);
+        }
+
+        .messages-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-button {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-button:hover,
+        .filter-button.active {
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+        }
+
+        .filter-button .badge {
+            margin-left: auto;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+
+        .messages-main {
+            background: white;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .messages-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-messages {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-messages input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--bg-secondary);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .search-messages i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .message-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .message-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .message-item.unread {
+            background: rgba(76, 81, 191, 0.1);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-sender {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .message-subject {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-preview {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--bg-secondary);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--bg-secondary);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .messages-container {
+                grid-template-columns: 1fr;
+            }
+
+            .messages-sidebar {
+                display: none;
+            }
+
+            .messages-sidebar.show {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 100;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="messages-container">
+            <div class="messages-sidebar">
+                <button class="compose-button" onclick="openComposeModal()">
+                    <i class="fas fa-pen"></i>
+                    <span>Nouveau message</span>
+                </button>
+
+                <div class="messages-filters">
+                    <button class="filter-button active" onclick="filterMessages('inbox')">
+                        <i class="fas fa-inbox"></i>
+                        <span>Boîte de réception</span>
+                        <span class="badge" id="unreadCount">0</span>
+                    </button>
+                    <button class="filter-button" onclick="filterMessages('sent')">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Messages envoyés</span>
+                    </button>
+                    <button class="filter-button" onclick="filterMessages('archived')">
+                        <i class="fas fa-archive"></i>
+                        <span>Archives</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages-main">
+                <div class="messages-header">
+                    <div class="search-messages">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Rechercher des messages..." onkeyup="searchMessages(this.value)">
+                    </div>
+                </div>
+
+                <div class="messages-list" id="messagesList">
+                    <!-- Messages will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compose Modal -->
+    <div id="composeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nouveau message</h2>
+                <button class="close-button" onclick="closeComposeModal()">&times;</button>
+            </div>
+            <form id="messageForm" onsubmit="sendMessage(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+					    <label for="recipient">Destinataire</label>
+					    <select id="recipient" name="recipient" class="form-select" required>
+					        <option value="">Sélectionner un destinataire</option>
+					        <option th:each="user : ${users}" 
+					                th:value="${user.id}" 
+					                th:text="${user.lastName + ' ' + user.firstName + ' (' + user.email + ')'}">
+					        </option>
+					    </select>
+					</div>
+                    <div class="form-group">
+                        <label for="subject">Sujet</label>
+                        <input type="text" id="subject" name="subject" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Message</label>
+                        <textarea id="content" name="content" class="form-control" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeComposeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+     <!-- Scripts -->
+    <script th:src="@{/js/topbar.js}"></script>
+    <script th:src="@{/js/sidebar.js}"></script>
+
+    <script>
+        // Load messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessages();
+            loadRecipients();
+            updateUnreadCount();
+        });
+
+        function loadMessages() {
+            fetch('/messages/data')
+                .then(response => response.json())
+                .then(messages => {
+                    const messagesList = document.getElementById('messagesList');
+                    messagesList.innerHTML = messages.map(message => `
+                        <div class="message-item ${!message.isRead ? 'unread' : ''}" onclick="openMessage(${message.id})">
+                            <div class="avatar">
+                                ${message.sender.name.charAt(0)}
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${message.sender.name}</span>
+                                    <span class="message-time">${formatDate(message.sentAt)}</span>
+                                </div>
+                                <div class="message-subject">${message.subject}</div>
+                                <div class="message-preview">${message.content}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function loadRecipients() {
+            fetch('/admin/users/list')
+                .then(response => response.json())
+                .then(users => {
+                    const select = document.getElementById('recipient');
+                    select.innerHTML = users.map(user => 
+                        `<option value="${user.id}">${user.firstName} ${user.lastName}</option>`
+                    ).join('');
+                });
+        }
+
+        function updateUnreadCount() {
+            fetch('/messages/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('unreadCount').textContent = data.count;
+                });
+        }
+
+        function openComposeModal() {
+            document.getElementById('composeModal').classList.add('show');
+        }
+
+        function closeComposeModal() {
+            document.getElementById('composeModal').classList.remove('show');
+            document.getElementById('messageForm').reset();
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const form = event.target;
+            const data = {
+                recipient: { id: form.recipient.value },
+                subject: form.subject.value,
+                content: form.content.value
+            };
+
+            fetch('/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeComposeModal();
+                    loadMessages();
+                } else {
+                    alert('Erreur lors de l\'envoi du message');
+                }
+            });
+        }
+
+        function openMessage(id) {
+            fetch(`/messages/${id}`)
+                .then(response => response.json())
+                .then(message => {
+                    // Update UI to show message is read
+                    loadMessages();
+                    updateUnreadCount();
+                });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function searchMessages(query) {
+            // Implement message search
+        }
+
+        function filterMessages(filter) {
+            const buttons = document.querySelectorAll('.filter-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            // Implement message filtering
+        }
+    </script>
+</body>
+</html>

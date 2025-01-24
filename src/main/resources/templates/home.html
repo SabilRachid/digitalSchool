@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital School - Plateforme de Gestion Scolaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <img src="/images/digitalSchool.png" th:src="@{/images/digitalSchool.png}" alt="Logo">
+                <span>Digital School</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Fonctionnalités</a>
+                <a href="#pricing">Tarifs</a>
+                <a href="#testimonials">Témoignages</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="/login" class="btn btn-outline">Connexion</a>
+                <a href="/register" class="btn btn-primary">Essai Gratuit</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Gérez votre école en toute simplicité</h1>
+            <p>Une solution complète de gestion scolaire pour les établissements modernes. Simplifiez l'administration, améliorez la communication et optimisez l'apprentissage.</p>
+            <div class="hero-buttons">
+                <a href="/register" class="btn btn-primary btn-lg">Commencer Gratuitement</a>
+                <a href="#demo" class="btn btn-outline btn-lg">Voir la Démo</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-value">500+</span>
+                    <span class="stat-label">Écoles</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">50k+</span>
+                    <span class="stat-label">Utilisateurs</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">98%</span>
+                    <span class="stat-label">Satisfaction</span>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="hero-image">
+          <div class="dashboard-preview">
+            <img src="https://myscol.com/wp-content/uploads/2020/10/collaboration-sidebar-1024x1024.png" alt="Collaboration Sidebar" class="hero-sidebar-image">
+          </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2>Tout ce dont vous avez besoin</h2>
+            <p>Une suite complète d'outils pour gérer votre établissement efficacement</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Gestion des Élèves</h3>
+                <p>Suivez les dossiers des élèves, les inscriptions et les performances en temps réel.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>Gestion des Professeurs</h3>
+                <p>Organisez les emplois du temps, les absences et la communication avec les enseignants.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>Suivi Pédagogique</h3>
+                <p>Gérez les notes, les bulletins et le suivi des compétences simplement.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>Communication</h3>
+                <p>Facilitez les échanges entre l'école, les parents et les élèves.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Statistiques & Rapports</h3>
+                <p>Analysez les performances et prenez des décisions éclairées.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Application Mobile</h3>
+                <p>Accédez à toutes les fonctionnalités depuis votre smartphone.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="section-header">
+            <h2>Des tarifs adaptés à vos besoins</h2>
+            <p>Choisissez le plan qui correspond le mieux à votre établissement</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Basic</h3>
+                    <div class="price">
+                        <span class="amount">199€</span>
+                        <span class="period">/mois</span>
+                    </div>
+                    <p>Pour les petites écoles</p>
+                </div>
+                <ul class="pricing-features">
+                    <li>Jusqu'à 500 élèves</li>
+                    <li>50 professeurs</li>
+                    <li>Support email</li>
+                    <li>5GB stockage</li>
+                    <li>Mises à jour gratuites</li>
+                </ul>
+                <a href="/register?plan=basic" class="btn btn-outline btn-full">Commencer</a>
+            </div>
+            <div class="pricing-card popular">
+                <div class="popular-badge">Populaire</div>
+                <div class="pricing-header">
+                    <h3>Pro</h3>
+                    <div class="price">
+                        <span class="amount">399€</span>
+                        <span class="period">/mois</span>
+                    </div>
+                    <p>Pour les écoles en croissance</p>
+                </div>
+                <ul class="pricing-features">
+                    <li>Jusqu'à 2000 élèves</li>
+                    <li>200 professeurs</li>
+                    <li>Support prioritaire</li>
+                    <li>20GB stockage</li>
+                    <li>API personnalisée</li>
+                </ul>
+                <a href="/register?plan=pro" class="btn btn-primary btn-full">Commencer</a>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Enterprise</h3>
+                    <div class="price">
+                        <span class="amount">999€</span>
+                        <span class="period">/mois</span>
+                    </div>
+                    <p>Pour les grands établissements</p>
+                </div>
+                <ul class="pricing-features">
+                    <li>Élèves illimités</li>
+                    <li>Professeurs illimités</li>
+                    <li>Support 24/7</li>
+                    <li>100GB stockage</li>
+                    <li>Personnalisation complète</li>
+                </ul>
+                <a href="/register?plan=enterprise" class="btn btn-outline btn-full">Contacter</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="section-header">
+            <h2>Ce que disent nos clients</h2>
+            <p>Découvrez pourquoi les écoles nous font confiance</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Digital School a transformé notre gestion administrative. Tout est plus simple et plus efficace."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-info">
+                        <h4>Marie Dubois</h4>
+                        <p>Directrice, École Saint-Joseph</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Une solution complète qui répond parfaitement à nos besoins. Le support est excellent."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-info">
+                        <h4>Pierre Martin</h4>
+                        <p>Proviseur, Lycée International</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"La communication avec les parents n'a jamais été aussi facile. Un vrai plus pour notre école."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-info">
+                        <h4>Sophie Laurent</h4>
+                        <p>Directrice adjointe, Collège Voltaire</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="contact-content">
+            <div class="section-header">
+                <h2>Prêt à commencer ?</h2>
+                <p>Contactez-nous pour une démonstration personnalisée</p>
+            </div>
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Nom de l'établissement" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Email professionnel" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" placeholder="Téléphone">
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Message" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Demander une démo</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="logo">
+                    <img src="/images/logo.svg" alt="Digital School Logo">
+                    <span>Digital School</span>
+                </div>
+                <p>La solution complète de gestion scolaire pour les établissements modernes.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Produit</h4>
+                <ul>
+                    <li><a href="#features">Fonctionnalités</a></li>
+                    <li><a href="#pricing">Tarifs</a></li>
+                    <li><a href="#testimonials">Témoignages</a></li>
+                    <li><a href="#demo">Démo</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Ressources</h4>
+                <ul>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/support">Support</a></li>
+                    <li><a href="/api">API</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Entreprise</h4>
+                <ul>
+                    <li><a href="/about">À propos</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/careers">Carrières</a></li>
+                    <li><a href="/legal">Mentions légales</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Digital School. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

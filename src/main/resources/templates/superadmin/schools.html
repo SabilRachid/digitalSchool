@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Gestion des Écoles - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+    <link rel="stylesheet" th:href="@{/css/components/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/components/modals.css}">
+    <link rel="stylesheet" th:href="@{/css/superadmin/schools.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-school"></i>
+                Gestion des Écoles
+            </h1>
+            <button class="btn btn-primary" onclick="schoolsManager.openModal()">
+                <i class="fas fa-plus"></i>
+                Ajouter une École
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher une école...">
+            </div>
+            <div class="filters">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">Tous les statuts</option>
+                    <option value="ACTIVE">Actif</option>
+                    <option value="INACTIVE">Inactif</option>
+                    <option value="PENDING">En attente</option>
+                </select>
+                <select class="filter-select" id="countryFilter">
+                    <option value="">Tous les pays</option>
+                </select>
+                <select class="filter-select" id="planFilter">
+                    <option value="">Tous les plans</option>
+                    <option value="BASIC">Basic</option>
+                    <option value="PRO">Pro</option>
+                    <option value="ENTERPRISE">Enterprise</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Schools Table -->
+        <div class="table-container">
+            <table id="schoolsTable" class="table">
+                <thead>
+                    <tr>
+                        <th>École</th>
+                        <th>Code</th>
+                        <th>Localisation</th>
+                        <th>Plan</th>
+                        <th>Utilisateurs</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <!-- School Modal -->
+    <div class="modal" id="schoolModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Ajouter une École</h3>
+                    <button type="button" class="close-button" onclick="schoolsManager.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="schoolForm">
+                    <div class="modal-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Nom de l'École</label>
+                                <input type="text" id="name" name="name" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="code">Code</label>
+                                <input type="text" id="code" name="code" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Téléphone</label>
+                                <input type="tel" id="phone" name="phone" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="website">Site Web</label>
+                                <input type="url" id="website" name="website" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Pays</label>
+                                <select id="country" name="country" class="form-select" required>
+                                    <option value="">Sélectionner un pays</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">Ville</label>
+                                <input type="text" id="city" name="city" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Adresse</label>
+                                <textarea id="address" name="address" class="form-input" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Plan d'Abonnement</h4>
+                            <div class="subscription-plans">
+                                <div class="plan-card">
+                                    <input type="radio" name="plan" id="planBasic" value="BASIC">
+                                    <label for="planBasic">
+                                        <div class="plan-header">
+                                            <h5>Basic</h5>
+                                            <div class="plan-price">€199/mois</div>
+                                        </div>
+                                        <div class="plan-features">
+                                            <ul>
+                                                <li>Jusqu'à 500 élèves</li>
+                                                <li>50 professeurs</li>
+                                                <li>Support email</li>
+                                                <li>5GB stockage</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="plan-card">
+                                    <input type="radio" name="plan" id="planPro" value="PRO">
+                                    <label for="planPro">
+                                        <div class="plan-header">
+                                            <h5>Pro</h5>
+                                            <div class="plan-price">€399/mois</div>
+                                        </div>
+                                        <div class="plan-features">
+                                            <ul>
+                                                <li>Jusqu'à 2000 élèves</li>
+                                                <li>200 professeurs</li>
+                                                <li>Support prioritaire</li>
+                                                <li>20GB stockage</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="plan-card">
+                                    <input type="radio" name="plan" id="planEnterprise" value="ENTERPRISE">
+                                    <label for="planEnterprise">
+                                        <div class="plan-header">
+                                            <h5>Enterprise</h5>
+                                            <div class="plan-price">€999/mois</div>
+                                        </div>
+                                        <div class="plan-features">
+                                            <ul>
+                                                <li>Élèves illimités</li>
+                                                <li>Professeurs illimités</li>
+                                                <li>Support 24/7</li>
+                                                <li>100GB stockage</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="schoolsManager.closeModal()">
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script th:src="@{/js/superadmin/schools.js}"></script>
+</body>
+</html>

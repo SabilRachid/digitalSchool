@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="scripts">
+        <script>
+            function toggleDropdown(id) {
+                const dropdown = document.getElementById(id);
+                const allDropdowns = document.querySelectorAll('.dropdown-content');
+                
+                allDropdowns.forEach(d => {
+                    if (d.id !== id) {
+                        d.classList.remove('show');
+                    }
+                });
+                
+                dropdown.classList.toggle('show');
+            }
+
+            window.onclick = function(event) {
+                if (!event.target.matches('.notification-icon') && 
+                    !event.target.matches('.user-profile') && 
+                    !event.target.matches('.fas')) {
+                    const dropdowns = document.querySelectorAll('.dropdown-content');
+                    dropdowns.forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+                }
+            }
+
+            const dateButtons = document.querySelectorAll('.date-button');
+            dateButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    dateButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

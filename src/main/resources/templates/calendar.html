@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Emploi du Temps - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/topbar.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+    <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+    <link rel="stylesheet" th:href="@{/css/calendar.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="calendar-container">
+        <!-- Sidebar -->
+        <div class="calendar-sidebar">
+            <div class="mini-calendar" id="miniCalendar"></div>
+            <div class="upcoming-events">
+                <h3>Prochains événements</h3>
+                <div id="upcomingEventsList"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="calendar-header">
+                <div class="calendar-title">
+                    <h1>Emploi du Temps</h1>
+                </div>
+                <div class="calendar-filters">
+                    <div class="filter-group">
+                        <label>
+                            <input type="checkbox" checked id="showCourses">
+                            <span class="filter-label courses">
+                                <i class="fas fa-book"></i>
+                                Cours
+                            </span>
+                        </label>
+                        <label>
+                            <input type="checkbox" checked id="showEvents">
+                            <span class="filter-label events">
+                                <i class="fas fa-calendar-day"></i>
+                                Événements
+                            </span>
+                        </label>
+                        <label>
+                            <input type="checkbox" checked id="showExams">
+                            <span class="filter-label exams">
+                                <i class="fas fa-file-alt"></i>
+                                Examens
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-calendar" id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="event-modal" id="eventModal">
+        <div class="event-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nouvel événement</h2>
+                <button type="button" class="modal-close" onclick="closeEventModal()">×</button>
+            </div>
+            <form id="eventForm">
+                <input type="hidden" id="eventId" name="id">
+                
+                <div class="form-group">
+                    <label for="title">Titre</label>
+                    <input type="text" id="title" name="title" class="form-input" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" name="type" class="form-select" required>
+                            <option value="EVENT">Événement</option>
+                            <option value="EXAM">Examen</option>
+                            <option value="MEETING">Réunion</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Lieu</label>
+                        <input type="text" id="location" name="location" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">Date de début</label>
+                        <input type="datetime-local" id="startDate" name="startDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">Date de fin</label>
+                        <input type="datetime-local" id="endDate" name="endDate" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-input" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="allDay" name="allDay">
+                        <span>Toute la journée</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
+    <script th:src="@{/js/calendar.js}"></script>
+    <script th:src="@{/js/topbar.js}"></script>
+    <script th:src="@{/js/sidebar.js}"></script>
+    
+</body>
+</html>

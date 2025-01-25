@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Gestion des groupes de navigation
     document.querySelectorAll('.nav-group-header').forEach(header => {
-        header.addEventListener('click', () => {
+        header.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent the click event from bubbling up
             const navGroup = header.parentElement;
             const chevron = header.querySelector('.fa-chevron-down');
-            
+
             // Fermer les autres groupes
             document.querySelectorAll('.nav-group').forEach(group => {
                 if (group !== navGroup) {
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     group.querySelector('.fa-chevron-down').classList.add('collapsed');
                 }
             });
-            
+
             // Basculer le groupe actuel
             navGroup.classList.toggle('open');
             chevron.classList.toggle('collapsed');
@@ -28,14 +29,4 @@ document.addEventListener('DOMContentLoaded', function() {
             parentGroup.querySelector('.fa-chevron-down').classList.remove('collapsed');
         }
     }
-    
-    
-    const parentGroup = item.closest('.nav-group');
-	if (parentGroup) {
-	    parentGroup.classList.add('open');
-	    const chevron = parentGroup.querySelector('.fa-chevron-down');
-	    if (chevron) {
-	        chevron.classList.remove('collapsed');
-	    }
-	}
 });

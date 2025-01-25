@@ -1,157 +1,136 @@
-class RoomsPage extends AdminPage {
-    constructor() {
-        super({
-            tableId: 'roomsTable',
-            modalId: 'roomModal',
-            formId: 'roomForm',
-            apiEndpoint: '/admin/rooms',
-            columns: [
-                { 
-                    data: 'name',
-                    render: function(data) {
-                        return data || '';
-                    }
-                },
-                { 
-                    data: 'buildingName',
-                    render: function(data) {
-                        return data || '';
-                    }
-                },
-                { 
-                    data: 'floorNumber',
-                    render: function(data) {
-                        return data !== null ? `${data}${data === 0 ? ' (RDC)' : 'ème'}` : '';
-                    }
-                },
-                { 
-                    data: 'maxCapacity',
-                    render: function(data) {
-                        return data || '0';
-                    }
-                },
-                {
-                    data: 'equipment',
-                    render: function(data) {
-                        if (!data || !data.length) return '';
-                        return data.map(eq => `
-                            <span class="badge bg-info">${eq}</span>
-                        `).join(' ');
-                    }
-                },
-                {
-                    data: 'status',
-                    render: function(data) {
-                        const statusClasses = {
-                            'AVAILABLE': 'success',
-                            'OCCUPIED': 'warning',
-                            'MAINTENANCE': 'danger'
-                        };
-                        const statusLabels = {
-                            'AVAILABLE': 'Disponible',
-                            'OCCUPIED': 'Occupée',
-                            'MAINTENANCE': 'Maintenance'
-                        };
-                        return `<span class="badge bg-${statusClasses[data]}">${statusLabels[data]}</span>`;
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data) {
-                        return `
-                            <div class="action-buttons">
-                                <button class="icon-button edit" onclick="roomsPage.edit(${data.id})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="icon-button delete" onclick="roomsPage.delete(${data.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>`;
-                    }
-                }
-            ]
-        });
-        
-        this.initializeFilters();
-        this.initializeSelect2();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const roomsTable = $('#roomsTable').DataTable({
+        ajax: {
+            url: '/admin/rooms/data',
+            dataSrc: ''
+        },
+        columns: [
+            { data: 'name' },
+            { data: 'buildingName' },
+            { data: 'floorNumber' },
+            { data: 'maxCapacity' },
+            { data: 'equipment', render: data => data.join(', ') },
+            { data: 'status' },
+            {
+                data: null,
+                render: data => `
+                    <button class="btn btn-sm btn-primary" onclick="roomsPage.editRoom(${data.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="roomsPage.deleteRoom(${data.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `
+            }
+        ],
+        language: {
+            url: '/js/datatables/fr-FR.json'
+        },
+        responsive: true,
+        order: [[0, 'asc']]
+    });
 
-    initializeFilters() {
-        const filters = ['building', 'floor', 'status'];
-        filters.forEach(filter => {
-            $(`#${filter}Filter`).on('change', () => this.table.ajax.reload());
-        });
-    }
+    const roomModal = new bootstrap.Modal(document.getElementById('roomModal'));
+    const roomForm = document.getElementById('roomForm');
 
-    initializeSelect2() {
-        $('#equipment').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Sélectionner les équipements',
-            allowClear: true
-        });
-    }
-
-    populateForm(data) {
-        super.populateForm(data);
-        
-        // Mise à jour des équipements
-        if (data.equipment) {
-            $('#equipment').val(data.equipment).trigger('change');
-        }
-    }
-
-    async save() {
-        const form = document.getElementById(this.formId);
-        if (!form) return;
-
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        // Conversion des valeurs numériques
-        if (data.maxCapacity) {
-            data.maxCapacity = parseInt(data.maxCapacity, 10);
-        }
-        if (data.floorNumber) {
-            data.floorNumber = parseInt(data.floorNumber, 10);
-        }
-
-        // Conversion des booléens
-        data.accessible = !!data.accessible;
-
-        // Récupération des équipements
-        data.equipment = $('#equipment').val() || [];
+    roomForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(roomForm);
+        const data = {
+            id: formData.get('id'),
+            name: formData.get('name'),
+            maxCapacity: formData.get('maxCapacity'),
+            buildingName: formData.get('buildingName'),
+            floorNumber: formData.get('floorNumber'),
+            equipment: Array.from(formData.getAll('equipment')),
+            status: formData.get('status'),
+            accessible: formData.get('accessible') === 'on',
+            description: formData.get('description'),
+            maintenanceNotes: formData.get('maintenanceNotes')
+        };
 
         try {
-            const response = await fetch(
-                data.id ? `${this.apiEndpoint}/${data.id}` : this.apiEndpoint,
-                {
-                    method: data.id ? 'PUT' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
-                    },
-                    body: JSON.stringify(data)
-                }
-            );
+            const response = await fetch(data.id ? `/admin/rooms/${data.id}` : '/admin/rooms', {
+                method: data.id ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: JSON.stringify(data)
+            });
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Erreur lors de la sauvegarde');
+                throw new Error(error.message);
             }
 
-            this.closeModal();
-            this.table.ajax.reload();
-            this.showNotification('Salle sauvegardée avec succès', 'success');
+            roomModal.hide();
+            roomsTable.ajax.reload();
+            showNotification('Operation successful', 'success');
         } catch (error) {
-            console.error('Erreur:', error);
-            this.showNotification(error.message, 'error');
+            showNotification(error.message, 'error');
         }
-    }
-}
+    });
 
-// Initialisation
-let roomsPage;
-document.addEventListener('DOMContentLoaded', () => {
-    roomsPage = new RoomsPage();
+    window.roomsPage = {
+        openModal: function() {
+            roomForm.reset();
+            document.getElementById('id').value = '';
+            roomModal.show();
+        },
+        editRoom: async function(id) {
+            try {
+                const response = await fetch(`/admin/rooms/${id}`);
+                if (!response.ok) throw new Error('Error loading data');
+
+                const room = await response.json();
+                populateForm(room);
+                roomModal.show();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        },
+        deleteRoom: async function(id) {
+            if (!confirm('Are you sure you want to delete this room?')) return;
+
+            try {
+                const response = await fetch(`/admin/rooms/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error deleting room');
+
+                roomsTable.ajax.reload();
+                showNotification('Room deleted successfully', 'success');
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+    };
+
+    function populateForm(room) {
+        roomForm.elements['id'].value = room.id;
+        roomForm.elements['name'].value = room.name;
+        roomForm.elements['maxCapacity'].value = room.maxCapacity;
+        roomForm.elements['buildingName'].value = room.buildingName;
+        roomForm.elements['floorNumber'].value = room.floorNumber;
+        roomForm.elements['status'].value = room.status;
+        roomForm.elements['accessible'].checked = room.accessible;
+        roomForm.elements['description'].value = room.description;
+        roomForm.elements['maintenanceNotes'].value = room.maintenanceNotes;
+
+        // Set equipment
+        const equipmentSelect = roomForm.elements['equipment'];
+        Array.from(equipmentSelect.options).forEach(option => {
+            option.selected = room.equipment.includes(option.value);
+        });
+    }
+
+    function showNotification(message, type) {
+        // Implement according to your notification system
+        alert(message);
+    }
 });

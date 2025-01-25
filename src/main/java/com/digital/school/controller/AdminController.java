@@ -31,6 +31,8 @@ public class AdminController {
     
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, Model model) {
+
+        // Créer une méthode pour calculer la somme des nombres pairs dans une liste
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && 
             !(authentication instanceof AnonymousAuthenticationToken)) {

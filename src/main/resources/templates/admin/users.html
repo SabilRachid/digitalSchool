@@ -103,14 +103,26 @@
                             <input type="password" class="form-control" id="password" name="password">
                             <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel lors d'une modification.</small>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rôles</label>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="roleProfessor" name="roles" value="ROLE_PROFESSOR">
+                                <label class="form-check-label" for="roleProfessor">Professeur</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="roleParent" name="roles" value="ROLE_PARENT">
+                                <label class="form-check-label" for="roleParent">Parent</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="roleStudent" name="roles" value="ROLE_STUDENT">
+                                <label class="form-check-label" for="roleStudent">Élève</label>
+                            </div>
+                        </div>
                         <div id="classeField" class="mb-3" style="display: none;">
                             <label for="classe" class="form-label">Classe</label>
                             <select class="form-select" id="classe" name="classe">
                                 <option value="">Sélectionner une classe</option>
-                                <option th:each="classe : ${classes}" 
-                                        th:value="${classe.id}" 
-                                        th:text="${classe.name}">
-                                </option>
+                                <option th:each="classe : ${classes}" th:value="${classe.id}" th:text="${classe.name}"></option>
                             </select>
                         </div>
                         <div class="form-check mb-3">

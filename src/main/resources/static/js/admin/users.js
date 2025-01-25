@@ -16,13 +16,13 @@ class UserManagement {
                 dataSrc: ''
             },
             columns: [
-                { 
+                {
                     data: null,
                     render: data => `${data.firstName} ${data.lastName}`
                 },
                 { data: 'email' },
                 { data: 'username' },
-                { 
+                {
                     data: 'roles',
                     render: data => this.renderRoles(data)
                 },
@@ -49,7 +49,7 @@ class UserManagement {
 
     initializeEventListeners() {
         this.form.addEventListener('submit', e => this.handleSubmit(e));
-        
+
         // Gestion de l'affichage du champ classe
         const roleCheckboxes = document.querySelectorAll('input[name="roles"]');
         roleCheckboxes.forEach(checkbox => {
@@ -60,13 +60,13 @@ class UserManagement {
     renderRoles(roles) {
         return roles.map(role => {
             const roleName = role.replace('ROLE_', '');
-            return `<span class="badge badge-${roleName.toLowerCase()}">${roleName}</span>`;
+            return `<span class="badge bg-primary">${roleName}</span>`;
         }).join(' ');
     }
 
     renderStatus(enabled) {
-        return enabled ? 
-            '<span class="status-badge status-active">Actif</span>' : 
+        return enabled ?
+            '<span class="status-badge status-active">Actif</span>' :
             '<span class="status-badge status-inactive">Inactif</span>';
     }
 
@@ -126,7 +126,7 @@ class UserManagement {
         try {
             const response = await fetch(`/admin/users/${id}`);
             if (!response.ok) throw new Error('Erreur lors du chargement des données');
-            
+
             const user = await response.json();
             this.populateForm(user);
             this.modal.show();
@@ -137,7 +137,7 @@ class UserManagement {
 
     async deleteUser(id) {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
-        
+
         try {
             const response = await fetch(`/admin/users/${id}`, {
                 method: 'DELETE',
@@ -147,7 +147,7 @@ class UserManagement {
             });
 
             if (!response.ok) throw new Error('Erreur lors de la suppression');
-            
+
             this.table.ajax.reload();
             this.showNotification('Utilisateur supprimé avec succès', 'success');
         } catch (error) {
@@ -163,20 +163,20 @@ class UserManagement {
         form.elements['firstName'].value = user.firstName;
         form.elements['lastName'].value = user.lastName;
         form.elements['enabled'].checked = user.enabled;
-        
+
         // Réinitialiser le mot de passe
         form.elements['password'].value = '';
-        
+
         // Gérer les rôles
         document.querySelectorAll('input[name="roles"]').forEach(cb => {
             cb.checked = user.roles.includes(cb.value);
         });
-        
+
         // Gérer la classe
         if (user.classe) {
             form.elements['classe'].value = user.classe.id;
         }
-        
+
         this.toggleClasseField();
     }
 
@@ -184,7 +184,7 @@ class UserManagement {
         const isStudent = document.getElementById('roleStudent').checked;
         const classeField = document.getElementById('classeField');
         classeField.style.display = isStudent ? 'block' : 'none';
-        
+
         if (!isStudent) {
             document.getElementById('classe').value = '';
         }
@@ -198,12 +198,12 @@ class UserManagement {
     openAddUserModal(type) {
         this.form.reset();
         document.getElementById('userId').value = '';
-        
+
         // Sélectionner le rôle approprié
         document.querySelectorAll('input[name="roles"]').forEach(cb => {
             cb.checked = cb.value === `ROLE_${type.toUpperCase()}`;
         });
-        
+
         this.toggleClasseField();
         this.modal.show();
     }

@@ -1,0 +1,353 @@
+/* Variables spécifiques au dashboard étudiant */
+:root {
+    --card-radius: 1rem;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --transition-speed: 0.3s;
+}
+
+/* Container principal */
+.dashboard-container {
+    padding: 2rem;
+    margin-left: var(--sidebar-width);
+    margin-top: var(--topbar-height);
+    background-color: var(--bg-primary);
+    min-height: calc(100vh - var(--topbar-height));
+}
+
+/* Section Bienvenue */
+.welcome-section {
+    margin-bottom: 2rem;
+}
+
+.welcome-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.welcome-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.class-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Statistiques Rapides */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform var(--transition-speed);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.attendance { background-color: #DEF7EC; color: #059669; }
+.stat-icon.grades { background-color: #E0E7FF; color: #4F46E5; }
+.stat-icon.homework { background-color: #FEF3C7; color: #D97706; }
+.stat-icon.exams { background-color: #FEE2E2; color: #DC2626; }
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-content h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stat-change.positive { color: #059669; }
+.stat-change.negative { color: #DC2626; }
+
+/* Grille Principale */
+.main-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Cartes Dashboard */
+.dashboard-card {
+    background: white;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--bg-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+/* Liste des Cours */
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.course-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+    transition: transform var(--transition-speed);
+}
+
+.course-item:hover {
+    transform: translateX(5px);
+}
+
+.course-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.course-info {
+    flex: 1;
+}
+
+.course-info h3 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.course-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Liste des Devoirs */
+.homework-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.homework-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+    transition: transform var(--transition-speed);
+}
+
+.homework-item:hover {
+    transform: translateX(5px);
+}
+
+.homework-subject {
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.homework-info {
+    flex: 1;
+}
+
+.deadline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Liste des Notes */
+.grades-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.grade-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+}
+
+.grade-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.grade-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 120px;
+}
+
+/* Ressources */
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.subject-resources {
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.resource-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: transform var(--transition-speed);
+}
+
+.resource-item:hover {
+    transform: translateX(5px);
+}
+
+/* Boutons et Actions */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all var(--transition-speed);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.btn-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+        margin-left: 0;
+    }
+
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .course-item,
+    .homework-item,
+    .grade-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .course-actions,
+    .homework-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

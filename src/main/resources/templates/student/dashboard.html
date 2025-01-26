@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Étudiant - Digital School</title>
+
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/student/dashboard.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+    <!-- Section Bienvenue -->
+    <div class="welcome-section">
+        <div class="welcome-header">
+            <h1>Bienvenue, <span th:text="${user.firstName}">Étudiant</span> !</h1>
+            <p class="class-info">
+                <i class="fas fa-graduation-cap"></i>
+                <span th:text="${'Classe de ' + user.classe.name}">Classe</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Statistiques Rapides -->
+    <div class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-icon attendance">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Présence</h3>
+                <div class="stat-value" th:text="${stats.attendanceRate + '%'}">95%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+2% cette semaine</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon grades">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Moyenne Générale</h3>
+                <div class="stat-value" th:text="${stats.averageGrade + '/20'}">14.5/20</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.5 pts</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon homework">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Devoirs à Rendre</h3>
+                <div class="stat-value" th:text="${stats.pendingHomework}">3</div>
+                <div class="stat-label">Cette semaine</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon exams">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Examens à Venir</h3>
+                <div class="stat-value" th:text="${stats.upcomingExams}">2</div>
+                <div class="stat-label">Cette semaine</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille Principale -->
+    <div class="main-grid">
+        <!-- Cours en Cours -->
+        <div class="dashboard-card current-courses">
+            <div class="card-header">
+                <h2><i class="fas fa-book"></i> Cours en Cours</h2>
+                <a href="/student/courses" class="btn-link">Voir tout</a>
+            </div>
+            <div class="card-content">
+                <div class="course-list">
+                    <div th:each="course : ${currentCourses}" class="course-item">
+                        <div class="course-time">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(course.startTime, 'HH:mm')}">09:00</span>
+                        </div>
+                        <div class="course-info">
+                            <h3 th:text="${course.subject.name}">Mathématiques</h3>
+                            <p th:text="${course.professor.firstName + ' ' + course.professor.lastName}">Prof. Dupont</p>
+                        </div>
+                        <div class="course-actions">
+                            <a th:if="${course.onlineLink}"
+                               th:href="${course.onlineLink}"
+                               class="btn btn-primary">
+                                <i class="fas fa-video"></i> Rejoindre
+                            </a>
+                            <a th:href="@{'/student/courses/' + ${course.id}}"
+                               class="btn btn-secondary">
+                                <i class="fas fa-info-circle"></i> Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Devoirs à Rendre -->
+        <div class="dashboard-card pending-homework">
+            <div class="card-header">
+                <h2><i class="fas fa-tasks"></i> Devoirs à Rendre</h2>
+                <a href="/student/homework" class="btn-link">Voir tout</a>
+            </div>
+            <div class="card-content">
+                <div class="homework-list">
+                    <div th:each="homework : ${pendingHomework}" class="homework-item">
+                        <div class="homework-subject">
+                            <i class="fas fa-book"></i>
+                            <span th:text="${homework.subject.name}">Matière</span>
+                        </div>
+                        <div class="homework-info">
+                            <h3 th:text="${homework.title}">Titre du devoir</h3>
+                            <p class="deadline">
+                                <i class="fas fa-clock"></i>
+                                À rendre le <span th:text="${#temporals.format(homework.dueDate, 'dd/MM/yyyy')}">Date</span>
+                            </p>
+                        </div>
+                        <div class="homework-actions">
+                            <a th:href="@{'/student/homework/' + ${homework.id}}"
+                               class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Rendre
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dernières Notes -->
+        <div class="dashboard-card recent-grades">
+            <div class="card-header">
+                <h2><i class="fas fa-star"></i> Dernières Notes</h2>
+                <a href="/student/grades" class="btn-link">Voir tout</a>
+            </div>
+            <div class="card-content">
+                <div class="grades-list">
+                    <div th:each="grade : ${recentGrades}" class="grade-item">
+                        <div class="grade-subject">
+                            <i class="fas fa-book"></i>
+                            <span th:text="${grade.subject.name}">Matière</span>
+                        </div>
+                        <div class="grade-info">
+                            <div class="grade-value" th:text="${grade.value + '/20'}">Note</div>
+                            <div class="grade-details">
+                                <span th:text="${grade.title}">Type d'évaluation</span>
+                                <span class="grade-date" th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">Date</span>
+                            </div>
+                        </div>
+                        <div class="grade-comparison">
+                            <div class="comparison-item">
+                                <span class="label">Moyenne classe</span>
+                                <span class="value" th:text="${grade.classAverage + '/20'}">12/20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique de Progression -->
+        <div class="dashboard-card progress-chart">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-line"></i> Progression</h2>
+                <div class="period-selector">
+                    <button class="btn-outline active">Trimestre</button>
+                    <button class="btn-outline">Année</button>
+                </div>
+            </div>
+            <div class="card-content">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Ressources Pédagogiques -->
+        <div class="dashboard-card resources">
+            <div class="card-header">
+                <h2><i class="fas fa-book-reader"></i> Ressources</h2>
+                <a href="/student/resources" class="btn-link">Voir tout</a>
+            </div>
+            <div class="card-content">
+                <div class="resources-grid">
+                    <div th:each="subject : ${subjects}" class="subject-resources">
+                        <div class="subject-header">
+                            <h3 th:text="${subject.name}">Matière</h3>
+                            <span class="resource-count"
+                                  th:text="${subject.resourceCount + ' ressources'}">
+                                    Nombre de ressources
+                                </span>
+                        </div>
+                        <div class="resource-list">
+                            <a th:each="resource : ${subject.recentResources}"
+                               th:href="@{'/student/resources/' + ${resource.id}}"
+                               class="resource-item">
+                                <i th:class="${'fas ' +
+                                        (resource.type == 'PDF' ? 'fa-file-pdf' :
+                                         resource.type == 'VIDEO' ? 'fa-video' :
+                                         resource.type == 'LINK' ? 'fa-link' :
+                                         'fa-file-alt')}"></i>
+                                <div class="resource-info">
+                                        <span class="resource-title" th:text="${resource.title}">
+                                            Titre de la ressource
+                                        </span>
+                                    <span class="resource-date"
+                                          th:text="${#temporals.format(resource.uploadedAt, 'dd/MM/yyyy')}">
+                                            Date d'ajout
+                                        </span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/student/dashboard.js}"></script>
+</body>
+</html>

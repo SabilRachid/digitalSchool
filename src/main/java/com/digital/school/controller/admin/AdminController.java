@@ -1,4 +1,4 @@
-package com.digital.school.controller;
+package com.digital.school.controller.admin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

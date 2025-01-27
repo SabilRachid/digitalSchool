@@ -29,4 +29,11 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     
     @Query("SELECT COUNT(a) FROM Attendance a")
 	double calculateAttendanceRate(User student);
+
+    @Query("SELECT COALESCE(AVG(CASE WHEN a.status = 'PRESENT' THEN 1.0 WHEN a.status = 'LATE' THEN 0.5 ELSE 0.0 END), 0.0) " +
+            "FROM Attendance a " +
+            "WHERE a.course.professor = :professor ")
+    double calculateAverageAttendanceForProfessor(
+            @Param("professor") User professor
+    );
 }

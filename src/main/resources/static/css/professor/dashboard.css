@@ -1,0 +1,282 @@
+:root {
+    --card-radius: 1rem;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+}
+
+/* Welcome Section */
+.welcome-section {
+    margin-bottom: 2rem;
+}
+
+.welcome-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform var(--transition-speed);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.students { background-color: #E0E7FF; color: #4F46E5; }
+.stat-icon.homework { background-color: #FEF3C7; color: #D97706; }
+.stat-icon.exams { background-color: #FCE7F3; color: #DB2777; }
+.stat-icon.attendance { background-color: #DCFCE7; color: #059669; }
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-content h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.stat-details {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: white;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--bg-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.period-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Schedule List */
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+    transition: transform var(--transition-speed);
+}
+
+.schedule-item:hover {
+    transform: translateX(5px);
+}
+
+.schedule-time {
+    min-width: 100px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.schedule-content {
+    flex: 1;
+}
+
+.schedule-content h4 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.room {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Homework List */
+.homework-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.homework-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+}
+
+.homework-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.homework-info p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Messages List */
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.75rem;
+}
+
+.sender-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sender-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.sender-name {
+    font-weight: 500;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.message-content {
+    flex: 1;
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .quick-actions {
+        width: 100%;
+    }
+
+    .quick-actions .btn {
+        flex: 1;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-item,
+    .homework-item,
+    .message-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .schedule-time {
+        margin-bottom: 0.5rem;
+    }
+
+    .homework-item .btn,
+    .message-item .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}

@@ -1,4 +1,4 @@
-package com.digital.school.controller;
+package com.digital.school.controller.student;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,46 +72,7 @@ public class StudentController {
         return "redirect:/login";
     }
     
-    
-    
-   
-    @GetMapping("/dashboardd")
-    public String dashboardd(@AuthenticationPrincipal User student, HttpServletRequest request, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() &&
-                !(authentication instanceof AnonymousAuthenticationToken)) {
 
-            String username = authentication.getName();
-            Optional<User> userOptional = userService.findByUsername(username);
-
-            if (userOptional.isPresent()) {
-                LOGGER.debug("Student user present: {}, URI: {}", username, request.getRequestURI());
-                User user = userOptional.get();
-                model.addAttribute("user", user);
-                model.addAttribute("currentURI", request.getRequestURI());
-
-                // Statistiques générales
-                model.addAttribute("stats", dashboardService.getStudentStats(student));
-
-                // Notes récentes
-                model.addAttribute("recentGrades", dashboardService.getRecentGrades(student));
-
-                // Devoirs en attente
-                model.addAttribute("pendingHomework", dashboardService.getPendingHomework(student));
-
-                // Matières et ressources
-                model.addAttribute("subjects", dashboardService.getSubjectsWithResources(student));
-
-                // Événements à venir
-                model.addAttribute("upcomingEvents", dashboardService.getUpcomingEvents(student));
-
-                return "student-dashboard";
-            }
-        }
-        return "redirect:/login";
-
-    }
-    
     @GetMapping("/student/dashboard/stats")
     @ResponseBody
     public Map<String, Object> getStudentStats() {

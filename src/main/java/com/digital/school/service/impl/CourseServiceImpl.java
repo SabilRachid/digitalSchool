@@ -143,4 +143,9 @@ public class CourseServiceImpl implements CourseService {
     public Map<String, String> generateMeetingLink(Long id) {
         return Map.of();
     }
+
+    @Override
+    public Object findTodaySchedule(User professor) {
+        return null;
+    }
 }

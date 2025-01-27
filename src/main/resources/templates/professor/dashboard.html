@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord Professeur - Digital School</title>
+
+  <!-- CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+  <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+  <link rel="stylesheet" th:href="@{/css/topbar.css}">
+  <link rel="stylesheet" th:href="@{/css/professor/dashboard.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-header">
+      <h1>Bienvenue, <span th:text="${user.firstName}">Professeur</span></h1>
+      <div class="quick-actions">
+        <button class="btn btn-primary" onclick="openAddCourseModal()">
+          <i class="fas fa-plus"></i> Nouveau Cours
+        </button>
+        <button class="btn btn-secondary" onclick="openAddHomeworkModal()">
+          <i class="fas fa-tasks"></i> Nouveau Devoir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon students">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Élèves</h3>
+        <div class="stat-value" th:text="${stats.totalStudents}">156</div>
+        <div class="stat-details">
+          <span th:text="${stats.totalClasses + ' classes'}">6 classes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon homework">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Devoirs à Corriger</h3>
+        <div class="stat-value" th:text="${stats.pendingHomework}">23</div>
+        <div class="stat-details">
+          <span th:text="${stats.submittedToday + ' aujourd''hui'}">5 aujourd'hui</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon exams">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Examens Prévus</h3>
+        <div class="stat-value" th:text="${stats.upcomingExams}">4</div>
+        <div class="stat-details">
+          <span>Cette semaine</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon attendance">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Présence Moyenne</h3>
+        <div class="stat-value" th:text="${stats.averageAttendance + '%'}">92%</div>
+        <div class="stat-details">
+          <span>Ce mois</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Class Performance Chart -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h2>Performance par Classe</h2>
+        <div class="period-selector">
+          <button class="btn-outline active">Trimestre</button>
+          <button class="btn-outline">Année</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <canvas id="classPerformanceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Today's Schedule -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h2>Emploi du Temps Aujourd'hui</h2>
+        <a href="/calendar" class="btn-link">Voir tout</a>
+      </div>
+      <div class="card-body">
+        <div class="schedule-list">
+          <div th:each="course : ${todaySchedule}" class="schedule-item">
+            <div class="schedule-time">
+              <span th:text="${#temporals.format(course.startTime, 'HH:mm')}">09:00</span>
+              <span class="separator">-</span>
+              <span th:text="${#temporals.format(course.endTime, 'HH:mm')}">10:30</span>
+            </div>
+            <div class="schedule-content">
+              <h4 th:text="${course.subject.name}">Mathématiques</h4>
+              <p th:text="${course.classe.name}">3ème A</p>
+              <span class="room" th:text="${course.room}">Salle 102</span>
+            </div>
+            <div class="schedule-actions">
+              <button class="btn btn-primary" th:if="${course.online}"
+                      th:onclick="'startOnlineClass(' + ${course.id} + ')'">
+                <i class="fas fa-video"></i> Démarrer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Homework -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h2>Devoirs à Corriger</h2>
+        <a href="/professor/homework" class="btn-link">Voir tout</a>
+      </div>
+      <div class="card-body">
+        <div class="homework-list">
+          <div th:each="homework : ${pendingHomework}" class="homework-item">
+            <div class="homework-info">
+              <h4 th:text="${homework.title}">Devoir de Mathématiques</h4>
+              <p>
+                <span th:text="${homework.classe.name}">3ème A</span> -
+                <span th:text="${homework.submittedCount + ' soumissions'}">15 soumissions</span>
+              </p>
+            </div>
+            <button class="btn btn-primary"
+                    th:onclick="'startGrading(' + ${homework.id} + ')'">
+              Corriger
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Messages -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h2>Messages Récents</h2>
+        <a href="/messages" class="btn-link">Voir tout</a>
+      </div>
+      <div class="card-body">
+        <div class="messages-list">
+          <div th:each="message : ${recentMessages}" class="message-item">
+            <div class="message-sender">
+              <div class="sender-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="sender-info">
+                                    <span class="sender-name"
+                                          th:text="${message.sender.firstName + ' ' + message.sender.lastName}">
+                                        John Doe
+                                    </span>
+                <span class="message-time"
+                      th:text="${#temporals.format(message.sentAt, 'HH:mm')}">
+                                        09:30
+                                    </span>
+              </div>
+            </div>
+            <div class="message-content">
+              <p th:text="${message.content}">Contenu du message</p>
+            </div>
+            <button class="btn btn-outline btn-sm"
+                    th:onclick="'viewMessage(' + ${message.id} + ')'">
+              Répondre
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/professor/dashboard.js}"></script>
+<script th:src="@{/js/dashboard.js}"></script>
+<script th:src="@{/js/chart.js}"></script>
+<script th:src="@{/js/topbar.js}"></script>
+
+</body>
+</html>

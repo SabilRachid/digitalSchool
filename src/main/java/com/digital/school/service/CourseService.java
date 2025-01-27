@@ -29,4 +29,7 @@ public interface CourseService {
 
     List<Map<String, Object>> getCourseResourcesAsMap(Long id);
     Map<String, String> generateMeetingLink(Long id);
+
+    //donne moi implementation de
+    Object findTodaySchedule(User professor);
 }

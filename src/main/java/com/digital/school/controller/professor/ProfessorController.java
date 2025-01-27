@@ -2,11 +2,15 @@ package com.digital.school.controller.professor;
 
 import com.digital.school.service.CourseService;
 import com.digital.school.service.MessageService;
+import com.digital.school.service.HomeworkService;
 import com.digital.school.service.ProfessorDashboardService;
+import com.digital.school.model.User;
+import com.digital.school.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -30,6 +34,9 @@ public class ProfessorController {
 
     @Autowired
     private ProfessorDashboardService dashboardService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CourseService courseService;

@@ -69,4 +69,9 @@ public class MessageServiceImpl implements MessageService {
     public long countUnreadMessages(User user) {
         return messageRepository.countUnreadMessages(user);
     }
+
+    @Override
+    public Object findRecentMessages(User professor, int i) {
+        return null;
+    }
 }

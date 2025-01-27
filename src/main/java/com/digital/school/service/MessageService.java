@@ -13,4 +13,6 @@ public interface MessageService {
     Message save(Message message);
     void deleteById(Long id);
     long countUnreadMessages(User user);
+
+    Object findRecentMessages(User professor, int i);
 }

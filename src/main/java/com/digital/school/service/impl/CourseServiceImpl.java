@@ -128,4 +128,19 @@ public class CourseServiceImpl implements CourseService {
             })
             .collect(Collectors.toList());
     }
+
+    @Override
+    public Object findByStudent(User student) {
+        return null;
+    }
+
+    @Override
+    public List<Map<String, Object>> getCourseResourcesAsMap(Long id) {
+        return List.of();
+    }
+
+    @Override
+    public Map<String, String> generateMeetingLink(Long id) {
+        return Map.of();
+    }
 }

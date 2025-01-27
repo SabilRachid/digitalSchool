@@ -13,6 +13,7 @@
     transition: all var(--transition-speed);
     z-index: 1000;
     box-shadow: var(--shadow-md);
+    overflow-y: auto;
 }
 
 /* Logo Container */
@@ -53,38 +54,32 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: var(--border-radius);
 }
 
-.nav-group-header i {
-    font-size: 1rem;
+.nav-group-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-group-header i.fa-chevron-down {
+    margin-left: auto;
     transition: transform var(--transition-speed);
-}
-
-.nav-group-header i.collapsed {
-    transform: rotate(-90deg);
 }
 
 .nav-group-content {
     max-height: 0;
     overflow: hidden;
     transition: max-height var(--transition-speed);
-}
-
-.nav-group-content a {
-    padding-left: 2rem;
-}
-
-.nav-group-content.expanded {
-    max-height: 500px;
+    padding-left: 1rem;
 }
 
 .nav-group.open .nav-group-content {
-    max-height: 500px; /* Ajustez selon le contenu */
+    max-height: 500px;
 }
 
-.nav-group.open .nav-group-header i {
-    transform: rotate(0deg);
+.nav-group.open .nav-group-header i.fa-chevron-down {
+    transform: rotate(180deg);
 }
 
 /* Navigation Items */
@@ -123,26 +118,11 @@
     transform: scale(1.1);
 }
 
-/* Sidebar Footer */
-.sidebar-footer {
+/* Common Menu */
+.common-menu {
     margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.logout-btn {
-    width: 100%;
-    justify-content: center;
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #FCA5A5;
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition-speed);
-}
-
-.logout-btn:hover {
-    background-color: rgba(239, 68, 68, 0.2);
-    transform: translateY(-2px);
 }
 
 /* Responsive Design */
@@ -154,9 +134,7 @@
     .logo-container span,
     .nav-group-header span,
     .nav-item span {
-        opacity: 0;
-        width: 0;
-        overflow: hidden;
+        display: none;
     }
 
     .nav-item {
@@ -169,6 +147,14 @@
         font-size: 1.25rem;
     }
 
+    .nav-group-header i.fa-chevron-down {
+        display: none;
+    }
+
+    .nav-group-content {
+        padding-left: 0;
+    }
+
     /* Hover state to show labels */
     .sidebar:hover {
         width: var(--sidebar-width);
@@ -177,13 +163,20 @@
     .sidebar:hover .logo-container span,
     .sidebar:hover .nav-group-header span,
     .sidebar:hover .nav-item span {
-        opacity: 1;
-        width: auto;
+        display: inline;
     }
 
     .sidebar:hover .nav-item {
         justify-content: flex-start;
         padding: 0.75rem 1rem;
+    }
+
+    .sidebar:hover .nav-group-header i.fa-chevron-down {
+        display: inline;
+    }
+
+    .sidebar:hover .nav-group-content {
+        padding-left: 1rem;
     }
 }
 

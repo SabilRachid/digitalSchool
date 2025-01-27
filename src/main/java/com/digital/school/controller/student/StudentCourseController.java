@@ -26,6 +26,7 @@ public class StudentCourseController {
 
     @GetMapping
     public String showCourses(@AuthenticationPrincipal User student, Model model) {
+
         model.addAttribute("courses", courseService.findByStudent(student));
         model.addAttribute("subjects", subjectService.findByStudent(student));
         return "student/courses";

@@ -1,5 +1,7 @@
 package com.digital.school.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StudentDashboardServiceImpl implements StudentDashboardService {
+
+    private static final Logger LOGGER  = LoggerFactory.getLogger(StudentDashboardServiceImpl.class);
 
     @Autowired
     private StudentGradeRepository gradeRepository;
@@ -27,6 +31,9 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     
     @Autowired
     private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private ClasseRepository classeRepository;
 
     @Override
     public StudentDashboardStats getStudentStats(User student) {
@@ -59,16 +66,20 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     }
 
     @Override
+    @Transactional
     public List<Map<String, Object>> getSubjectsWithResources(User student) {
-        return student.getClasse().getSubjects().stream()
-            .map(subject -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("subject", subject);
-                map.put("recentResources", resourceRepository.findRecentResources(subject));
-                map.put("resourceCount", resourceRepository.countBySubject(subject));
-                return map;
-            })
-            .collect(Collectors.toList());
+        Classe classeWithSubjects = classeRepository.findByIdWithSubjects(student.getClasse().getId());
+
+        LOGGER.debug("classeWithSubjects : "+classeWithSubjects.toString());
+        return classeWithSubjects.getSubjects().stream()
+                .map(subject -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", subject);
+                    map.put("recentResources", resourceRepository.findRecentResources(subject));
+                    map.put("resourceCount", resourceRepository.countBySubject(subject));
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

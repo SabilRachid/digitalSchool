@@ -74,7 +74,11 @@
                 <span class="role">
                     (<span sec:authorize="hasRole('ROLE_ADMIN')">Administrateur</span>
                     <span sec:authorize="hasRole('ROLE_PROFESSOR')">Professeur</span>
+                    <!--
                     <span sec:authorize="hasRole('ROLE_STUDENT')" th:text="${studentClass}">Classe de 3ème A</span>)
+                    -->
+                    <span sec:authorize="hasRole('ROLE_STUDENT')">Etudiant</span>)
+
                 </span>
                 <div id="profileDropdown" class="dropdown-content">
                     <a href="/profile" class="dropdown-item">
@@ -96,3 +100,4 @@
             </div>
         </div>
     </div>
+

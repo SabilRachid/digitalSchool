@@ -13,4 +13,7 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
     
     @Query("SELECT COUNT(s) FROM Classe c JOIN c.students s WHERE c.id = ?1")
     long countStudents(Long classeId);
+
+    @Query("SELECT c FROM Classe c JOIN FETCH c.subjects WHERE c.id = ?1")
+    Classe findByIdWithSubjects(Long id);
 }

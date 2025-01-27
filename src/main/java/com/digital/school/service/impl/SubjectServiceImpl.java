@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,5 +92,10 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public long countCourses(Long subjectId) {
         return subjectRepository.countCourses(subjectId);
+    }
+
+    @Override
+    public Object findByStudent(User student) {
+        return null;
     }
 }

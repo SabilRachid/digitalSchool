@@ -12,5 +12,6 @@ public interface LearningResourceRepository extends JpaRepository<LearningResour
     @Query("SELECT r FROM LearningResource r WHERE r.subject = ?1 ORDER BY r.uploadedAt DESC LIMIT 5")
     List<LearningResource> findRecentResources(Subject subject);
 
-	Object countBySubject(Subject subject);
+
+    long countBySubject(Subject subject);
 }

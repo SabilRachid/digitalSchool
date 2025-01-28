@@ -49,7 +49,7 @@ class ProfilesPage {
                     render: function(data) {
                         return `
                             <div class="action-buttons">
-                                <button class="icon-button edit" onclick="profilesPage.editStudentProfile(${data.id})">
+                                <button class="btn btn-sm btn-primary" onclick="profilesPage.editStudentProfile(${data.id})">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>`;
@@ -82,7 +82,7 @@ class ProfilesPage {
                     render: function(data) {
                         return `
                             <div class="action-buttons">
-                                <button class="icon-button edit" onclick="profilesPage.editParentProfile(${data.id})">
+                                <button class="btn btn-sm btn-primary" onclick="profilesPage.editParentProfile(${data.id})">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>`;
@@ -135,7 +135,7 @@ class ProfilesPage {
                     render: function(data) {
                         return `
                             <div class="action-buttons">
-                                <button class="icon-button edit" onclick="profilesPage.editAssociation(${data.id})">
+                                <button class="btn btn-sm btn-primary" onclick="profilesPage.editAssociation(${data.id})">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 ${!data.validated ? `
@@ -143,7 +143,7 @@ class ProfilesPage {
                                         <i class="fas fa-check"></i>
                                     </button>
                                 ` : ''}
-                                <button class="icon-button delete" onclick="profilesPage.deleteAssociation(${data.id})">
+                                <button class="btn btn-sm btn-danger" onclick="profilesPage.deleteAssociation(${data.id})">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>`;

@@ -10,10 +10,19 @@ import com.digital.school.model.*;
 import com.digital.school.model.Level;
 import com.digital.school.model.enumerated.*;
 import com.digital.school.repository.*;
+
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.sql.DataSource;
 import java.util.*;
 
 @Configuration
 public class DataLoader {
+
+    @Autowired
+    private DataSource dataSource;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -27,6 +36,9 @@ public class DataLoader {
             LevelRepository levelRepository,
             SubjectRepository subjectRepository) {
         return args -> {
+            // Création de la séquence si elle n'existe pas
+            createSequenceIfNotExists();
+
             // Create permissions
             Arrays.stream(PermissionName.values()).forEach(permName -> {
                 Permission permission = new Permission(permName);
@@ -172,4 +184,16 @@ public class DataLoader {
         };
 
     }
+
+    private void createSequenceIfNotExists() {
+        String createSequenceQuery = "CREATE SEQUENCE IF NOT EXISTS hibernate_seq START WITH 1 INCREMENT BY 1";
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute(createSequenceQuery);
+            System.out.println("Sequence 'hibernate_seq' checked or created successfully.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while checking or creating sequence 'hibernate_seq': " + e.getMessage(), e);
+        }
+    }
+
 }

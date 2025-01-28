@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class StudentDashboardStats {
+
     private double attendanceRate;
     private double averageGrade;
     private int pendingHomework;

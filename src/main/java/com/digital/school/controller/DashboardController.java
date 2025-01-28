@@ -33,7 +33,7 @@ public class DashboardController {
     private CourseService courseService;
 
     @GetMapping({"/dashboard"})
-    public String dashboard(Model model) {
+    public String dashboard(HttpServletRequest request, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && 
             !(authentication instanceof AnonymousAuthenticationToken)) {
@@ -45,6 +45,7 @@ public class DashboardController {
                 LOGGER.debug("User present: {}", userOptional.get());
                 User user = userOptional.get();
                 model.addAttribute("user", user);
+                model.addAttribute("currentURI", request.getRequestURI());
                 
 
                 if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {

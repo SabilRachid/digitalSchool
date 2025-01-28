@@ -48,7 +48,7 @@ public class ProfessorController {
     private MessageService messageService;
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal User professor, Model model) {
+    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User professor, Model model) {
         // Add user to model
         model.addAttribute("user", professor);
 
@@ -63,6 +63,8 @@ public class ProfessorController {
 
         // Add recent messages
         model.addAttribute("recentMessages", messageService.findRecentMessages(professor, 5));
+
+        model.addAttribute("currentURI", request.getRequestURI());
 
         return "professor/dashboard";
     }

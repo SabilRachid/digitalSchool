@@ -7,11 +7,7 @@ import java.util.Map;
 
 @Entity
 @Table(name = "subscription_plans")
-public class SubscriptionPlan {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class SubscriptionPlan extends AuditableEntity {
     
     @Column(nullable = false)
     private String name;
@@ -63,14 +59,6 @@ public class SubscriptionPlan {
             this.features = null;
         }
     }
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;

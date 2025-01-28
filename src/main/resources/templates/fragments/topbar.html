@@ -74,9 +74,7 @@
                 <span class="role">
                     (<span sec:authorize="hasRole('ROLE_ADMIN')">Administrateur</span>
                     <span sec:authorize="hasRole('ROLE_PROFESSOR')">Professeur</span>
-                    <!--
-                    <span sec:authorize="hasRole('ROLE_STUDENT')" th:text="${studentClass}">Classe de 3ème A</span>)
-                    -->
+                    <span sec:authorize="hasRole('ROLE_PARENT')">Professeur</span>
                     <span sec:authorize="hasRole('ROLE_STUDENT')">Etudiant</span>)
 
                 </span>

@@ -13,12 +13,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "student_grades")
-public class StudentGrade {
+public class StudentGrade extends AuditableEntity {
 	
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
     @ManyToOne
     @JoinColumn(name = "student_id")
     private User student;
@@ -43,14 +39,6 @@ public class StudentGrade {
     public StudentGrade() {
     }
     
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public User getStudent() {
 		return student;
 	}

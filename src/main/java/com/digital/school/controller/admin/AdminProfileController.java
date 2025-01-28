@@ -1,5 +1,6 @@
 package com.digital.school.controller.admin;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,8 @@ public class AdminProfileController {
     private ParentStudentService parentStudentService;
 
     @GetMapping
-    public String showProfiles(Model model) {
+    public String showProfiles(HttpServletRequest request, Model model) {
+        model.addAttribute("currentURI", request.getRequestURI());
         return "admin/profiles";
     }
 

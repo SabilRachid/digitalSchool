@@ -1,5 +1,6 @@
 package com.digital.school.controller.admin;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,8 @@ public class AdminSubjectController {
     private SubjectService subjectService;
 
     @GetMapping
-    public String showSubjects(Model model) {
+    public String showSubjects(HttpServletRequest request, Model model) {
+        model.addAttribute("currentURI", request.getRequestURI());
         return "admin/subjects";
     }
 

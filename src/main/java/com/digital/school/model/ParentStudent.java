@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "parent_student_associations")
-public class ParentStudent {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ParentStudent extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = false)
@@ -49,14 +45,6 @@ public class ParentStudent {
     private LocalDateTime validatedAt;
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public User getParent() {
         return parent;
     }

@@ -37,7 +37,7 @@ public class StudentController {
     
     
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal User student, HttpServletRequest request, Model model) {
+    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User student, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && 
             !(authentication instanceof AnonymousAuthenticationToken)) {
@@ -65,6 +65,8 @@ public class StudentController {
                 
                 // Événements à venir
                 model.addAttribute("upcomingEvents", dashboardService.getUpcomingEvents(student));
+
+                model.addAttribute("currentURI", request.getRequestURI());
                 
                 return "student/dashboard";
             }

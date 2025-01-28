@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "exam_results")
-public class ExamResult {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ExamResult extends AuditableEntity {
     
     @OneToOne
     @JoinColumn(name = "exam_id", nullable = false)
@@ -38,14 +34,6 @@ public class ExamResult {
     private User publishedBy;
 
     public ExamResult() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Exam getExam() {

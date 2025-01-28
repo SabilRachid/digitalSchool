@@ -1,5 +1,6 @@
 package com.digital.school.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,9 @@ public class MessageController {
     private UserService userService;
 
     @GetMapping
-    public String showMessages(Model model, @AuthenticationPrincipal User user) {
+    public String showMessages(HttpServletRequest request, Model model, @AuthenticationPrincipal User user) {
         model.addAttribute("user", user);
+        model.addAttribute("currentURI", request.getRequestURI());
         return "messages";
     }
 

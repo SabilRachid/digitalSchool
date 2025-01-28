@@ -9,11 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "levels")
-public class Level {
-    
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Level extends AuditableEntity {
     
 	@Column(nullable = false, unique = true)
 	private String code;
@@ -44,14 +40,6 @@ public class Level {
     private Set<Subject> subjects = new HashSet<>();
 
     public Level() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCode() {

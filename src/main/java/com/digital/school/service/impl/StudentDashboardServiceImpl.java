@@ -70,7 +70,6 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     public List<Map<String, Object>> getSubjectsWithResources(User student) {
         Classe classeWithSubjects = classeRepository.findByIdWithSubjects(student.getClasse().getId());
 
-        LOGGER.debug("classeWithSubjects : "+classeWithSubjects.toString());
         return classeWithSubjects.getSubjects().stream()
                 .map(subject -> {
                     Map<String, Object> map = new HashMap<>();

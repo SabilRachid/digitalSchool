@@ -6,6 +6,7 @@ import com.digital.school.model.User;
 import com.digital.school.config.PaymentRequest;
 import com.digital.school.service.EmailService;
 import com.digital.school.service.SMSService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,13 +33,14 @@ public class PaymentController {
     private SMSService smsService;
 
     @GetMapping
-    public String showPayments(Model model, @AuthenticationPrincipal User user) {
+    public String showPayments(HttpServletRequest request, Model model, @AuthenticationPrincipal User user) {
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     	if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             model.addAttribute("payments", paymentService.findAllPayments());
         } else {
             model.addAttribute("payments", paymentService.findPaymentsByUser(user));
         }
+        model.addAttribute("currentURI", request.getRequestURI());
         return "payments/index";
     }
 

@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "events")
-public class Event {
+public class Event extends AuditableEntity {
     
     public enum EventType {
         COURSE,
@@ -15,10 +15,6 @@ public class Event {
         EVENT,
         MEETING
     }
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     
     @Column(nullable = false)
     private String title;
@@ -55,13 +51,6 @@ public class Event {
     private boolean allDay;
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;

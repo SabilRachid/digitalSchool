@@ -1,4 +1,4 @@
-// Initialisation des graphiques du tableau de bord administrateur
+x²// Initialisation des graphiques du tableau de bord administrateur
 document.addEventListener('DOMContentLoaded', function() {
     // Distribution des utilisateurs
     new Chart(document.getElementById('userDistributionChart'), {

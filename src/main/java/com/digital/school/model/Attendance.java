@@ -6,11 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "attendances")
-public class Attendance {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Attendance extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
@@ -36,15 +32,7 @@ public class Attendance {
     public Attendance() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getStudent() {
+      public User getStudent() {
         return student;
     }
 

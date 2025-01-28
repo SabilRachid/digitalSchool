@@ -1,5 +1,6 @@
 package com.digital.school.controller.admin;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,9 +36,10 @@ public class AdminUserController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping
-    public String listUsers(Model model) {
+    public String listUsers(HttpServletRequest request, Model model) {
         model.addAttribute("roles", RoleName.values());
         model.addAttribute("classes", classeService.findAllBasicInfo());
+        model.addAttribute("currentURI", request.getRequestURI());
         return "admin/users";
     }
 

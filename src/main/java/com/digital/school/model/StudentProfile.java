@@ -5,11 +5,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "student_profiles")
-public class StudentProfile {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class StudentProfile extends AuditableEntity {
     
     @OneToOne
     @JoinColumn(name = "student_id", nullable = false)
@@ -50,13 +46,6 @@ public class StudentProfile {
     private String specialNeeds;
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public User getStudent() {
         return student;

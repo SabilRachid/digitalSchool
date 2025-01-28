@@ -5,11 +5,8 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "invoice_items")
-public class InvoiceItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+public class InvoiceItem extends AuditableEntity {
+
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
@@ -30,14 +27,6 @@ public class InvoiceItem {
 	public InvoiceItem() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Invoice getInvoice() {

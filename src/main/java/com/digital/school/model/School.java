@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "schools")
-public class School {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class School extends AuditableEntity {
     
     @Column(nullable = false)
     private String name;
@@ -36,14 +32,6 @@ public class School {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }

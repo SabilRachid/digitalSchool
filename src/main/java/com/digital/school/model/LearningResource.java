@@ -5,11 +5,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "learning_resources")
-public class LearningResource {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+public class LearningResource extends AuditableEntity {
+
     @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
@@ -23,14 +20,6 @@ public class LearningResource {
     @ManyToOne
     @JoinColumn(name = "uploaded_by_id")
     private User uploadedBy;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public Subject getSubject() {
 		return subject;

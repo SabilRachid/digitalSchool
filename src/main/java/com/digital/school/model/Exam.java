@@ -6,12 +6,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "exams")
-public class Exam {
+public class Exam extends AuditableEntity {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+
     @Column(nullable = false)
     private String name;
     
@@ -49,14 +46,6 @@ public class Exam {
     private Boolean isPublished = false;
 
     public Exam() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

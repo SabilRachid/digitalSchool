@@ -1,5 +1,6 @@
 package com.digital.school.controller.superadmin;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,8 @@ public class SchoolManagementController {
     private SchoolService schoolService;
 
     @GetMapping
-    public String showSchools(Model model) {
+    public String showSchools(HttpServletRequest request, Model model) {
+        model.addAttribute("currentURI", request.getRequestURI());
         return "superadmin/schools";
     }
 

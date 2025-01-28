@@ -1,5 +1,7 @@
 package com.digital.school.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.coyote.http11.Http11InputBuffer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,9 +26,10 @@ public class BillingController {
     private PaymentService paymentService;
 
     @GetMapping("/invoices")
-    public String listInvoices(@AuthenticationPrincipal User user, Model model) {
+    public String listInvoices(HttpServletRequest request, @AuthenticationPrincipal User user, Model model) {
         List<Invoice> invoices = billingService.getParentInvoices(user);
         model.addAttribute("invoices", invoices);
+        model.addAttribute("currentURI", request.getRequestURI());
         return "billing/invoices";
     }
 

@@ -8,11 +8,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "invoices")
-public class Invoice {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+public class Invoice extends AuditableEntity {
+
     @Column(unique = true)
     private String invoiceNumber;
     
@@ -52,12 +49,6 @@ public class Invoice {
     public Invoice() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
 	}
 	public String getInvoiceNumber() {
 		return invoiceNumber;

@@ -74,6 +74,17 @@
     padding-left: 1rem;
 }
 
+
+.nav-group-content .nav-item.active {
+    color: white;
+    font-weight: bold;
+}
+
+.nav-group-content .nav-item.active ~ .nav-group-content {
+    max-height: 500px; /* Assurez-vous que cette valeur correspond à la hauteur réelle */
+    overflow: visible;
+}
+
 .nav-group.open .nav-group-content {
     max-height: 500px;
 }

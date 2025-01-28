@@ -1,5 +1,6 @@
 package com.digital.school.controller.student;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,10 +26,11 @@ public class StudentCourseController {
     private SubjectService subjectService;
 
     @GetMapping
-    public String showCourses(@AuthenticationPrincipal User student, Model model) {
+    public String showCourses(HttpServletRequest request, @AuthenticationPrincipal User student, Model model) {
 
         model.addAttribute("courses", courseService.findByStudent(student));
         model.addAttribute("subjects", subjectService.findByStudent(student));
+        model.addAttribute("currentURI", request.getRequestURI());
         return "student/courses";
     }
 

@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "messages")
-public class Message {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Message extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
@@ -30,14 +26,6 @@ public class Message {
     private LocalDateTime readAt;
     
     private boolean isRead = false;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public User getSender() {
         return sender;

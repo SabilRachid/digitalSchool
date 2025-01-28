@@ -5,11 +5,7 @@ import com.digital.school.model.enumerated.PermissionName;
 
 @Entity
 @Table(name = "permissions")
-public class Permission {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Permission extends AuditableEntity {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
@@ -22,14 +18,6 @@ public class Permission {
     
     public Permission(PermissionName name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public PermissionName getName() {

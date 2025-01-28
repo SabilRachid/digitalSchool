@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "student_exams")
-public class StudentExam {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class StudentExam extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
@@ -36,14 +32,6 @@ public class StudentExam {
     private Boolean isPresent = false;
 
     public StudentExam() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public User getStudent() {

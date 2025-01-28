@@ -4,11 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "parent_profiles")
-public class ParentProfile {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ParentProfile extends AuditableEntity {
     
     @OneToOne
     @JoinColumn(name = "parent_id", nullable = false)
@@ -35,14 +31,6 @@ public class ParentProfile {
     private String additionalInfo;
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public User getParent() {
         return parent;
     }

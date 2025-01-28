@@ -1,5 +1,6 @@
 package com.digital.school.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,13 +24,15 @@ public class HomeController {
     private SubscriptionPlanService subscriptionPlanService;
 
     @GetMapping("/")
-    public String landing(Model model) {
+    public String landing(HttpServletRequest request, Model model) {
         // Ajouter les statistiques globales
         Map<String, Object> stats = schoolService.getSchoolStatistics();
         model.addAttribute("stats", stats);
         
         // Ajouter les plans d'abonnement
         model.addAttribute("plans", subscriptionPlanService.findAllActive());
+
+        model.addAttribute("currentURI", request.getRequestURI());
         
         return "home";
     }

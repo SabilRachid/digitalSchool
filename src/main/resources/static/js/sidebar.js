@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gestion des groupes de navigation
     document.querySelectorAll('.nav-group-header').forEach(header => {
         header.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent the click event from bubbling up
             const navGroup = header.parentElement;
             const chevron = header.querySelector('.fa-chevron-down');
 
@@ -20,13 +19,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Garder le groupe ouvert si un élément est actif
+    // Garder les groupes contenant des éléments actifs ouverts au chargement
     const activeItem = document.querySelector('.nav-item.active');
     if (activeItem) {
         const parentGroup = activeItem.closest('.nav-group');
         if (parentGroup) {
             parentGroup.classList.add('open');
-            parentGroup.querySelector('.fa-chevron-down').classList.remove('collapsed');
+            const chevron = parentGroup.querySelector('.fa-chevron-down');
+            if (chevron) {
+                chevron.classList.remove('collapsed');
+            }
         }
     }
 });

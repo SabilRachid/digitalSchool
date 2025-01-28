@@ -1,5 +1,6 @@
 package com.digital.school.controller.superadmin;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,8 @@ public class SuperAdminDashboardController {
     private SchoolService schoolService;
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(HttpServletRequest request, Model model) {
+        model.addAttribute("currentURI", request.getRequestURI());
         model.addAttribute("recentSchools", schoolService.findRecentlyCreated());
         return "superadmin/dashboard";
     }

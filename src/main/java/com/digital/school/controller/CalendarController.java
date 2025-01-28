@@ -1,5 +1,6 @@
 package com.digital.school.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +16,10 @@ public class CalendarController {
     private EventService eventService;
 
     @GetMapping("/calendar")
-    public String showCalendar(Model model, @AuthenticationPrincipal User user) {
+    public String showCalendar(HttpServletRequest request, Model model, @AuthenticationPrincipal User user) {
+
         model.addAttribute("user", user);
+        model.addAttribute("currentURI", request.getRequestURI());
         return "calendar";
     }
 }

@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "school_subscriptions")
-public class SchoolSubscription {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class SchoolSubscription extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "school_id")
@@ -37,13 +33,6 @@ public class SchoolSubscription {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public School getSchool() {
         return school;

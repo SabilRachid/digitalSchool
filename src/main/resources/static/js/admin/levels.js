@@ -16,10 +16,10 @@ class LevelsPage extends AdminPage {
                     render: function(data) {
                         return `
                             <div class="action-buttons">
-                                <button class="icon-button edit" onclick="window.levelsPage.edit(${data.id})">
+                                <button class="btn btn-sm btn-primary" onclick="window.levelsPage.edit(${data.id})">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="icon-button delete" onclick="window.levelsPage.delete(${data.id})">
+                                <button class="btn btn-sm btn-danger" onclick="window.levelsPage.delete(${data.id})">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>`;

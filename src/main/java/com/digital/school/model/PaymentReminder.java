@@ -5,11 +5,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment_reminders")
-public class PaymentReminder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+public class PaymentReminder extends AuditableEntity {
+
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
@@ -23,12 +20,6 @@ public class PaymentReminder {
     public PaymentReminder() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
 	}
 	public Invoice getInvoice() {
 		return invoice;

@@ -87,7 +87,9 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.6.0</version>
         </dependency>
+
 
         <!-- Apache POI (Manipulation des fichiers Excel) -->
         <dependency>

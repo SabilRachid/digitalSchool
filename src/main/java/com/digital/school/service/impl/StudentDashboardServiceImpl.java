@@ -70,15 +70,19 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     public List<Map<String, Object>> getSubjectsWithResources(User student) {
         Classe classeWithSubjects = classeRepository.findByIdWithSubjects(student.getClasse().getId());
 
-        return classeWithSubjects.getSubjects().stream()
-                .map(subject -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("subject", subject);
-                    map.put("recentResources", resourceRepository.findRecentResources(subject));
-                    map.put("resourceCount", resourceRepository.countBySubject(subject));
-                    return map;
-                })
-                .collect(Collectors.toList());
+        // gerer si classeWithSubjects est null
+        if (classeWithSubjects!=null) {
+            return classeWithSubjects.getSubjects().stream()
+                    .map(subject -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("subject", subject);
+                        map.put("recentResources", resourceRepository.findRecentResources(subject));
+                        map.put("resourceCount", resourceRepository.countBySubject(subject));
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 
     @Override

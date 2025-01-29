@@ -1,0 +1,36 @@
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dataTable th,
+.dataTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--bg-secondary);
+}
+
+.dataTable th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dataTable tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+}
+
+.badge-warning { background: #F59E0B; color: white; }
+.badge-info { background: #4299E1; color: white; }
+.badge-success { background: #22C55E; color: white; }

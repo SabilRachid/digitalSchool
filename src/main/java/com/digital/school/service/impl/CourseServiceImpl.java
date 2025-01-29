@@ -36,7 +36,24 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Transactional
     public Course save(Course course) {
+        if (course.getSubject() == null || course.getProfessor() == null || course.getClasse() == null) {
+            throw new IllegalArgumentException("Les ID de la matière, du professeur et de la classe sont obligatoires");
+        }
+
+        // Charger les entités réelles depuis la base
+        Subject subject = subjectRepository.findById(course.getSubject().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Matière non trouvée"));
+        User professor = userRepository.findById(course.getProfessor().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Professeur non trouvé"));
+        Classe classe = classeRepository.findById(course.getClasse().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Classe non trouvée"));
+
+        course.setSubject(subject);
+        course.setProfessor(professor);
+        course.setClasse(classe);
+
         return courseRepository.save(course);
     }
 
@@ -148,4 +165,6 @@ public class CourseServiceImpl implements CourseService {
     public Object findTodaySchedule(User professor) {
         return null;
     }
+
+
 }

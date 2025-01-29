@@ -1,5 +1,8 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.controller.admin.AdminController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,19 +16,23 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ClasseServiceImpl implements ClasseService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClasseServiceImpl.class);
+
+
     @Autowired
     private ClasseRepository classeRepository;
 
     @Override
     public List<Map<String, Object>> findAllAsMap() {
+        LOGGER.debug("findAllAsMap ClasseServiceImpl" + getClass().getName());
         return classeRepository.findAll().stream()
             .map(classe -> {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", classe.getId());
                 map.put("name", classe.getName());
                 map.put("level", Map.of(
-                    "id", classe.getLevel(),
-                    "name", classe.getLevel()
+                    "id", classe.getLevel().getId(),
+                    "name", classe.getLevel().getName()
                 ));
                 map.put("maxStudents", classe.getMaxStudents());
                 map.put("currentStudents", countStudents(classe.getId()));
@@ -37,6 +44,7 @@ public class ClasseServiceImpl implements ClasseService {
 
     @Override
     public List<Map<String, Object>> findAllBasicInfo() {
+        LOGGER.debug("findAllBasicInfo ClasseServiceImpl"+ getClass().getName());
         return classeRepository.findAll().stream()
             .map(classe -> {
                 Map<String, Object> map = new HashMap<>();

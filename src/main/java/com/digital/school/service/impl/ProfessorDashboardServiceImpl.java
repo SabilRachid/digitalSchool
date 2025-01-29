@@ -17,7 +17,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     private CourseRepository courseRepository;
 
     @Autowired
-    private StudentHomeworkRepository homeworkRepository;
+    private HomeworkRepository homeworkRepository;
 
     @Autowired
     private ExamRepository examRepository;

@@ -32,4 +32,5 @@ public interface CourseService {
 
     //donne moi implementation de
     Object findTodaySchedule(User professor);
+
 }

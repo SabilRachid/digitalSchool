@@ -23,11 +23,18 @@ public class Homework extends AuditableEntity {
     private User professor;
 
     @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false) // 🔥 Ajout du lien avec un cours
+    private Course course;
+
+    @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    public Homework() {
+    }
 
     // Getters and Setters
 
@@ -61,6 +68,14 @@ public class Homework extends AuditableEntity {
 
     public void setProfessor(User professor) {
         this.professor = professor;
+    }
+
+    public Course getCourse() { // ✅ Getter pour le cours
+        return course;
+    }
+
+    public void setCourse(Course course) { // ✅ Setter pour le cours
+        this.course = course;
     }
 
     public User getStudent() {

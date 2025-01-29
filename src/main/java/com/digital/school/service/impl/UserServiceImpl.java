@@ -101,4 +101,23 @@ public class UserServiceImpl implements UserService {
         // TODO: Implement student dashboard statistics
         return stats;
     }
+
+    @Override
+    public List<Map<String, Object>> findProfessorsAsMap() {
+        return userRepository.findAll().stream()
+            .filter(user -> user.getRoles().stream()
+                .anyMatch(role -> role.getName() == RoleName.ROLE_PROFESSOR))
+            .map(user -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", user.getId());
+                map.put("username", user.getUsername());
+                map.put("email", user.getEmail());
+                map.put("firstName", user.getFirstName());
+                map.put("lastName", user.getLastName());
+                return map;
+            })
+            .collect(Collectors.toList());
+    }
+
+
 }

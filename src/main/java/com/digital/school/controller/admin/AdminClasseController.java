@@ -1,13 +1,18 @@
 package com.digital.school.controller.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Classe;
 import com.digital.school.service.ClasseService;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +20,14 @@ import java.util.Map;
 @RequestMapping("/admin/classes")
 public class AdminClasseController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminClasseController.class);
+
     @Autowired
     private ClasseService classeService;
 
     @GetMapping
     public String showClasses(HttpServletRequest request, Model model) {
-
+        LOGGER.debug("showClasses called " + getClass().getName());
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/classes";
     }
@@ -28,12 +35,19 @@ public class AdminClasseController {
     @GetMapping("/data")
     @ResponseBody
     public List<Map<String, Object>> getClassesData() {
-        return classeService.findAllAsMap();
+        LOGGER.debug("getClassesData " + getClass().getName());
+         try {
+             return classeService.findAllAsMap();
+         }catch (Exception e) {
+             LOGGER.error("Erreur lors du chargement des classes : " + e.getMessage());
+             return null;
+         }
     }
 
     @GetMapping("/list")
     @ResponseBody
     public List<Map<String, Object>> getClassesList() {
+        LOGGER.debug("getClassesList " + getClass().getName());
         return classeService.findAllBasicInfo();
     }
 

@@ -7,7 +7,7 @@ import java.util.Map;
 public interface StudentDashboardService {
     StudentDashboardStats getStudentStats(User student);
     List<StudentGrade> getRecentGrades(User student);
-    List<StudentHomework> getPendingHomework(User student);
+    List<Homework> getPendingHomework(User student);
     List<Map<String, Object>> getSubjectsWithResources(User student);
     List<Event> getUpcomingEvents(User student);
 }

@@ -21,7 +21,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     private StudentGradeRepository gradeRepository;
     
     @Autowired
-    private StudentHomeworkRepository homeworkRepository;
+    private HomeworkRepository homeworkRepository;
     
     @Autowired
     private LearningResourceRepository resourceRepository;
@@ -61,7 +61,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     }
 
     @Override
-    public List<StudentHomework> getPendingHomework(User student) {
+    public List<Homework> getPendingHomework(User student) {
         return homeworkRepository.findByStudentAndStatusOrderByDueDateAsc(student, "PENDING");
     }
 

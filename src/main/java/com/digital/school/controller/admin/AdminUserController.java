@@ -51,6 +51,12 @@ public class AdminUserController {
             .collect(Collectors.toList());
     }
 
+    @GetMapping("/professors")
+    @ResponseBody
+    public List<Map<String, Object>> getProfessors() {
+        return userService.findProfessorsAsMap();
+    }
+
     @PostMapping
     @ResponseBody
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {

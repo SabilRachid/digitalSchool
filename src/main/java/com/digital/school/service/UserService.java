@@ -22,4 +22,5 @@ public interface UserService {
     Map<String, Object> getAdminDashboardStats();
     Map<String, Object> getProfessorDashboardStats(User professor);
     Map<String, Object> getStudentDashboardStats(User student);
+    List<Map<String, Object>> findProfessorsAsMap();
 }

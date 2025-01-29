@@ -1,5 +1,8 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.repository.ClasseRepository;
+import com.digital.school.repository.SubjectRepository;
+import com.digital.school.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,8 @@ import com.digital.school.model.User;
 import com.digital.school.repository.CourseRepository;
 import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +29,15 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     CourseRepository courseRepository;
+
+    @Autowired
+    SubjectRepository subjectRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ClasseRepository classeRepository;
 
     @Override
     public Page<Course> findAll(Pageable pageable) {

@@ -1,12 +1,5 @@
 package com.digital.school.controller.admin;
 
-import com.digital.school.dto.CourseDTO;
-import com.digital.school.model.Classe;
-import com.digital.school.model.Subject;
-import com.digital.school.model.User;
-import com.digital.school.service.ClasseService;
-import com.digital.school.service.SubjectService;
-import com.digital.school.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +15,12 @@ import java.util.Map;
 @RequestMapping("/admin/courses")
 public class AdminCourseController {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AdminCourseController.class);
+
     @Autowired
     private CourseService courseService;
 
-    @Autowired
-    private SubjectService subjectService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ClasseService classeService;
 
 
     @GetMapping
@@ -97,19 +85,32 @@ public class AdminCourseController {
     @PostMapping
     @ResponseBody
     public ResponseEntity<?> createCourse(@RequestBody Course course) {
+        LOGGER.debug("📌 Requête reçue : {}", course);  // 🔍 Affiche le contenu de course
+
         try {
+
+            LOGGER.debug("subjects id" + course.getSubject().getName());
+            LOGGER.debug("professors id" + course.getProfessor().getFirstName());
+            LOGGER.debug("classes id" + course.getClasse().getName());
+
+            LOGGER.debug("subjects Name" + course.getSubject().getName());
+            LOGGER.debug("professors firstName" + course.getProfessor().getFirstName());
+            LOGGER.debug("classes name" + course.getClasse().getName());
             if (course.getSubject() == null || course.getSubject().getId() == null ||
                     course.getProfessor() == null || course.getProfessor().getId() == null ||
                     course.getClasse() == null || course.getClasse().getId() == null) {
+                LOGGER.error("🚨 ID manquant pour subject, professor ou class !");
                 return ResponseEntity.badRequest().body(Map.of("message", "Les ID de la matière, du professeur et de la classe sont obligatoires"));
             }
 
             Course savedCourse = courseService.save(course);
             return ResponseEntity.ok(savedCourse);
         } catch (Exception e) {
+            LOGGER.error("🚨 Erreur lors de la création du cours : {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("message", "Erreur lors de la création: " + e.getMessage()));
         }
     }
+
 
 
     @PutMapping("/{id}")

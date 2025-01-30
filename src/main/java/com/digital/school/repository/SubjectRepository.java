@@ -19,4 +19,10 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     
     @Query("SELECT COUNT(c) FROM Course c WHERE c.subject.id = ?1")
     long countCourses(Long subjectId);
+
+    @Query("SELECT s.name AS subjectName, COUNT(u.id) AS professorCount " +
+            "FROM Subject s JOIN s.professors u " +
+            "WHERE u.roles = 'ROLE_PROFESSOR' " +
+            "GROUP BY s.name")
+    List<Object[]> findProfessorCountBySubject();
 }

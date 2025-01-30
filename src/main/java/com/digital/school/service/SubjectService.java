@@ -17,6 +17,5 @@ public interface SubjectService {
     boolean existsByName(String name);
     List<Subject> findByClasseId(Long classeId);
     long countCourses(Long subjectId);
-
     Object findByStudent(User student);
 }

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED) // Stratégie pour gérer les sous-classes
 @Table(name = "users")
 public class User extends AuditableEntity implements UserDetails {
     

@@ -1,4 +1,4 @@
-x²// Initialisation des graphiques du tableau de bord administrateur
+// Initialisation des graphiques du tableau de bord administrateur
 document.addEventListener('DOMContentLoaded', function() {
     // Distribution des utilisateurs
     new Chart(document.getElementById('userDistributionChart'), {
@@ -43,6 +43,43 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Répartition de nombre de prof par matière
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/admin/api/dashboard/professors-per-subject')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.subject);
+                const values = data.map(item => item.count);
+
+                new Chart(document.getElementById('distributionProfChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Nombre de Professeurs par Matière',
+                            data: values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Erreur lors du chargement des données :', error));
+    });
+
+
+
 
     // Performance par niveau
     new Chart(document.getElementById('levelPerformanceChart'), {

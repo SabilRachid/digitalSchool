@@ -22,6 +22,9 @@ public class Subject extends AuditableEntity {
     
     @Column(name = "is_optional")
     private boolean optional = false;
+
+    @OneToMany(mappedBy = "subject")
+    private Set<User> professors = new HashSet<>();
     
     @ManyToMany(mappedBy = "subjects")
     private Set<Level> levels = new HashSet<>();
@@ -74,6 +77,10 @@ public class Subject extends AuditableEntity {
     public void setOptional(boolean optional) {
         this.optional = optional;
     }
+
+    public Set<User> getProfessors() { return professors; }
+
+    public void setProfessors(Set<User> professors) { this.professors = professors; }
 
     public Set<Level> getLevels() {
         return levels;

@@ -75,21 +75,6 @@ public class ProfessorController {
         return dashboardService.getProfessorStats(professor);
     }
 
-
-    @GetMapping("/dashboardd/stats")
-    @ResponseBody
-    public Map<String, Object> getProfessorStats() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            Optional<User> userOptional = userService.findByUsername(username);
-            if (userOptional.isPresent()) {
-                return userService.getProfessorDashboardStats(userOptional.get());
-            }
-        }
-        return null;
-    }
-    
     
     
 }

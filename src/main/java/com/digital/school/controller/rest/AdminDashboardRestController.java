@@ -19,8 +19,6 @@ public class AdminDashboardRestController {
     @Autowired
     private AdminDashboardService dashboardService;
 
-
-
     @GetMapping("/professors-per-subject")
     public List<Map<String, Object>> getProfessorCountBySubject() {
         List<Map<String, Object>> listMap = dashboardService.getProfessorCountBySubject();

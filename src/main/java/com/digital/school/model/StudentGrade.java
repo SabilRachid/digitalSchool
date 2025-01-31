@@ -2,14 +2,8 @@ package com.digital.school.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.digital.school.model.enumerated.GradeType;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "student_grades")
@@ -17,7 +11,7 @@ public class StudentGrade extends AuditableEntity {
 	
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private User student;
+    private Student student;
     
     @ManyToOne
     @JoinColumn(name = "subject_id")
@@ -27,7 +21,11 @@ public class StudentGrade extends AuditableEntity {
     
     @Column(name = "grade_value") // Renommage de la colonne
     private Float value;
-    
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "grade_letter", nullable = false)
+	private GradeType grade; // Grade (A, B, C...)
+
     private Double classAverage;
     private LocalDateTime date;
     private String comments;
@@ -69,7 +67,10 @@ public class StudentGrade extends AuditableEntity {
 
 	public void setValue(Float value) {
 		this.value = value;
+		this.grade = GradeType.fromScore(value);
 	}
+
+	public GradeType getGrade() { return grade; }
 
 	public Double getClassAverage() {
 		return classAverage;

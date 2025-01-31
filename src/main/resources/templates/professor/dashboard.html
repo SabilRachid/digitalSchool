@@ -11,7 +11,14 @@
   <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
   <link rel="stylesheet" th:href="@{/css/sidebar.css}">
   <link rel="stylesheet" th:href="@{/css/topbar.css}">
+  <link rel="stylesheet" th:href="@{/css/cards.css}">
+  <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+  <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+  <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+  <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+  <link rel="stylesheet" th:href="@{/css/components/stats.css}">
   <link rel="stylesheet" th:href="@{/css/professor/dashboard.css}">
+
 </head>
 <body>
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
@@ -35,74 +42,15 @@
 
   <!-- Stats Grid -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon students">
-        <i class="fas fa-users"></i>
-      </div>
-      <div class="stat-content">
-        <h3>Élèves</h3>
-        <div class="stat-value" th:text="${stats.totalStudents}">156</div>
-        <div class="stat-details">
-          <span th:text="${stats.totalClasses + ' classes'}">6 classes</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon homework">
-        <i class="fas fa-tasks"></i>
-      </div>
-      <div class="stat-content">
-        <h3>Devoirs à Corriger</h3>
-        <div class="stat-value" th:text="${stats.pendingHomework}">23</div>
-        <div class="stat-details">
-          <span th:text="${stats.submittedToday + ' aujourd''hui'}">5 aujourd'hui</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon exams">
-        <i class="fas fa-file-alt"></i>
-      </div>
-      <div class="stat-content">
-        <h3>Examens Prévus</h3>
-        <div class="stat-value" th:text="${stats.upcomingExams}">4</div>
-        <div class="stat-details">
-          <span>Cette semaine</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon attendance">
-        <i class="fas fa-user-check"></i>
-      </div>
-      <div class="stat-content">
-        <h3>Présence Moyenne</h3>
-        <div class="stat-value" th:text="${stats.averageAttendance + '%'}">92%</div>
-        <div class="stat-details">
-          <span>Ce mois</span>
-        </div>
-      </div>
-    </div>
+    <!-- Cartes de statistiques -->
+    <div th:replace="~{fragments/dashboard/stats :: professorStats}"></div>
   </div>
 
   <!-- Main Content Grid -->
-  <div class="content-grid">
-    <!-- Class Performance Chart -->
-    <div class="dashboard-card">
-      <div class="card-header">
-        <h2>Performance par Classe</h2>
-        <div class="period-selector">
-          <button class="btn-outline active">Trimestre</button>
-          <button class="btn-outline">Année</button>
-        </div>
-      </div>
-      <div class="card-body">
-        <canvas id="classPerformanceChart"></canvas>
-      </div>
-    </div>
+  <div class="charts-grid">
+    <!-- Graphiques -->
+    <div th:replace="~{fragments/dashboard/charts :: professorCharts}"></div>
+  </div>
 
     <!-- Today's Schedule -->
     <div class="dashboard-card">

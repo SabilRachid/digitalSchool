@@ -35,8 +35,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     @Autowired
     private ClasseRepository classeRepository;
 
-    @Override
-    public StudentDashboardStats getStudentStats(User student) {
+    public StudentDashboardStats getStudentStats(Student student) {
         StudentDashboardStats stats = new StudentDashboardStats();
         
         // Calculer le taux de présence

@@ -30,7 +30,7 @@ public class StudentProfileServiceImpl implements StudentProfileService {
     }
 
     @Override
-    public Optional<StudentProfile> findByStudent(User student) {
+    public Optional<StudentProfile> findByStudent(Student student) {
         return studentProfileRepository.findByStudent(student);
     }
 

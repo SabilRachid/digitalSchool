@@ -55,6 +55,11 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     }
 
     @Override
+    public StudentDashboardStats getStudentStats(User student) {
+        return null;
+    }
+
+    @Override
     public List<StudentGrade> getRecentGrades(User student) {
         return gradeRepository.findRecentGrades(student);
     }
@@ -87,5 +92,10 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     @Override
     public List<Event> getUpcomingEvents(User student) {
         return eventRepository.findUpcomingEventsByStudent(student);
+    }
+
+    @Override
+    public Map<String, Object> getStudentStats() {
+        return Map.of();
     }
 }

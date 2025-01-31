@@ -75,27 +75,5 @@ public class StudentController {
     }
     
 
-    @GetMapping("/student/dashboard/stats")
-    @ResponseBody
-    public Map<String, Object> getStudentStats() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            Optional<User> userOptional = userService.findByUsername(username);
-            if (userOptional.isPresent()) {
-                return userService.getStudentDashboardStats(userOptional.get());
-            }
-        }
-        return null;
-    }
-
-    @GetMapping("/dashboard/statss")
-    @ResponseBody
-    public ResponseEntity<?> getStats(@AuthenticationPrincipal User student) {
-        try {
-            return ResponseEntity.ok(dashboardService.getStudentStats(student));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
+    
 }

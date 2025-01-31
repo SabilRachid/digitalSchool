@@ -2,6 +2,8 @@ package com.digital.school.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "students")
@@ -9,6 +11,10 @@ import jakarta.persistence.*;
 public class Student extends User {
 
     private String specialNeeds; // Besoins spécifiques
+
+    @Column(name = "registration_date", nullable = false)
+    private LocalDateTime registrationDate;
+
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
@@ -41,5 +47,9 @@ public class Student extends User {
     public void setClasse(Classe classe) {
         this.classe = classe;
     }
+
+    public LocalDateTime getRegistrationDate() { return registrationDate; }
+
+    public void setRegistrationDate(LocalDateTime registrationDate) { this.registrationDate = registrationDate; }
 }
 

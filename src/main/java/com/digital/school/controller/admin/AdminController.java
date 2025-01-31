@@ -47,6 +47,7 @@ public class AdminController {
                 model.addAttribute("user", user);
                 
                 model.addAttribute("currentURI", request.getRequestURI());
+
                 return "admin/dashboard";
             }
         }

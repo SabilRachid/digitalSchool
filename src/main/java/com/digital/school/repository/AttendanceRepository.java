@@ -15,7 +15,16 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByCourse(Course course);
     List<Attendance> findByStudentAndRecordedAtBetween(User student, LocalDateTime start, LocalDateTime end);
     List<Attendance> findByCourseAndRecordedAtBetween(Course course, LocalDateTime start, LocalDateTime end);
-    
+
+    @Query("SELECT (SUM(CASE WHEN (a.status = 'PRESENT' OR a.status = 'RETARD') THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
+    Double getAverageAttendance();
+
+    @Query("SELECT (SUM(CASE WHEN a.status = 'EXCUSE' THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
+    Double getJustifiedAbsencesRate();
+
+    @Query("SELECT (SUM(CASE WHEN a.status = 'ABSENT' THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
+    Double getUnjustifiedAbsencesRate();
+
     long countByStudentAndCourse(User student, Course course);
     
     long countByStudentAndStatusAndCourse(
@@ -30,9 +39,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT COUNT(a) FROM Attendance a")
 	double calculateAttendanceRate(User student);
 
-    @Query("SELECT COALESCE(AVG(CASE WHEN a.status = 'PRESENT' THEN 1.0 WHEN a.status = 'LATE' THEN 0.5 ELSE 0.0 END), 0.0) " +
-            "FROM Attendance a " +
-            "WHERE a.course.professor = :professor ")
+    @Query("SELECT COALESCE(AVG(CASE WHEN a.status = 'PRESENT' THEN 1.0 WHEN a.status = 'RETARD' THEN 0.5 ELSE 0.0 END), 0.0) " +
+            "FROM Attendance a WHERE a.course.professor = :professor ")
     double calculateAverageAttendanceForProfessor(
             @Param("professor") User professor
     );

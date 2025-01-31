@@ -1,6 +1,7 @@
     <!-- Stats Admin -->
     <div th:fragment="adminStats">
         <div class="stats-grid">
+            <!-- Statistique des étudiants -->
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-icon students">
@@ -8,7 +9,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Étudiants</div>
-                        <div class="stat-value">1,234</div>
+                        <div class="stat-value" id="totalStudents" th:text="${totalStudents}">1,234</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>12% vs mois dernier</span>
@@ -18,15 +19,16 @@
                 <div class="stat-details">
                     <div class="stat-detail-item">
                         <span>Actifs</span>
-                        <span>1,180</span>
+                        <span id="studentsActive" th:text="${studentsActive}">1,180</span>
                     </div>
                     <div class="stat-detail-item">
                         <span>En attente</span>
-                        <span>54</span>
+                        <span id="studentsPending" th:text="${studentsPending}">54</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Statistique des professeurs -->
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-icon professors">
@@ -34,7 +36,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Professeurs</div>
-                        <div class="stat-value">87</div>
+                        <div class="stat-value" id="totalProfessors" th:text="${totalProfessors}">87</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>5% vs mois dernier</span>
@@ -44,15 +46,16 @@
                 <div class="stat-details">
                     <div class="stat-detail-item">
                         <span>Temps plein</span>
-                        <span>65</span>
+                        <span id="fullTimeProfessors" th:text="${fullTimeProfessors}">65</span>
                     </div>
                     <div class="stat-detail-item">
                         <span>Temps partiel</span>
-                        <span>22</span>
+                        <span id="partTimeProfessors" th:text="${partTimeProfessors}">22</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Statistique des classes -->
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-icon classes">
@@ -60,7 +63,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Classes</div>
-                        <div class="stat-value">45</div>
+                        <div class="stat-value" id="totalClasses" th:text="${totalClasses}">45</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>8% vs mois dernier</span>
@@ -70,15 +73,16 @@
                 <div class="stat-details">
                     <div class="stat-detail-item">
                         <span>Taux de remplissage</span>
-                        <span>92%</span>
+                        <span id="occupancyRate" th:text="${occupancyRate}">92%</span>
                     </div>
                     <div class="stat-detail-item">
                         <span>Places disponibles</span>
-                        <span>108</span>
+                        <span id="availableSeats" th:text="${availableSeats}">108</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Statistique des présences -->
             <div class="stat-card">
                 <div class="stat-header">
                     <div class="stat-icon attendance">
@@ -86,24 +90,25 @@
                     </div>
                     <div>
                         <div class="stat-title">Taux de présence</div>
-                        <div class="stat-value">95%</div>
-                        <div class="stat-change negative">
+                        <div class="stat-value" id="attendanceRate" th:text="${attendanceRate}">--%</div>
+                        <div class="stat-change negative" id="attendanceTrend">
                             <i class="fas fa-arrow-down"></i>
-                            <span>2% vs mois dernier</span>
+                            <span>--% vs mois dernier</span>
                         </div>
                     </div>
                 </div>
                 <div class="stat-details">
                     <div class="stat-detail-item">
                         <span>Absences justifiées</span>
-                        <span>3%</span>
+                        <span id="justifiedAbsencesRate" th:text="${justifiedAbsencesRate}">--%</span>
                     </div>
                     <div class="stat-detail-item">
                         <span>Absences injustifiées</span>
-                        <span>2%</span>
+                        <span id="unjustifiedAbsencesRate" th:text="${unjustifiedAbsencesRate}">--%</span>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 

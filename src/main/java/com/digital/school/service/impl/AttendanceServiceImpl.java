@@ -78,7 +78,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         long presentSessions = attendanceRepository.countByStudentAndStatusAndCourse(
             student, AttendanceStatus.PRESENT, course);
         long lateSessions = attendanceRepository.countByStudentAndStatusAndCourse(
-            student, AttendanceStatus.LATE, course);
+            student, AttendanceStatus.RETARD, course);
 
         return ((double) (presentSessions + lateSessions) / totalSessions) * 100;
     }
@@ -116,10 +116,10 @@ public class AttendanceServiceImpl implements AttendanceService {
                 case ABSENT:
                     stats.put("absentRate", rate);
                     break;
-                case LATE:
+                case RETARD:
                     stats.put("lateRate", rate);
                     break;
-                case EXCUSED:
+                case EXCUSE:
                     stats.put("excusedRate", rate);
                     break;
             }

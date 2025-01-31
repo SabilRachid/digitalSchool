@@ -31,7 +31,7 @@ public class SendinBlueEmailServiceImpl implements EmailService {
     }
 
 /*
-    public SendinBlueEmailServiceImpl(@Value("${sendinblue.api-key}") String apiKey) {
+    public SendinBlueEmailServiceImpl(@Value("${sendinblue.api.key}") String apiKey) {
         // Configuration personnalisée d'ApiClient
         ApiClient client = new ApiClient();
         client.setBasePath("https://api.sendinblue.com/v3");

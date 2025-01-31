@@ -7,7 +7,16 @@ import java.util.List;
 
 public interface ClasseRepository extends JpaRepository<Classe, Long> {
     boolean existsByNameAndSchoolYear(String name, String schoolYear);
-    
+
+    @Query("SELECT COUNT(c) FROM Classe c")
+    Long countClasses();
+
+    @Query("SELECT (SUM(SIZE(c.students)) * 100.0 / SUM(c.maxStudents)) FROM Classe c")
+    Double calculateOccupancyRate();
+
+    @Query("SELECT SUM(c.maxStudents - SIZE(c.students)) FROM Classe c")
+    Long countAvailableSeats();
+
     @Query("SELECT c FROM Classe c WHERE c.level.id = ?1")
     List<Classe> findByLevelId(Long levelId);
     
@@ -16,4 +25,6 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
 
     @Query("SELECT c FROM Classe c JOIN FETCH c.subjects WHERE c.id = ?1")
     Classe findByIdWithSubjects(Long id);
+
+
 }

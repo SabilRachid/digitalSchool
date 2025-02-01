@@ -2,6 +2,8 @@ package com.digital.school.service;
 
 import com.digital.school.model.StudentGrade;
 
+import java.util.List;
+
 public interface StudentGradeService {
 
     StudentGrade assignGrade(StudentGrade studentGrade); // Attribuer une note avec grade

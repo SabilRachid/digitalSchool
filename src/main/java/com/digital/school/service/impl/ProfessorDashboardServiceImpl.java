@@ -7,6 +7,7 @@ import com.digital.school.model.User;
 import com.digital.school.repository.*;
 import com.digital.school.service.ProfessorDashboardService;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -25,7 +26,6 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     @Autowired
     private AttendanceRepository attendanceRepository;
 
-    @Prof
 
     @Override
     public Map<String, Object> getProfessorStats(User professor) {

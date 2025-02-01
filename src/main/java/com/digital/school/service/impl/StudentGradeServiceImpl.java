@@ -3,16 +3,20 @@ package com.digital.school.service.impl;
 import com.digital.school.model.Student;
 import com.digital.school.model.StudentGrade;
 import com.digital.school.model.User;
+import com.digital.school.repository.StudentGradeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class StudentGradeServiceImpl {
     
         @Autowired
         private StudentGradeRepository studentGradeRepository;
 
-        public Double calculateAverageGrade(User student) {
-        return studentGradeRepository.calculateAverageGrade(Student student);
+        public Double calculateAverageGrade(Student student) {
+        return studentGradeRepository.calculateAverageGrade(student);
 
         }
         public StudentGrade assignGrade(StudentGrade studentGrade) {

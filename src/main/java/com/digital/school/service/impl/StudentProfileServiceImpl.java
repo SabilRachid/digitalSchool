@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,11 @@ public class StudentProfileServiceImpl implements StudentProfileService {
     @Override
     public List<StudentProfile> findAll() {
         return studentProfileRepository.findAll();
+    }
+
+    @Override
+    public Optional<StudentProfile> findByStudent(User student) {
+        return Optional.empty();
     }
 
     @Override

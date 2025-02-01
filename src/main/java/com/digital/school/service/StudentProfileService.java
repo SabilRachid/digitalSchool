@@ -1,5 +1,6 @@
 package com.digital.school.service;
 
+import com.digital.school.model.Student;
 import com.digital.school.model.StudentProfile;
 import com.digital.school.model.User;
 
@@ -11,6 +12,9 @@ import java.util.Optional;
 public interface StudentProfileService {
     List<Map<String, Object>> findAllAsMap();
     Optional<StudentProfile> findById(Long id);
+
+    Optional<StudentProfile> findByStudent(Student student);
+
     StudentProfile save(StudentProfile profile);
     void deleteById(Long id);
     List<StudentProfile> findBySpecialNeeds(boolean hasSpecialNeeds);

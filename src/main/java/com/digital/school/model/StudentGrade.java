@@ -41,7 +41,7 @@ public class StudentGrade extends AuditableEntity {
 		return student;
 	}
 
-	public void setStudent(User student) {
+	public void setStudent(Student student) {
 		this.student = student;
 	}
 

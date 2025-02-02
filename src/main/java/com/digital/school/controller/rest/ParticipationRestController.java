@@ -22,6 +22,8 @@ public class ParticipationRestController {
     /**
      * Récupérer toutes les participations
      */
+
+
     @GetMapping
     public ResponseEntity<List<ParticipationDto>> getAllParticipations() {
         List<ParticipationDto> participations = participationService.getAllParticipations()
@@ -30,7 +32,6 @@ public class ParticipationRestController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(participations);
     }
-
     /**
      * Récupérer les participations d'une classe et d'une matière
      */

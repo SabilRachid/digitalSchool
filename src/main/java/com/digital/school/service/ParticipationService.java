@@ -3,6 +3,7 @@ package com.digital.school.service;
 import com.digital.school.model.Participation;
 import com.digital.school.model.enumerated.ParticipationLevel;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ParticipationService {
@@ -12,4 +13,12 @@ public interface ParticipationService {
 
     
     void deleteParticipation(Long id);
+
+    Collection<Participation> getAllParticipations();
+
+    Collection<Participation> getParticipationsByClassAndSubject(Long classId, Long subjectId);
+
+    Participation updateParticipation(Long id, Participation entity);
+
+    Participation saveParticipation(Participation entity);
 }

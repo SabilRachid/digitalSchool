@@ -8,22 +8,23 @@ import com.digital.school.repository.UserRepository;
 import com.digital.school.repository.CourseRepository;
 import com.digital.school.service.ParticipationService;
 import com.digital.school.model.enumerated.ParticipationLevel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
 public class ParticipationServiceImpl implements ParticipationService {
 
-    private final ParticipationRepository participationRepository;
-    private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
+    @Autowired
+    private ParticipationRepository participationRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CourseRepository courseRepository;
 
-    public ParticipationServiceImpl(ParticipationRepository participationRepository, UserRepository userRepository, CourseRepository courseRepository) {
-        this.participationRepository = participationRepository;
-        this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
-    }
+
 
     @Override
     public List<Participation> getParticipationsByStudent(Long studentId) {
@@ -37,18 +38,38 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     @Override
     public Participation recordParticipation(Long studentId, Long courseId, String feedback, ParticipationLevel level) {
-        User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Cours non trouvé"));
+        return null;
+    }
 
-        Participation participation = new Participation();
-        participation.setStudent(student);
-        participation.setCourse(course);
-        participation.setLevel(level);
-        participation.setFeedback(feedback);
 
-        return participationRepository.save(participation);
+    public ParticipationServiceImpl(ParticipationRepository participationRepository) {
+        this.participationRepository = participationRepository;
+    }
+
+    @Override
+    public Collection<Participation> getAllParticipations() {
+        return participationRepository.findAllProjected();
+    }
+
+    @Override
+    public Collection<Participation> getParticipationsByClassAndSubject(Long classId, Long subjectId) {
+        return participationRepository.findByClassAndSubject(classId, subjectId);
+    }
+
+    //updateParticipation
+    @Override
+    public Participation updateParticipation(Long id, Participation entity) {
+        Participation existingParticipation = participationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Participation not found"));
+        existingParticipation.setFeedback(entity.getFeedback());
+        existingParticipation.setParticipationType(entity.getParticipationType());
+        existingParticipation.setRecordedAt(entity.getRecordedAt());
+        return participationRepository.save(existingParticipation);
+    }
+
+    @Override
+    public Participation saveParticipation(Participation entity) {
+        return participationRepository.save(entity);
     }
 
     //implemente deleteParticipation
@@ -56,6 +77,8 @@ public class ParticipationServiceImpl implements ParticipationService {
     public void deleteParticipation(Long id) {
         participationRepository.deleteById(id);
     }
+
+
 
 
 }

@@ -29,6 +29,10 @@ public class Performance extends AuditableEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public Performance() {
+        
+    }
+
     public User getStudent() {
         return student;
     }

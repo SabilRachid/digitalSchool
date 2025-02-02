@@ -1,5 +1,7 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Classe;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,14 +16,14 @@ public interface ProfessorDashboardRepository extends JpaRepository<Classe, Long
         List<Object[]> getClassPerformance();
 
         @Query("SELECT CASE " +
-                "WHEN g.grade BETWEEN 0 AND 5 THEN '0-5' " +
-                "WHEN g.grade BETWEEN 5 AND 8 THEN '5-8' " +
-                "WHEN g.grade BETWEEN 8 AND 10 THEN '8-10' " +
-                "WHEN g.grade BETWEEN 10 AND 12 THEN '10-12' " +
-                "WHEN g.grade BETWEEN 12 AND 15 THEN '12-15' " +
-                "WHEN g.grade BETWEEN 15 AND 18 THEN '15-18' " +
+                "WHEN g.value BETWEEN 0 AND 5 THEN '0-5' " +
+                "WHEN g.value BETWEEN 5 AND 8 THEN '5-8' " +
+                "WHEN g.value BETWEEN 8 AND 10 THEN '8-10' " +
+                "WHEN g.value BETWEEN 10 AND 12 THEN '10-12' " +
+                "WHEN g.value BETWEEN 12 AND 15 THEN '12-15' " +
+                "WHEN g.value BETWEEN 15 AND 18 THEN '15-18' " +
                 "ELSE '18-20' END AS gradeRange, COUNT(g) " +
-                "FROM Grade g GROUP BY gradeRange ORDER BY gradeRange")
+                "FROM StudentGrade g GROUP BY gradeRange ORDER BY gradeRange")
         List<Object[]> getGradesDistribution();
 
         @Query("SELECT " +
@@ -31,7 +33,7 @@ public interface ProfessorDashboardRepository extends JpaRepository<Classe, Long
                 "FROM Participation p")
         List<Object[]> getParticipationRate();
 
-        @Query("SELECT TO_CHAR(g.date, 'TMMon', 'fr_FR'), AVG(g.grade) FROM Grade g " +
+        @Query("SELECT TO_CHAR(g.date, 'TMMon', 'fr_FR'), AVG(g.grade) FROM StudentGrade g " +
                 "WHERE g.date >= :startDate " +
                 "GROUP BY TO_CHAR(g.date, 'TMMon', 'fr_FR') " +
                 "ORDER BY MIN(g.date)")

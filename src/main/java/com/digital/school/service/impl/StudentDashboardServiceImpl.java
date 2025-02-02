@@ -42,7 +42,8 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         stats.setAttendanceRate(attendanceRepository.calculateAttendanceRate(student));
         
         // Calculer la moyenne générale
-        Double averageGrade = gradeRepository.calculateAverageGrade(student);
+        //gerer optional de student
+        Double averageGrade = gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
         stats.setAverageGrade(averageGrade != null ? averageGrade : 0.0);
         
         // Compter les devoirs en attente

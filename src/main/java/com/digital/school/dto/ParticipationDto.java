@@ -42,6 +42,15 @@ public class ParticipationDto {
         );
     }
 
+    public Participation toEntity() {
+        Participation participation = new Participation();
+        participation.setId(this.id);
+        participation.setFeedback(this.feedback);
+        participation.setRecordedAt(this.recordedAt);
+        participation.setParticipationType(this.participationType);
+        // Set other fields as necessary
+        return participation;
+    }
 
     public Long getId() {
         return id;

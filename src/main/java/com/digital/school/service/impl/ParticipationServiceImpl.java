@@ -2,8 +2,6 @@ package com.digital.school.service.impl;
 
 import com.digital.school.dto.ParticipationDto;
 import com.digital.school.model.Participation;
-import com.digital.school.model.User;
-import com.digital.school.model.Course;
 import com.digital.school.model.enumerated.ParticipationType;
 import com.digital.school.repository.ParticipationRepository;
 import com.digital.school.repository.UserRepository;
@@ -68,8 +66,19 @@ public class ParticipationServiceImpl implements ParticipationService {
     }
 
     @Override
-    public Collection<Object> getParticipationsByClassAndSubject(Long classId, Long subjectId) {
-        return participationRepository.findByClassAndSubject(classId, subjectId);
+    public Collection<ParticipationDto> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId) {
+        return participationRepository.findByClassIdAndSubjectId(classId, subjectId).stream()
+                .map(objects -> new ParticipationDto(
+                        (Long) objects[0],
+                        (String) objects[1],
+                        (String) objects[2],
+                        (String) objects[3],
+                        (String) objects[4],
+                        (LocalDateTime) objects[5],
+                        (ParticipationType) objects[6],
+                        (String) objects[7]
+                ))
+                .collect(Collectors.toList());
     }
 
     //updateParticipation

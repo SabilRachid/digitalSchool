@@ -35,8 +35,7 @@ public class ParticipationRestController {
     public ResponseEntity<List<ParticipationDto>> getParticipationsByClassAndSubject(
             @RequestParam Long classId,
             @RequestParam Long subjectId) {
-        List<ParticipationDto> participations = participationService.getParticipationsByClassAndSubject(classId, subjectId).stream()
-                .map(ParticipationDto::fromEntity)
+        List<ParticipationDto> participations = participationService.getParticipationsByClassIdAndSubjectId(classId, subjectId).stream()
                 .collect(Collectors.toList());
         return ResponseEntity.ok(participations);
     }

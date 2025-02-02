@@ -24,5 +24,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
             "p.recordedAt, p.participationType, p.feedback " +
             "FROM Participation p WHERE p.course.classe.id = :classId " +
             "AND p.course.subject.id = :subjectId")
-    Collection<Object[]> findByClassAndSubject(Long classId, Long subjectId);
+    Collection<Object[]> findByClassIdAndSubjectId(Long classId, Long subjectId);
+
+
 }

@@ -17,7 +17,7 @@ public interface ParticipationService {
 
     Collection<ParticipationDto> getAllParticipations();
 
-    Collection<Participation> getParticipationsByClassAndSubject(Long classId, Long subjectId);
+    Collection<ParticipationDto> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId);
 
     Participation updateParticipation(Long id, Participation entity);
 

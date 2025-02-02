@@ -1,52 +1,40 @@
+//donne moi toute la classe ParticipationDto adaptée pour participations```java
+
 package com.digital.school.dto;
 
 import com.digital.school.model.Participation;
-import com.digital.school.model.User;
-import com.digital.school.model.Subject;
-import com.digital.school.model.Classe;
 import com.digital.school.model.enumerated.ParticipationType;
 
 import java.time.LocalDateTime;
 
 public class ParticipationDto {
-
     private Long id;
-    private Long studentId;
-    private String studentName;
-    private Long subjectId;
+    private String studentFirstName;
+    private String studentLastName;
     private String subjectName;
-    private Long classId;
     private String className;
-    private LocalDateTime participationDate;
-    private String participationType;
-    private String comments;
+    private LocalDateTime recordedAt;
+    private ParticipationType participationType;
+    private String feedback;
 
-    public ParticipationDto() {}
-
-    public ParticipationDto(Long id, Long studentId, String studentName, Long subjectId, String subjectName,
-                            Long classId, String className, LocalDateTime participationDate,
-                            ParticipationType participationType, String comments) {
+    public ParticipationDto(Long id, String studentFirstName, String studentLastName, String subjectName, String className, LocalDateTime recordedAt, ParticipationType participationType, String feedback) {
         this.id = id;
-        this.studentId = studentId;
-        this.studentName = studentName;
-        this.subjectId = subjectId;
+        this.studentFirstName = studentFirstName;
+        this.studentLastName = studentLastName;
         this.subjectName = subjectName;
-        this.classId = classId;
         this.className = className;
-        this.participationDate = participationDate;
-        this.participationType = String.valueOf(participationType);
+        this.recordedAt = recordedAt;
+        this.participationType = participationType;
         this.feedback = feedback;
     }
 
-    // Convertir une entité en DTO
+
     public static ParticipationDto fromEntity(Participation participation) {
         return new ParticipationDto(
                 participation.getId(),
-                participation.getStudent().getId(),
-                participation.getStudent().getFirstName() + " " + participation.getStudent().getLastName(),
-                participation.getCourse().getSubject().getId(),
+                participation.getStudent().getFirstName(),
+                participation.getStudent().getLastName(),
                 participation.getCourse().getSubject().getName(),
-                participation.getCourse().getClasse().getId(),
                 participation.getCourse().getClasse().getName(),
                 participation.getRecordedAt(),
                 participation.getParticipationType(),
@@ -54,59 +42,69 @@ public class ParticipationDto {
         );
     }
 
-    private String feedback; // Remarque sur la participation
 
-    private LocalDateTime recordedAt;
-    // Convertir un DTO en entité
-    public Participation toEntity() {
-        Participation participation = new Participation();
-        participation.setId(this.id);
-
-        User student = new User();
-        student.setId(this.studentId);
-        participation.setStudent(student);
-
-        Subject subject = new Subject();
-        subject.setId(this.subjectId);
-
-        Classe classe = new Classe();
-        classe.setId(this.classId);
-
-        participation.setRecordedAt(this.participationDate);
-        participation.setParticipationType(ParticipationType.valueOf(this.participationType));
-        participation.setFeedback(this.feedback);
-
-        return participation;
+    public Long getId() {
+        return id;
     }
 
-    // Getters & Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Long getStudentId() { return studentId; }
-    public void setStudentId(Long studentId) { this.studentId = studentId; }
+    public String getStudentFirstName() {
+        return studentFirstName;
+    }
 
-    public String getStudentName() { return studentName; }
-    public void setStudentName(String studentName) { this.studentName = studentName; }
+    public void setStudentFirstName(String studentFirstName) {
+        this.studentFirstName = studentFirstName;
+    }
 
-    public Long getSubjectId() { return subjectId; }
-    public void setSubjectId(Long subjectId) { this.subjectId = subjectId; }
+    public String getStudentLastName() {
+        return studentLastName;
+    }
 
-    public String getSubjectName() { return subjectName; }
-    public void setSubjectName(String subjectName) { this.subjectName = subjectName; }
+    public void setStudentLastName(String studentLastName) {
+        this.studentLastName = studentLastName;
+    }
 
-    public Long getClassId() { return classId; }
-    public void setClassId(Long classId) { this.classId = classId; }
+    public String getSubjectName() {
+        return subjectName;
+    }
 
-    public String getClassName() { return className; }
-    public void setClassName(String className) { this.className = className; }
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
 
-    public LocalDateTime getParticipationDate() { return participationDate; }
-    public void setParticipationDate(LocalDateTime participationDate) { this.participationDate = participationDate; }
+    public String getClassName() {
+        return className;
+    }
 
-    public String getParticipationType() { return participationType; }
-    public void setParticipationType(String participationType) { this.participationType = participationType; }
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-    public String getComments() { return comments; }
-    public void setComments(String comments) { this.comments = comments; }
+    public LocalDateTime getRecordedAt() {
+        return recordedAt;
+    }
+
+    public void setRecordedAt(LocalDateTime recordedAt) {
+        this.recordedAt = recordedAt;
+    }
+
+    public ParticipationType getParticipationType() {
+        return participationType;
+    }
+
+    public void setParticipationType(ParticipationType participationType) {
+        this.participationType = participationType;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+
 }

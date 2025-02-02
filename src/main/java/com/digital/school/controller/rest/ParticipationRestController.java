@@ -22,13 +22,9 @@ public class ParticipationRestController {
     /**
      * Récupérer toutes les participations
      */
-
-
     @GetMapping
     public ResponseEntity<List<ParticipationDto>> getAllParticipations() {
-        List<ParticipationDto> participations = participationService.getAllParticipations()
-                .stream()
-                .map(ParticipationDto::fromEntity)
+        List<ParticipationDto> participations = participationService.getAllParticipations().stream()
                 .collect(Collectors.toList());
         return ResponseEntity.ok(participations);
     }
@@ -39,21 +35,14 @@ public class ParticipationRestController {
     public ResponseEntity<List<ParticipationDto>> getParticipationsByClassAndSubject(
             @RequestParam Long classId,
             @RequestParam Long subjectId) {
-        List<ParticipationDto> participations = participationService.getParticipationsByClassAndSubject(classId, subjectId)
-                .stream()
+        List<ParticipationDto> participations = participationService.getParticipationsByClassAndSubject(classId, subjectId).stream()
                 .map(ParticipationDto::fromEntity)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(participations);
     }
 
-    /**
-     * Enregistrer une nouvelle participation
-     */
-    @PostMapping
-    public ResponseEntity<ParticipationDto> createParticipation(@RequestBody ParticipationDto participationDto) {
-        Participation savedParticipation = participationService.saveParticipation(participationDto.toEntity());
-        return ResponseEntity.ok(ParticipationDto.fromEntity(savedParticipation));
-    }
+    //créé moi la methode fromEntity
+
 
     /**
      * Mettre à jour une participation existante
@@ -63,6 +52,8 @@ public class ParticipationRestController {
             @PathVariable Long id,
             @RequestBody ParticipationDto participationDto) {
         Participation updatedParticipation = participationService.updateParticipation(id, participationDto.toEntity());
+      //donne moi toEntity
+
         return ResponseEntity.ok(ParticipationDto.fromEntity(updatedParticipation));
     }
 

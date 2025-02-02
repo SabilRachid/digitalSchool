@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.dto.ParticipationDto;
 import com.digital.school.model.Participation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,12 +17,12 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
     @Query("SELECT p.id, p.student.firstName, p.student.lastName, " +
             "p.course.subject.name, p.course.classe.name, " +
             "p.recordedAt, p.participationType, p.feedback FROM Participation p")
-    Collection<Object> findAllProjected();
+    Collection<Object[]> findAllProjected();
 
     @Query("SELECT p.id, p.student.firstName, p.student.lastName, " +
             "p.course.subject.name, p.course.classe.name, " +
             "p.recordedAt, p.participationType, p.feedback " +
             "FROM Participation p WHERE p.course.classe.id = :classId " +
             "AND p.course.subject.id = :subjectId")
-    Collection<Object> findByClassAndSubject(Long classId, Long subjectId);
+    Collection<Object[]> findByClassAndSubject(Long classId, Long subjectId);
 }

@@ -45,8 +45,14 @@ public class PerformanceServiceImpl implements PerformanceService {
         Long totalStudents = studentGradeRepository.countStudentsInClass(classId);
         Long gradedStudents = studentGradeRepository.countGradesForClass(subjectId, title, classId);
 
+        //commentaire
         if (gradedStudents.equals(totalStudents)) { // Vérifier si toutes les notes ont été saisies
+
+
+
+
             Double classAverage = studentGradeRepository.calculateClassAverage(subjectId, title, classId);
+            Double successRate = studentGradeRepository.calculateSuccessRate(subjectId, title, classId);
 
             List<Performance> performances = performanceRepository.findAllByClasseOrderByAverageDesc(classId);
             int rank = 1;

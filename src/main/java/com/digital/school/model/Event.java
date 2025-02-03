@@ -1,5 +1,6 @@
 package com.digital.school.model;
 
+import com.digital.school.model.enumerated.EventType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -8,13 +9,6 @@ import java.util.Set;
 @Entity
 @Table(name = "events")
 public class Event extends AuditableEntity {
-    
-    public enum EventType {
-        COURSE,
-        EXAM,
-        EVENT,
-        MEETING
-    }
     
     @Column(nullable = false)
     private String title;

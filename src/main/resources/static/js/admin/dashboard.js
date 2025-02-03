@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 📊 Taux de réussite par matière
     initSuccessRateChart();
+
+    // 📊 Activité récente
+    initRecentEvents();
 });
 
 /**
@@ -215,54 +218,137 @@ function loadProfessorDistributionChart() {
 /**
  * Moyenne des performances par niveau scolaire
  */
+
+// 📊 Performance par Niveau scolaire
 function initLevelPerformanceChart() {
-    new Chart(document.getElementById('levelPerformanceChart'), {
-        type: 'bar',
-        data: {
-            labels: ['6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'],
-            datasets: [{
-                label: 'Moyenne générale',
-                data: [14.5, 13.8, 14.2, 15.1, 14.7, 15.3, 15.8],
-                backgroundColor: '#48BB78'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 20
+    fetch('/admin/api/dashboard/level-performance')
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => item.level);
+            const values = data.map(item => item.average);
+
+            new Chart(document.getElementById('levelPerformanceChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Moyenne générale',
+                        data: values,
+                        backgroundColor: '#48BB78'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20
+                        }
+                    }
                 }
-            }
-        }
-    });
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement des données :', error));
 }
+
 
 /**
  * Taux de réussite par matière en radar chart
  */
 function initSuccessRateChart() {
-    new Chart(document.getElementById('successRateChart'), {
-        type: 'radar',
-        data: {
-            labels: ['Maths', 'Français', 'Histoire', 'Sciences', 'Langues', 'Sport'],
-            datasets: [{
-                label: 'Taux de réussite',
-                data: [85, 90, 88, 92, 87, 95],
-                backgroundColor: 'rgba(76, 81, 191, 0.2)',
-                borderColor: '#4C51BF'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 100
+    fetch('/admin/api/dashboard/success-rate')
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => item.subject);
+            const values = data.map(item => item.successRate);
+
+            new Chart(document.getElementById('successRateChart'), {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Taux de réussite',
+                        data: values,
+                        backgroundColor: 'rgba(76, 81, 191, 0.2)',
+                        borderColor: '#4C51BF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
                 }
-            }
-        }
-    });
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement des données :', error));
+}
+
+
+
+
+
+//donne moi le jpa repository
+
+function initRecentEvents() {
+    fetch('/admin/api/dashboard/last-events')
+        .then(response => response.json())
+        .then(data => {
+            const activityList = document.getElementById('activityList');
+            data.forEach(event => {
+                const eventHtml = `
+                    <div class="activity-item">
+                        <div class="activity-icon ${getEventColor(event.eventType)}">
+                            <i class="${getEventIcon(event.eventType)}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="activity-text">${event.title}</p>
+                            <span class="activity-time">${event.timeAgo}</span>
+                        </div>
+                        <div class="activity-actions">
+                            <button class="action-button view">Voir</button>
+                        </div>
+                    </div>`;
+                activityList.innerHTML += eventHtml; // ✅ Correction ici
+            });
+        })
+        .catch(error => console.error('Error fetching activities:', error));
+
+}
+
+
+function getEventColor(eventType) {
+    switch (eventType) {
+        case 'COURSE':
+            return 'bg-primary'; // Bleu pour les cours
+        case 'EXAM':
+            return 'bg-danger'; // Rouge pour les examens
+        case 'EVENT':
+            return 'bg-success'; // Vert pour les événements
+        case 'MEETING':
+            return 'bg-warning'; // Jaune pour les réunions
+        default:
+            return 'bg-secondary'; // Gris par défaut
+    }
+}
+
+
+function getEventIcon(eventType) {
+    switch (eventType) {
+        case 'COURSE':
+            return 'fas fa-book-open'; // Icône pour un cours
+        case 'EXAM':
+            return 'fas fa-pencil-alt'; // Icône pour un examen
+        case 'EVENT':
+            return 'fas fa-calendar-check'; // Icône pour un événement
+        case 'MEETING':
+            return 'fas fa-users'; // Icône pour une réunion
+        default:
+            return 'fas fa-info-circle'; // Icône par défaut
+    }
 }

@@ -16,4 +16,12 @@ public interface AdminDashboardService {
 
     Map<String, Object> getAdminStats();
 
+    //Performance par niveau
+    List<Map<String, Object>> getLevelPerformance();
+
+    // Taux de Réussite
+    List<Map<String, Object>> getSuccessRate();
+
+    //dernières activités
+    List<Map<String, Object>> getLastActivities();
 }

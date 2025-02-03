@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Event;
 import com.digital.school.model.enumerated.RoleName;
 import com.digital.school.repository.*;
 import com.digital.school.service.AdminDashboardService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
@@ -37,6 +39,12 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     @Autowired
     private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private PerformanceRepository performanceRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Override
     public List<Map<String, Object>> getProfessorCountBySubject() {
@@ -165,4 +173,65 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
         return stats;
     }
+
+    @Override
+    public List<Map<String, Object>> getLevelPerformance() {
+        List<Object[]> results = performanceRepository.findAveragePerformanceByLevel();
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Object[] row : results) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("level", row[0]);
+            map.put("average", row[1] != null ? Math.round((Double) row[1] * 100.0) / 100.0 : 0);
+            response.add(map);
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<Map<String, Object>> getSuccessRate() {
+        List<Object[]> results = performanceRepository.findSuccessRateBySubject();
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Object[] row : results) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("subject", row[0]);
+            map.put("successRate", row[1] != null ? Math.round((Double) row[1] * 100.0) / 100.0 : 0);
+            response.add(map);
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<Map<String, Object>> getLastActivities() {
+        List<Event> events = eventRepository.findLastEvents();
+        List<Map<String, Object>> activities = new ArrayList<>();
+
+        for (Event event : events) {
+            Map<String, Object> activity = new HashMap<>();
+            activity.put("title", event.getTitle());
+            activity.put("eventType", event.getType().name());
+            activity.put("timeAgo", formatTimeAgo(event.getStartTime()));
+
+            activities.add(activity);
+        }
+
+        return activities;
+    }
+
+    // 🔹 Format "Il y a X minutes / heures"
+    private String formatTimeAgo(LocalDateTime startTime) {
+        Duration duration = Duration.between(startTime, LocalDateTime.now());
+        long minutes = duration.toMinutes();
+        if (minutes < 60) {
+            return "Il y a " + minutes + " minutes";
+        } else {
+            long hours = duration.toHours();
+            return "Il y a " + hours + " heures";
+        }
+    }
+
+
 }

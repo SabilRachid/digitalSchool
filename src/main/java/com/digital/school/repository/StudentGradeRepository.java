@@ -35,6 +35,8 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
     @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
     Double calculateClassAverage(@Param("subjectId") Long subjectId, @Param("title") String title, @Param("classId") Long classId);
 
+    @Query("SELECT AVG(CASE WHEN g.value >= 10 THEN 1 ELSE 0 END) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Double calculateSuccessRate(Long subjectId, String title, Long classId);
 }
 
 

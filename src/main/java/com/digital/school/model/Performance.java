@@ -28,6 +28,17 @@ public class Performance extends AuditableEntity {
     public Performance(Student student) {
         this.updatedAt = LocalDateTime.now();
     }
+    //donne sucessRate et ses getter and setter
+    @Column(name = "success_rate")
+    private Double successRate;
+
+    public Double getSuccessRate() {
+        return successRate;
+    }
+
+    public void setSuccessRate(Double successRate) {
+        this.successRate = successRate;
+    }
 
     public Performance() {
         

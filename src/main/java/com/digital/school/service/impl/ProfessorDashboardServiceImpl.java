@@ -8,6 +8,7 @@ import com.digital.school.repository.*;
 import com.digital.school.service.ProfessorDashboardService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +88,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     }
 
     public List<Map<String, Object>> getAverageProgression() {
-        LocalDate startDate = LocalDate.now().minusMonths(5);
+        LocalDateTime startDate = LocalDateTime.now().minusMonths(5);
         List<Object[]> results = professorDashboardRepository.getAverageProgression(startDate);
         return results.stream().map(row -> Map.of("month", row[0], "average", row[1])).toList();
     }

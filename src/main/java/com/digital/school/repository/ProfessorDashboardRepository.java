@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,15 +28,18 @@ public interface ProfessorDashboardRepository extends JpaRepository<Classe, Long
         List<Object[]> getGradesDistribution();
 
         @Query("SELECT " +
-                "SUM(CASE WHEN p.level = 'HIGH' THEN 1 ELSE 0 END) AS high, " +
+                "SUM(CASE WHEN p.level = 'ACTIVE' THEN 1 ELSE 0 END) AS high, " +
                 "SUM(CASE WHEN p.level = 'MEDIUM' THEN 1 ELSE 0 END) AS medium, " +
                 "SUM(CASE WHEN p.level = 'LOW' THEN 1 ELSE 0 END) AS low " +
                 "FROM Participation p")
         List<Object[]> getParticipationRate();
 
-        @Query("SELECT TO_CHAR(g.date, 'TMMon', 'fr_FR'), AVG(g.value) FROM StudentGrade g " +
+        @Query("SELECT " +
+                "TO_CHAR(g.date, 'YYYY-MM') AS month, " +
+                "AVG(g.value) AS average " +
+                "FROM StudentGrade g " +
                 "WHERE g.date >= :startDate " +
-                "GROUP BY TO_CHAR(g.date, 'TMMon', 'fr_FR') " +
-                "ORDER BY MIN(g.date)")
-        List<Object[]> getAverageProgression(@Param("startDate") LocalDate startDate);
+                "GROUP BY month " +
+                "ORDER BY month")
+        List<Object[]> getAverageProgression(@Param("startDate") LocalDateTime startDate);
 }

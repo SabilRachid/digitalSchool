@@ -1,4 +1,4 @@
-package com.digital.school.controller.professor;
+package com.digital.school.controller.rest.professor;
 
 import com.digital.school.model.Homework;
 import com.digital.school.model.User;
@@ -24,14 +24,6 @@ public class ProfessorHomeworkController {
     @Autowired
     private CourseService courseService;
 
-    /* Affiche la liste des devoirs du professeur */
-    @GetMapping
-    public String listHomeworks(@AuthenticationPrincipal User professor, Model model) {
-        List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor);
-        model.addAttribute("homeworks", homeworks);
-        model.addAttribute("courses", courseService.findByProfessor(professor));
-        return "professor/homeworks";
-    }
 
     @GetMapping("/data")
     @ResponseBody

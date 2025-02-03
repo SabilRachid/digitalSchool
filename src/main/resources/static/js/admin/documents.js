@@ -4,7 +4,7 @@ class DocumentsPage extends AdminPage {
             tableId: 'documentsTable',
             modalId: 'documentModal',
             formId: 'documentForm',
-            apiEndpoint: '/admin/documents',
+            apiEndpoint: '/admin/api/documents',
             columns: [
                 { 
                     data: 'name',
@@ -92,7 +92,7 @@ class DocumentsPage extends AdminPage {
     async loadUsers() {
         try {
             // Charger les étudiants
-            const studentsResponse = await fetch('/admin/users/students');
+            const studentsResponse = await fetch('/admin/api/users/students');
             const students = await studentsResponse.json();
             const studentSelect = document.getElementById('student');
             students.forEach(student => {
@@ -104,7 +104,7 @@ class DocumentsPage extends AdminPage {
             });
 
             // Charger les parents
-            const parentsResponse = await fetch('/admin/users/parents');
+            const parentsResponse = await fetch('/admin/api/users/parents');
             const parents = await parentsResponse.json();
             const parentSelect = document.getElementById('parent');
             parents.forEach(parent => {

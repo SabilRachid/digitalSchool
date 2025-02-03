@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ProfessorDashboardRepository extends JpaRepository<Classe, Long> {
 
-        @Query("SELECT c.name, AVG(g.grade) FROM StudentGrade g JOIN g.student s JOIN s.classe c GROUP BY c.name")
+        @Query("SELECT c.name, AVG(g.value) FROM StudentGrade g JOIN g.student s JOIN s.classe c GROUP BY c.name")
         List<Object[]> getClassPerformance();
 
         @Query("SELECT CASE " +
@@ -33,7 +33,7 @@ public interface ProfessorDashboardRepository extends JpaRepository<Classe, Long
                 "FROM Participation p")
         List<Object[]> getParticipationRate();
 
-        @Query("SELECT TO_CHAR(g.date, 'TMMon', 'fr_FR'), AVG(g.grade) FROM StudentGrade g " +
+        @Query("SELECT TO_CHAR(g.date, 'TMMon', 'fr_FR'), AVG(g.value) FROM StudentGrade g " +
                 "WHERE g.date >= :startDate " +
                 "GROUP BY TO_CHAR(g.date, 'TMMon', 'fr_FR') " +
                 "ORDER BY MIN(g.date)")

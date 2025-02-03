@@ -1,17 +1,13 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.digital.school.model.User;
 import com.digital.school.model.Role;
-import com.digital.school.model.Classe;
 import com.digital.school.service.UserService;
 import com.digital.school.service.RoleService;
 import com.digital.school.service.ClasseService;
@@ -20,12 +16,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/users")
-public class AdminUserController {
+@RequestMapping("/admin/api/users")
+public class AdminUserRestController {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private RoleService roleService;
     
@@ -34,14 +30,6 @@ public class AdminUserController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @GetMapping
-    public String listUsers(HttpServletRequest request, Model model) {
-        model.addAttribute("roles", RoleName.values());
-        model.addAttribute("classes", classeService.findAllBasicInfo());
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/users";
-    }
 
     @GetMapping("/data")
     @ResponseBody

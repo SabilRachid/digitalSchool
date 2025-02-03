@@ -1,33 +1,33 @@
-package com.digital.school.controller.rest;
+package com.digital.school.controller.rest.professor;
 
 import com.digital.school.dto.ParticipationDto;
+import com.digital.school.model.Classe;
 import com.digital.school.model.Participation;
+import com.digital.school.service.ClasseService;
 import com.digital.school.service.ParticipationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/api/participations")
 public class ParticipationRestController {
 
-    private final ParticipationService participationService;
+    @Autowired
+    private ParticipationService participationService;
 
     public ParticipationRestController(ParticipationService participationService) {
         this.participationService = participationService;
     }
 
-    /**
-     * Récupérer toutes les participations
-     */
-    @GetMapping
-    public ResponseEntity<List<ParticipationDto>> getAllParticipations() {
-        List<ParticipationDto> participations = participationService.getAllParticipations().stream()
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(participations);
-    }
+
     /**
      * Récupérer les participations d'une classe et d'une matière
      */
@@ -51,7 +51,7 @@ public class ParticipationRestController {
             @PathVariable Long id,
             @RequestBody ParticipationDto participationDto) {
         Participation updatedParticipation = participationService.updateParticipation(id, participationDto.toEntity());
-      //donne moi toEntity
+        //donne moi toEntity
 
         return ResponseEntity.ok(ParticipationDto.fromEntity(updatedParticipation));
     }
@@ -64,4 +64,5 @@ public class ParticipationRestController {
         participationService.deleteParticipation(id);
         return ResponseEntity.noContent().build();
     }
+
 }

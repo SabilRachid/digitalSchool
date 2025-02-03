@@ -1,10 +1,9 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Classe;
 import com.digital.school.service.ClasseService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/classes")
-public class AdminClasseController {
+@RequestMapping("/admin/api/classes")
+public class AdminClasseRestController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminClasseController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminClasseRestController.class);
 
     @Autowired
     private ClasseService classeService;
@@ -36,12 +34,12 @@ public class AdminClasseController {
     @ResponseBody
     public List<Map<String, Object>> getClassesData() {
         LOGGER.debug("getClassesData " + getClass().getName());
-         try {
-             return classeService.findAllAsMap();
-         }catch (Exception e) {
-             LOGGER.error("Erreur lors du chargement des classes : " + e.getMessage());
-             return null;
-         }
+        try {
+            return classeService.findAllAsMap();
+        }catch (Exception e) {
+            LOGGER.error("Erreur lors du chargement des classes : " + e.getMessage());
+            return null;
+        }
     }
 
     @GetMapping("/list")
@@ -67,7 +65,7 @@ public class AdminClasseController {
             return ResponseEntity.ok(savedClasse);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("message", "Erreur lors de la création: " + e.getMessage()));
+                    .body(Map.of("message", "Erreur lors de la création: " + e.getMessage()));
         }
     }
 
@@ -83,7 +81,7 @@ public class AdminClasseController {
             return ResponseEntity.ok(updatedClasse);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("message", "Erreur lors de la mise à jour: " + e.getMessage()));
+                    .body(Map.of("message", "Erreur lors de la mise à jour: " + e.getMessage()));
         }
     }
 

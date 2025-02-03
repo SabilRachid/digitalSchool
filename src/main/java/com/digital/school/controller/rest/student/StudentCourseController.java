@@ -1,4 +1,4 @@
-package com.digital.school.controller.student;
+package com.digital.school.controller.rest.student;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

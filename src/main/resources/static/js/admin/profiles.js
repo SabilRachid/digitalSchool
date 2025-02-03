@@ -8,7 +8,7 @@ class ProfilesPage {
         // Table des profils étudiants
         this.studentProfilesTable = $('#studentProfilesTable').DataTable({
             ajax: {
-                url: '/admin/profiles/students/data',
+                url: '/admin/api/profiles/students/data',
                 dataSrc: ''
             },
             columns: [
@@ -64,7 +64,7 @@ class ProfilesPage {
         // Table des profils parents
         this.parentProfilesTable = $('#parentProfilesTable').DataTable({
             ajax: {
-                url: '/admin/profiles/parents/data',
+                url: '/admin/api/profiles/parents/data',
                 dataSrc: ''
             },
             columns: [
@@ -97,7 +97,7 @@ class ProfilesPage {
         // Table des associations parent-élève
         this.associationsTable = $('#associationsTable').DataTable({
             ajax: {
-                url: '/admin/profiles/associations/data',
+                url: '/admin/api/profiles/associations/data',
                 dataSrc: ''
             },
             columns: [
@@ -183,7 +183,7 @@ class ProfilesPage {
 
     async editStudentProfile(id) {
         try {
-            const response = await fetch(`/admin/profiles/students/${id}`);
+            const response = await fetch(`/admin/api/profiles/students/${id}`);
             if (!response.ok) throw new Error('Erreur lors du chargement du profil');
             
             const profile = await response.json();
@@ -197,7 +197,7 @@ class ProfilesPage {
 
     async editParentProfile(id) {
         try {
-            const response = await fetch(`/admin/profiles/parents/${id}`);
+            const response = await fetch(`/admin/api/profiles/parents/${id}`);
             if (!response.ok) throw new Error('Erreur lors du chargement du profil');
             
             const profile = await response.json();
@@ -211,7 +211,7 @@ class ProfilesPage {
 
     async editAssociation(id) {
         try {
-            const response = await fetch(`/admin/profiles/associations/${id}`);
+            const response = await fetch(`/admin/api/profiles/associations/${id}`);
             if (!response.ok) throw new Error('Erreur lors du chargement de l\'association');
             
             const association = await response.json();
@@ -227,7 +227,7 @@ class ProfilesPage {
         if (!confirm('Êtes-vous sûr de vouloir valider cette association ?')) return;
         
         try {
-            const response = await fetch(`/admin/profiles/associations/${id}/validate`, {
+            const response = await fetch(`/admin/api/profiles/associations/${id}/validate`, {
                 method: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -248,7 +248,7 @@ class ProfilesPage {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cette association ?')) return;
         
         try {
-            const response = await fetch(`/admin/profiles/associations/${id}`, {
+            const response = await fetch(`/admin/api/profiles/associations/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -322,7 +322,7 @@ class ProfilesPage {
 
         try {
             const response = await fetch(
-                data.id ? `/admin/profiles/students/${data.id}` : '/admin/profiles/students',
+                data.id ? `/admin/api/profiles/students/${data.id}` : '/admin/api/profiles/students',
                 {
                     method: data.id ? 'PUT' : 'POST',
                     headers: {
@@ -355,7 +355,7 @@ class ProfilesPage {
 
         try {
             const response = await fetch(
-                data.id ? `/admin/profiles/parents/${data.id}` : '/admin/profiles/parents',
+                data.id ? `/admin/profiles/parents/${data.id}` : '/admin/api/profiles/parents',
                 {
                     method: data.id ? 'PUT' : 'POST',
                     headers: {
@@ -388,7 +388,7 @@ class ProfilesPage {
 
         try {
             const response = await fetch(
-                data.id ? `/admin/profiles/associations/${data.id}` : '/admin/profiles/associations',
+                data.id ? `/admin/api/profiles/associations/${data.id}` : '/admin/api/profiles/associations',
                 {
                     method: data.id ? 'PUT' : 'POST',
                     headers: {

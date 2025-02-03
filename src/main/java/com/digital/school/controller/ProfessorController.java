@@ -1,30 +1,25 @@
-package com.digital.school.controller.professor;
+package com.digital.school.controller;
 
-import com.digital.school.service.CourseService;
-import com.digital.school.service.MessageService;
-import com.digital.school.service.HomeworkService;
-import com.digital.school.service.ProfessorDashboardService;
+import com.digital.school.dto.ParticipationDto;
+import com.digital.school.model.Homework;
+import com.digital.school.service.*;
 import com.digital.school.model.User;
-import com.digital.school.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.digital.school.model.User;
-import com.digital.school.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/professor")
@@ -46,6 +41,9 @@ public class ProfessorController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private ParticipationService participationService;
 
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User professor, Model model) {
@@ -75,6 +73,25 @@ public class ProfessorController {
         return dashboardService.getProfessorStats(professor);
     }
 
+
+    /* Affiche la liste des devoirs du professeur */
+    @GetMapping("/homeworks")
+    public String listHomeworks(@AuthenticationPrincipal User professor, Model model) {
+        List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor);
+        model.addAttribute("homeworks", homeworks);
+        model.addAttribute("courses", courseService.findByProfessor(professor));
+        return "professor/homeworks";
+    }
+
+     // Récupérer toutes les participations
+    @GetMapping("/participations")
+    public String showParticipations(HttpServletRequest request, Model model) {
+        List<ParticipationDto> participations = participationService.getAllParticipations().stream()
+                .collect(Collectors.toList());
+        model.addAttribute("participations", participations);
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "professor/participations";
+    }
     
     
 }

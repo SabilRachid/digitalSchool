@@ -1,4 +1,4 @@
-package com.digital.school.controller.rest;
+package com.digital.school.controller.rest.professor;
 
 import com.digital.school.service.ProfessorDashboardService;
 import org.springframework.beans.factory.annotation.Autowired;

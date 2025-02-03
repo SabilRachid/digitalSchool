@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.digital.school.model.Document;
@@ -15,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/documents")
-public class AdminDocumentController {
+@RequestMapping("/admin/api/documents")
+public class AdminDocumentRestController {
 
     @Autowired
     private DocumentService documentService;
@@ -24,11 +22,6 @@ public class AdminDocumentController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public String showDocuments(HttpServletRequest request,  Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/documents";
-    }
 
     @GetMapping("/data")
     @ResponseBody

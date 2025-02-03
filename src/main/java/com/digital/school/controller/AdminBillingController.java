@@ -1,4 +1,4 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/admin/billing")
+@RequestMapping("/admin/api/billing")
 public class AdminBillingController {
 
     @Autowired

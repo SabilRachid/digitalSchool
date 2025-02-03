@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Level;
 import com.digital.school.service.LevelService;
@@ -12,17 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/levels")
-public class AdminLevelController {
+@RequestMapping("/admin/api/levels")
+public class AdminLevelRestController {
 
     @Autowired
     private LevelService levelService;
 
-    @GetMapping
-    public String showLevels(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/levels";
-    }
 
     @GetMapping("/data")
     @ResponseBody

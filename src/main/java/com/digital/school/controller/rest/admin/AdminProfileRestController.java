@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.*;
 import com.digital.school.service.*;
@@ -12,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/profiles")
-public class AdminProfileController {
+@RequestMapping("/admin/api/profiles")
+public class AdminProfileRestController {
 
     @Autowired
     private StudentProfileService studentProfileService;
@@ -24,11 +22,7 @@ public class AdminProfileController {
     @Autowired
     private ParentStudentService parentStudentService;
 
-    @GetMapping
-    public String showProfiles(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/profiles";
-    }
+
 
     // Student Profiles
     @GetMapping("/students/data")

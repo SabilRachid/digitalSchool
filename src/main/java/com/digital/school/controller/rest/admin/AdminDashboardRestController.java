@@ -1,4 +1,4 @@
-package com.digital.school.controller.rest;
+package com.digital.school.controller.rest.admin;
 
 import com.digital.school.service.AdminDashboardService;
 import org.slf4j.Logger;
@@ -40,5 +40,7 @@ public class AdminDashboardRestController {
     public Map<String, Object> getAdminStats() {
         return dashboardService.getAdminStats();
     }
+
+
 }
 

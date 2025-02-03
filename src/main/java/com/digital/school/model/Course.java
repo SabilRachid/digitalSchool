@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "courses")
 public class Course extends AuditableEntity {
-    
+
+    //ajoute propriété name
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
@@ -31,6 +33,14 @@ public class Course extends AuditableEntity {
     public Course() {
     }
 
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     public Subject getSubject() {
         return subject;
     }

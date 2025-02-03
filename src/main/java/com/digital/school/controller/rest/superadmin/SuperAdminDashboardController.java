@@ -1,4 +1,4 @@
-package com.digital.school.controller.superadmin;
+package com.digital.school.controller.rest.superadmin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

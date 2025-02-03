@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Subject;
 import com.digital.school.service.SubjectService;
@@ -12,17 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/subjects")
-public class AdminSubjectController {
+@RequestMapping("/admin/api/subjects")
+public class AdminSubjectRestController {
 
     @Autowired
     private SubjectService subjectService;
-
-    @GetMapping
-    public String showSubjects(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/subjects";
-    }
 
     @GetMapping("/data")
     @ResponseBody

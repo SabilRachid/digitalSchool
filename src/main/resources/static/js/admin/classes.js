@@ -4,7 +4,7 @@ class ClassesPage extends AdminPage {
             tableId: 'classesTable',
             modalId: 'classModal',
             formId: 'classForm',
-            apiEndpoint: '/admin/classes',
+            apiEndpoint: '/admin/api/classes',
             columns: [
                 { 
                     data: 'name',
@@ -53,7 +53,7 @@ class ClassesPage extends AdminPage {
 
     async loadLevels() {
         try {
-            const response = await fetch('/admin/levels/list');
+            const response = await fetch('/admin/api/levels/list');
             if (!response.ok) throw new Error('Erreur lors du chargement des niveaux');
             
             const levels = await response.json();

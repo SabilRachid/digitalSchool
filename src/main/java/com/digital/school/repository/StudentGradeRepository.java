@@ -26,13 +26,15 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
     List<StudentGrade> findBySubjectId(@Param("subjectId") Long subjectId);
 
 
-    Optional<Student> student(Student student);
-
-    Long countGradesForClass(Long subjectId, String title, Long classId);
-
+    @Query("SELECT COUNT(DISTINCT s.id) FROM Student s WHERE s.classe.id = :classId")
     Long countStudentsInClass(Long classId);
 
-    Double calculateClassAverage(Long subjectId, String title, Long classId);
+    @Query("SELECT COUNT(g) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Long countGradesForClass(@Param("subjectId") Long subjectId, @Param("title") String title, @Param("classId") Long classId);
+
+    @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Double calculateClassAverage(@Param("subjectId") Long subjectId, @Param("title") String title, @Param("classId") Long classId);
+
 }
 
 

@@ -12,7 +12,7 @@ class UserManagement {
     initializeTable() {
         return new DataTable('#usersTable', {
             ajax: {
-                url: '/admin/users/data',
+                url: '/admin/api/users/data',
                 dataSrc: ''
             },
             columns: [
@@ -100,7 +100,7 @@ class UserManagement {
         };
 
         try {
-            const response = await fetch(data.id ? `/admin/users/${data.id}` : '/admin/users', {
+            const response = await fetch(data.id ? `/admin/api/users/${data.id}` : '/admin/users', {
                 method: data.id ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ class UserManagement {
 
     async editUser(id) {
         try {
-            const response = await fetch(`/admin/users/${id}`);
+            const response = await fetch(`/admin/api/users/${id}`);
             if (!response.ok) throw new Error('Erreur lors du chargement des données');
 
             const user = await response.json();
@@ -139,7 +139,7 @@ class UserManagement {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
 
         try {
-            const response = await fetch(`/admin/users/${id}`, {
+            const response = await fetch(`/admin/api/users/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content

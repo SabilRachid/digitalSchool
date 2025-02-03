@@ -1,4 +1,4 @@
-package com.digital.school.controller.student;
+package com.digital.school.controller.rest.student;
 
 import com.digital.school.model.Homework;
 import org.springframework.beans.factory.annotation.Autowired;

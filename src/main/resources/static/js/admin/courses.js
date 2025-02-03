@@ -5,7 +5,7 @@ class CoursesPage extends AdminPage {
             tableId: 'coursesTable',
             modalId: 'courseModal',
             formId: 'courseForm',
-            apiEndpoint: '/admin/courses',
+            apiEndpoint: '/admin/api/courses',
             columns: [
                 {
                     data: 'subject',
@@ -66,7 +66,7 @@ class CoursesPage extends AdminPage {
     // Fonctions pour charger les données complémentaires
     async loadSubjects() {
         try {
-            const response = await fetch('/admin/subjects/list');
+            const response = await fetch('/admin/api/subjects/list');
             if (!response.ok) throw new Error('Erreur lors du chargement des matières');
 
             const subjects = await response.json();
@@ -88,7 +88,7 @@ class CoursesPage extends AdminPage {
 
     async loadProfessors() {
         try {
-            const response = await fetch('/admin/users/professors');
+            const response = await fetch('/admin/api/users/professors');
             if (!response.ok) throw new Error('Erreur lors du chargement des professeurs');
 
             const professors = await response.json();
@@ -110,7 +110,7 @@ class CoursesPage extends AdminPage {
 
     async loadClasses() {
         try {
-            const response = await fetch('/admin/classes/list');
+            const response = await fetch('/admin/api/classes/list');
             if (!response.ok) throw new Error('Erreur lors du chargement des classes');
 
             const classes = await response.json();

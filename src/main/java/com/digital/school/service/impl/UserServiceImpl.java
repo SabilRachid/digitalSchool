@@ -81,26 +81,6 @@ public class UserServiceImpl implements UserService {
         return List.of();
     }
 
-    @Override
-    public Map<String, Object> getAdminDashboardStats() {
-        Map<String, Object> stats = new HashMap<>();
-        // TODO: Implement admin dashboard statistics
-        return stats;
-    }
-
-    @Override
-    public Map<String, Object> getProfessorDashboardStats(User professor) {
-        Map<String, Object> stats = new HashMap<>();
-        // TODO: Implement professor dashboard statistics
-        return stats;
-    }
-
-    @Override
-    public Map<String, Object> getStudentDashboardStats(User student) {
-        Map<String, Object> stats = new HashMap<>();
-        // TODO: Implement student dashboard statistics
-        return stats;
-    }
 
     @Override
     public List<Map<String, Object>> findProfessorsAsMap() {

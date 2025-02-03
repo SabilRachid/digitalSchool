@@ -5,7 +5,7 @@ class LevelsPage extends AdminPage {
             tableId: 'levelsTable',
             modalId: 'levelModal',
             formId: 'levelForm',
-            apiEndpoint: '/admin/levels',
+            apiEndpoint: '/admin/api/levels',
             columns: [
                 { data: 'code' },
                 { data: 'name' },
@@ -39,7 +39,7 @@ class LevelsPage extends AdminPage {
             const cycle = cycleSelect.value;
             if (cycle) {
                 try {
-                    const response = await fetch(`/admin/levels/maxOrder?cycle=${cycle}`);
+                    const response = await fetch(`/admin/api/levels/maxOrder?cycle=${cycle}`);
                     if (!response.ok) throw new Error('Erreur lors de la récupération de l\'ordre maximum');
                     
                     const maxOrder = await response.json();

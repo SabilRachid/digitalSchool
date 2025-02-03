@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const roomsTable = $('#roomsTable').DataTable({
         ajax: {
-            url: '/admin/rooms/data',
+            url: '/admin/api/rooms/data',
             dataSrc: ''
         },
         columns: [
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            const response = await fetch(data.id ? `/admin/rooms/${data.id}` : '/admin/rooms', {
+            const response = await fetch(data.id ? `/admin/api/rooms/${data.id}` : '/admin/rooms', {
                 method: data.id ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         editRoom: async function(id) {
             try {
-                const response = await fetch(`/admin/rooms/${id}`);
+                const response = await fetch(`/admin/api/rooms/${id}`);
                 if (!response.ok) throw new Error('Error loading data');
 
                 const room = await response.json();
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirm('Are you sure you want to delete this room?')) return;
 
             try {
-                const response = await fetch(`/admin/rooms/${id}`, {
+                const response = await fetch(`/admin/api/rooms/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content

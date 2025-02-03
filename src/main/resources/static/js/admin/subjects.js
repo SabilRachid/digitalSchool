@@ -5,7 +5,7 @@ class SubjectsPage extends AdminPage {
             tableId: 'subjectsTable',
             modalId: 'subjectModal',
             formId: 'subjectForm',
-            apiEndpoint: '/admin/subjects',
+            apiEndpoint: '/admin/api/subjects',
             columns: [
                 { data: 'code' },
                 { data: 'name' },

@@ -19,8 +19,5 @@ public interface UserService {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     List<User> findByRole(RoleName roleName);
-    Map<String, Object> getAdminDashboardStats();
-    Map<String, Object> getProfessorDashboardStats(User professor);
-    Map<String, Object> getStudentDashboardStats(User student);
     List<Map<String, Object>> findProfessorsAsMap();
 }

@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Course;
 import com.digital.school.service.CourseService;
@@ -12,22 +10,16 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/courses")
-public class AdminCourseController {
+@RequestMapping("/admin/api/courses")
+public class AdminCourseRestController {
 
-    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AdminCourseController.class);
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AdminCourseRestController.class);
 
     @Autowired
     private CourseService courseService;
 
 
 
-
-    @GetMapping
-    public String showCourses(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/courses";
-    }
 
     @GetMapping("/data")
     @ResponseBody
@@ -48,39 +40,6 @@ public class AdminCourseController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-/*
-    @PostMapping
-    @ResponseBody
-    public ResponseEntity<?> createCourse(@RequestBody CourseDTO courseDTO) {
-        try {
-            // Vérification que les ID sont bien présents
-            if (courseDTO.getSubject() == null || courseDTO.getProfessor() == null || courseDTO.getClasse() == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Les ID de la matière, du professeur et de la classe sont obligatoires"));
-            }
-
-            // Récupération des entités associées
-            Subject subject = subjectService.findById(courseDTO.getSubject()).orElseThrow(() -> new IllegalArgumentException("Matière introuvable"));
-            User professor = userService.findById(courseDTO.getProfessor()).orElseThrow(() -> new IllegalArgumentException("Professeur introuvable"));
-            Classe classe = classeService.findById(courseDTO.getClasse()).orElseThrow(() -> new IllegalArgumentException("Classe introuvable"));
-
-            // Création du cours
-            Course course = new Course();
-            course.setSubject(subject);
-            course.setProfessor(professor);
-            course.setClasse(classe);
-            course.setStartTime(courseDTO.getStartTime());
-            course.setEndTime(courseDTO.getEndTime());
-            course.setRoom(courseDTO.getRoom());
-            course.setDescription(courseDTO.getDescription());
-
-            Course savedCourse = courseService.save(course);
-            return ResponseEntity.ok(savedCourse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Erreur lors de la création: " + e.getMessage()));
-        }
-    }
-*/
 
     @PostMapping
     @ResponseBody

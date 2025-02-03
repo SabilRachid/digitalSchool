@@ -1,10 +1,8 @@
-package com.digital.school.controller.admin;
+package com.digital.school.controller.rest.admin;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.Room;
 import com.digital.school.service.RoomService;
@@ -13,17 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 @Controller
-@RequestMapping("/admin/rooms")
-public class AdminRoomController {
+@RequestMapping("/admin/api/rooms")
+public class AdminRoomRestController {
 
     @Autowired
     private RoomService roomService;
-
-    @GetMapping
-    public String showRooms(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/rooms";
-    }
 
     @GetMapping("/data")
     @ResponseBody

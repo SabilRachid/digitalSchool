@@ -18,9 +18,6 @@ public class AdminCourseRestController {
     @Autowired
     private CourseService courseService;
 
-
-
-
     @GetMapping("/data")
     @ResponseBody
     public List<Map<String, Object>> getCoursesData() {
@@ -47,7 +44,6 @@ public class AdminCourseRestController {
         LOGGER.debug("📌 Requête reçue : {}", course);  // 🔍 Affiche le contenu de course
 
         try {
-
             LOGGER.debug("subjects id" + course.getSubject().getName());
             LOGGER.debug("professors id" + course.getProfessor().getFirstName());
             LOGGER.debug("classes id" + course.getClasse().getName());

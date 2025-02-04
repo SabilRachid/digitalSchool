@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface CourseService {
     Page<Course> findAll(Pageable pageable);
-    Course findById(Long id);
+    CourseDto findById(Long id);
     Course save(Course course);
     void deleteById(Long id);
     boolean existsById(Long id);

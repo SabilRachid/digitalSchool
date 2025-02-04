@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 //@Service
@@ -33,33 +34,6 @@ public class FileSystemStorageService implements StorageService {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize storage", e);
-        }
-    }
-
-    @Override
-    public String store(MultipartFile file, String filename) {
-        try {
-            if (file.isEmpty()) {
-                throw new RuntimeException("Failed to store empty file.");
-            }
-            
-            Path destinationFile = this.rootLocation.resolve(
-                Paths.get(filename))
-                .normalize()
-                .toAbsolutePath();
-                
-            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-                throw new RuntimeException("Cannot store file outside current directory.");
-            }
-            
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFile,
-                    StandardCopyOption.REPLACE_EXISTING);
-            }
-            
-            return filename;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store file.", e);
         }
     }
 
@@ -115,9 +89,38 @@ public class FileSystemStorageService implements StorageService {
 		return null;
 	}
 
-	@Override
-	public void store(String path, byte[] content) {
-		// TODO Auto-generated method stub
-		
-	}
+
+    public String storeFile(MultipartFile file) throws IOException {
+        Path storagePath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Files.createDirectories(storagePath);
+
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path targetLocation = storagePath.resolve(fileName);
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/resources/" + fileName; // URL pour accéder au fichier
+    }
+
+    @Override
+    public String store(MultipartFile file, String filename) {
+        try {
+            if (file.isEmpty()) {
+                throw new RuntimeException("Failed to store empty file.");
+            }
+            Path destinationFile = this.rootLocation.resolve(
+                            Paths.get(filename))
+                    .normalize().toAbsolutePath();
+            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+                throw new RuntimeException(
+                        "Cannot store file outside current directory.");
+            }
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, destinationFile,
+                        StandardCopyOption.REPLACE_EXISTING);
+            }
+            return destinationFile.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file.", e);
+        }
+    }
 }

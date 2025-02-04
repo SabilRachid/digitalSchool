@@ -1,4 +1,4 @@
-// Configuration spécifique pour la page des ressources pédagogiques
+// Configuration spécifique pour la gestion des ressources pédagogiques
 class ResourcesPage extends AdminPage {
     constructor() {
         super({
@@ -32,10 +32,11 @@ class ResourcesPage extends AdminPage {
             ]
         });
 
+        // Charger les cours pour la sélection
         this.loadCourses();
     }
 
-    // Chargement des cours pour l'association
+    // Chargement des cours disponibles pour l'association
     async loadCourses() {
         try {
             const response = await fetch('/admin/api/courses/list');
@@ -74,21 +75,24 @@ class ResourcesPage extends AdminPage {
         const formData = new FormData(form);
         let data = Object.fromEntries(formData.entries());
 
-        // Vérification et transformation des valeurs
-        if (data.course) {
-            data.course = { id: parseInt(data.course, 10) };
+        // Ajout du fichier dans FormData
+        const fileInput = document.getElementById('file');
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
         }
+
+        // Suppression de l'ancien champ `url`
+        formData.delete('url');
 
         try {
             const response = await fetch(
-                data.id ? `${this.apiEndpoint}/${data.id}` : this.apiEndpoint,
+                data.id ? `${this.apiEndpoint}/${data.id}` : `${this.apiEndpoint}/upload`,
                 {
                     method: data.id ? 'PUT' : 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 }
             );
 
@@ -99,14 +103,17 @@ class ResourcesPage extends AdminPage {
 
             this.closeModal();
             this.table.ajax.reload();
+            this.showNotification('Fichier ajouté avec succès', 'success');
         } catch (error) {
             console.error('🚨 Erreur:', error);
-            alert('Une erreur est survenue lors de la sauvegarde: ' + error.message);
+            this.showNotification(error.message, 'error');
         }
     }
+
+
 }
 
-// Initialisation de la page
+// Initialisation de la page après chargement du DOM
 document.addEventListener('DOMContentLoaded', function() {
     window.resourcesPage = new ResourcesPage();
 });

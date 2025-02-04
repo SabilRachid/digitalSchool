@@ -1,6 +1,10 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.dto.ResourceDto;
+import com.digital.school.service.CourseService;
+import com.digital.school.service.ResourceService;
 import com.digital.school.service.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -12,37 +16,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
 public class LocalStorageServiceImpl implements StorageService {
 
-    private final Path rootLocation;
 
-    public LocalStorageServiceImpl(@Value("${app.storage.location}") String storageLocation) {
+    private Path rootLocation;
+    @Autowired
+    private ResourceService resourceService;
+    @Autowired
+    private CourseService courseService;
+
+    @Value("${app.storage.resources}")
+    private String resourceStoragePath;
+
+
+    public LocalStorageServiceImpl(@Value("${app.storage.resources}") String storageLocation, ResourceService resourceService) {
         this.rootLocation = Paths.get(storageLocation);
         try {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize storage location", e);
         }
+        this.resourceService = resourceService;
     }
 
-    @Override
-    public void store(String path, byte[] content) {
-        try {
-            Path destinationFile = this.rootLocation.resolve(Paths.get(path)).normalize().toAbsolutePath();
-            
-            if (!destinationFile.getParent().startsWith(this.rootLocation.toAbsolutePath())) {
-                throw new RuntimeException("Cannot store file outside current directory.");
-            }
-            
-            Files.createDirectories(destinationFile.getParent());
-            Files.write(destinationFile, content);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store file", e);
-        }
-    }
 
     @Override
     public Resource loadAsResource(String path) {
@@ -81,11 +81,29 @@ public class LocalStorageServiceImpl implements StorageService {
 		
 	}
 
-	@Override
-	public String store(MultipartFile file, String filename) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String storeFile(MultipartFile file) throws IOException {
+        Path storagePath = Paths.get(resourceStoragePath).toAbsolutePath().normalize();
+        Files.createDirectories(storagePath);
+
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path targetLocation = storagePath.resolve(fileName);
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/resources/" + fileName; // URL pour accéder au fichier
+    }
+
+    @Override
+    public String store(MultipartFile file, String s) {
+        return "";
+    }
+
+    //implement cette methode
+    public ResourceDto saveResource(ResourceDto dto) {
+        com.digital.school.model.Resource resource = ResourceDto.toEntity(dto);
+        resource.setCourse(courseService.findById(dto.getCourseId())); // Associer un cours
+        com.digital.school.model.Resource saved = resourceService.addResource(resource);
+        return ResourceDto.fromEntity(saved);
+    }
 
 	@Override
 	public Stream<Path> loadAll() {

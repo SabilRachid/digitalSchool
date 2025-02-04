@@ -20,7 +20,7 @@
     --bg-tertiary: #E5E7EB;
 
     /* Layout */
-    --sidebar-width: 280px;
+    --sidebar-width: 260px;
     --sidebar-width-collapsed: 80px;
     --topbar-height: 70px;
     --border-radius: 0.5rem;
@@ -65,12 +65,12 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.75rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.125rem; }
-h6 { font-size: 1rem; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.50rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: 1.875rem; }
+h6 { font-size: 0.75rem; }
 
 /* Liens */
 a {
@@ -99,10 +99,10 @@ a:hover {
 .font-semibold { font-weight: 600; }
 .font-medium { font-weight: 500; }
 
-.text-sm { font-size: 0.875rem; }
-.text-base { font-size: 1rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
+.text-sm { font-size: 0.675rem; }
+.text-base { font-size: 0.8rem; }
+.text-lg { font-size: 0.875rem; }
+.text-xl { font-size: 1rem; }
 
 /* Animations */
 @keyframes fadeIn {
@@ -206,11 +206,11 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.8rem;
 }
 
 .dashboard-title {
-    font-size: 1.875rem;
+    font-size: 1.625rem;
     font-weight: 700;
     color: var(--text-primary);
 }

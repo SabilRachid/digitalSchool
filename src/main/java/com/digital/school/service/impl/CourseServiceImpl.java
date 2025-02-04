@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +44,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Optional<Course> findById(Long id) {
+    public Course findById(Long id) {
         return courseRepository.findById(id);
     }
 

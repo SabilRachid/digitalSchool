@@ -5,7 +5,8 @@
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: linear-gradient(180deg, var(--primary-color) 0%, #6D28D9 100%);
+    /*background: linear-gradient(180deg, var(--primary-color) 0%, #6D28D9 100%);*/
+    background: linear-gradient(180deg, #1d5985 0%, #3c4059 100%);
     color: white;
     padding: 1.5rem 1rem;
     display: flex;
@@ -26,13 +27,13 @@
 }
 
 .logo-container img {
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 60px;
     transition: all var(--transition-speed);
 }
 
 .logo-container span {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
     color: white;
     transition: opacity var(--transition-speed);
@@ -119,7 +120,7 @@
 }
 
 .nav-item i {
-    font-size: 1.125rem;
+    font-size: 0.875rem;
     width: 20px;
     text-align: center;
     transition: transform var(--transition-speed);
@@ -155,7 +156,7 @@
 
     .nav-item i {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1rem;
     }
 
     .nav-group-header i.fa-chevron-down {

@@ -100,6 +100,8 @@ public class AdminController {
         return "admin/subjects";
     }
 
+
+
     @GetMapping("/users")
     public String listUsers(HttpServletRequest request, Model model) {
         model.addAttribute("roles", RoleName.values());

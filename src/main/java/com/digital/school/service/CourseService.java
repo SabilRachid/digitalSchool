@@ -9,11 +9,10 @@ import com.digital.school.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface CourseService {
     Page<Course> findAll(Pageable pageable);
-    Optional<Course> findById(Long id);
+    Course findById(Long id);
     Course save(Course course);
     void deleteById(Long id);
     boolean existsById(Long id);

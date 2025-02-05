@@ -1,14 +1,19 @@
 package com.digital.school.dto;
 
+import com.digital.school.model.Course;
 import com.digital.school.model.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResourceDto {
+
+
+
     private Long id;
     private String title;
     private String type; // Type de ressource : PDF, Vidéo, Lien, etc.
@@ -31,15 +36,15 @@ public class ResourceDto {
     }
 
     // ✅ Convertir un DTO en entité `Resource`
-    public static Resource toEntity(ResourceDto dto) {
+    // ✅ Conversion DTO → Entité avec association du `Course`
+    public static Resource toEntity(ResourceDto dto, Course course) {
         Resource resource = new Resource();
         resource.setId(dto.getId());
         resource.setTitle(dto.getTitle());
         resource.setType(dto.getType());
         resource.setUrl(dto.getUrl());
         resource.setDescription(dto.getDescription());
-
-        // Course sera associé lors de la sauvegarde en base
+        resource.setCourse(course); // Associe le cours récupéré
         return resource;
     }
 }

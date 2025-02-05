@@ -100,6 +100,13 @@ public class AdminController {
         return "admin/subjects";
     }
 
+    @GetMapping("/resources")
+    public String showResources(HttpServletRequest request, Model model) {
+        LOGGER.debug("showResources Controller");
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/resources";
+    }
+
 
 
     @GetMapping("/users")

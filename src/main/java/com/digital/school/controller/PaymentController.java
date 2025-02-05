@@ -8,6 +8,7 @@ import com.digital.school.service.EmailService;
 import com.digital.school.service.SMSService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RequestMapping("/payments")
 public class PaymentController {
 
+    @Qualifier("CMIPaymentServiceImpl")
     @Autowired
     private PaymentService paymentService;
     

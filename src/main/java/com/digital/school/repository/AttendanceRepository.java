@@ -7,6 +7,8 @@ import com.digital.school.model.Attendance;
 import com.digital.school.model.Course;
 import com.digital.school.model.User;
 import com.digital.school.model.enumerated.AttendanceStatus;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +17,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByCourse(Course course);
     List<Attendance> findByStudentAndRecordedAtBetween(User student, LocalDateTime start, LocalDateTime end);
     List<Attendance> findByCourseAndRecordedAtBetween(Course course, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT a FROM Attendance a WHERE a.course = :course AND a.date = :date")
+    List<Attendance> findByCourseAndDate(Course course, LocalDate date);
 
     @Query("SELECT (SUM(CASE WHEN (a.status = 'PRESENT' OR a.status = 'RETARD') THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
     Double getAverageAttendance();

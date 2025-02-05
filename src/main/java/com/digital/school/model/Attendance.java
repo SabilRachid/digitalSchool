@@ -2,6 +2,8 @@ package com.digital.school.model;
 
 import jakarta.persistence.*;
 import com.digital.school.model.enumerated.AttendanceStatus;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +21,10 @@ public class Attendance extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceStatus status;
-    
+
+    @Column(nullable = false)
+    private LocalDate date;
+
     private LocalDateTime recordedAt = LocalDateTime.now();
     
     @Column(columnDefinition = "TEXT")
@@ -62,6 +67,14 @@ public class Attendance extends AuditableEntity {
 
     public void setRecordedAt(LocalDateTime recordedAt) {
         this.recordedAt = recordedAt;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getJustification() {

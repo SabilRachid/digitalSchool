@@ -45,6 +45,9 @@ public class ProfessorController {
     @Autowired
     private ParticipationService participationService;
 
+    @Autowired
+    private AttendanceService attendanceService;
+
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User professor, Model model) {
         // Add user to model
@@ -92,6 +95,11 @@ public class ProfessorController {
         model.addAttribute("currentURI", request.getRequestURI());
         return "professor/participations";
     }
-    
-    
+
+    @GetMapping("/")
+    public String listAttendances(HttpServletRequest request, Model model) {
+        model.addAttribute("attendances", attendanceService.findAll());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "professor/attendances";
+    }
 }

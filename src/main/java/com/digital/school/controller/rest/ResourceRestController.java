@@ -6,6 +6,8 @@ import com.digital.school.model.Resource;
 import com.digital.school.service.CourseService;
 import com.digital.school.service.ResourceService;
 import com.digital.school.service.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //donne moi une interface html pour afficher et gérer les
@@ -22,6 +25,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/api/resources")
 @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR', 'STUDENT', 'PARENT')")
 public class ResourceRestController {
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceRestController.class);
 
     @Autowired
     private ResourceService resourceService;
@@ -33,20 +39,18 @@ public class ResourceRestController {
     private CourseService courseService;
 
 
-    @GetMapping
+
+    @GetMapping("/data")
+    @ResponseBody
     public ResponseEntity<List<ResourceDto>> getResources() {
+        LOGGER.debug("getResources api return ResourceDto");
         List<ResourceDto> resources = resourceService.getAllResources()
                 .stream()
                 .map(ResourceDto::fromEntity)
                 .collect(Collectors.toList());
+
+        LOGGER.info("Resources: {}", resources.toString());
         return ResponseEntity.ok(resources);
-    }
-
-
-    @GetMapping("/data")
-    @ResponseBody
-    public List<Map<String, Object>> getSubjectsData() {
-        return resourceService.findAllAsMap();
     }
 
     // 📌 Ajouter une ressource (Admins & Professeurs uniquement)
@@ -71,13 +75,14 @@ public class ResourceRestController {
         return ResponseEntity.ok(resourceService.getResourcesByCourse(courseId));
     }
 
+/*
     // 📌 Récupérer toutes les ressources (Admins uniquement)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Resource>> getAllResources() {
         return ResponseEntity.ok(resourceService.getAllResources());
     }
-
+*/
     @PostMapping("/upload")
     public ResponseEntity<ResourceDto> uploadResource(
             @RequestParam("file") MultipartFile file,
@@ -88,17 +93,19 @@ public class ResourceRestController {
 
         try {
             String filePath = storageService.storeFile(file); // Stockage du fichier
-            Course course = courseService.findById(courseId);
+            Optional<Course> course = courseService.findById(courseId);
 
             Resource resource = new Resource();
             resource.setTitle(title);
             resource.setType(type);
             resource.setUrl(filePath);
-            resource.setCourse(course);
+            resource.setCourse(course.orElseThrow());
             resource.setDescription(description);
 
-            //corrige moi ceci
-            Resource savedResource = resourceService.saveResource(ResourceDto.toEntity(resource));
+// Sauvegarde de l'entité directement sans conversion inutile
+            Resource savedResource = resourceService.saveResource(resource);
+
+// Conversion correcte de l'entité sauvegardée en DTO pour la réponse
             return ResponseEntity.ok(ResourceDto.fromEntity(savedResource));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

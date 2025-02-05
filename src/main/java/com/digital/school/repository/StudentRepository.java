@@ -15,6 +15,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findById(Long classId); // Récupérer les élèves d'une classe
 
+    List<Student> getStudentsByClasseId(Long classId);
+
     @Query("SELECT COUNT(s) FROM Student s")
     Long countStudents();
 

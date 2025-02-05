@@ -127,7 +127,7 @@ public class PaymentServiceImpl implements PaymentService {
             String fullPath = generateReceiptPath(fileName);
 
             // Sauvegarder le fichier
-            storageService.store(receiptContent, fileName);
+            storageService.store(null, fileName);
             
             // Mettre à jour le paiement avec le chemin du reçu
             Payment payment = paymentRepository.findById(paymentId)

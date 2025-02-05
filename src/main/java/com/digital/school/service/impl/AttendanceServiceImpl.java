@@ -12,6 +12,8 @@ import com.digital.school.model.enumerated.AttendanceStatus;
 import com.digital.school.repository.AttendanceRepository;
 import com.digital.school.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +29,18 @@ public class AttendanceServiceImpl implements AttendanceService {
 	AttendanceRepository attendanceRepository;
 
     @Override
+    public void save(List<Attendance> attendanceList) {
+        attendanceRepository.saveAll(attendanceList); // Enregistre la liste des présences
+    }
+
+    @Override
     public Page<Attendance> findAll(Pageable pageable) {
         return attendanceRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Attendance> findAll() {
+        return attendanceRepository.findAll();
     }
 
     @Override
@@ -132,5 +144,17 @@ public class AttendanceServiceImpl implements AttendanceService {
         stats.putIfAbsent("excusedRate", 0.0);
 
         return stats;
+    }
+
+    @Override
+    public List<Attendance> getAttendancesByCourseAndDate(Course course, LocalDate date) {
+        return attendanceRepository.findByCourseAndDate(course, date);
+    }
+
+    @Override
+    public void updateAttendance(Long id, AttendanceStatus status) {
+        Attendance attendance = attendanceRepository.findById(id).orElseThrow(() -> new RuntimeException("Présence non trouvée"));
+        attendance.setStatus(status);
+        attendanceRepository.save(attendance);
     }
 }

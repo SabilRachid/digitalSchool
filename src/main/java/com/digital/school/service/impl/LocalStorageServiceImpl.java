@@ -1,9 +1,11 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.dto.ResourceDto;
+import com.digital.school.model.Course;
 import com.digital.school.service.CourseService;
 import com.digital.school.service.ResourceService;
 import com.digital.school.service.StorageService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -16,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -97,13 +100,7 @@ public class LocalStorageServiceImpl implements StorageService {
         return "";
     }
 
-    //implement cette methode
-    public ResourceDto saveResource(ResourceDto dto) {
-        com.digital.school.model.Resource resource = ResourceDto.toEntity(dto);
-        resource.setCourse(courseService.findById(dto.getCourseId())); // Associer un cours
-        com.digital.school.model.Resource saved = resourceService.addResource(resource);
-        return ResourceDto.fromEntity(saved);
-    }
+
 
 	@Override
 	public Stream<Path> loadAll() {

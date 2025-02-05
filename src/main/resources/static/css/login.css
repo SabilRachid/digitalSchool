@@ -4,7 +4,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #6D28D9 100%);
+    /*background: linear-gradient(135deg, var(--primary-color) 0%, #6D28D9 100%);*/
+    background: linear-gradient(180deg, #1d5985 0%, #3c4059 100%);
     padding: 2rem;
 }
 

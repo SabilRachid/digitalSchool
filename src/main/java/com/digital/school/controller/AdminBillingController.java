@@ -1,6 +1,7 @@
 package com.digital.school.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,12 +18,14 @@ public class AdminBillingController {
 
     @Autowired
     private BillingService billingService;
-    
+
+    @Qualifier("CMIPaymentServiceImpl")
     @Autowired
     private PaymentService paymentService;
     
     @Autowired
     private UserService userService;
+
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {

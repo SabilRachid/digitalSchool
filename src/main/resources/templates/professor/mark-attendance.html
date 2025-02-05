@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Marquer la Présence</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script th:src="@{/js/attendance.js}" defer></script>
+</head>
+<body>
+
+<h2>Marquer la Présence</h2>
+
+<form th:action="@{/attendance/save}" method="post">
+  <label>Classe :</label>
+  <select id="classSelect" name="classId" required>
+    <option value="">Sélectionner une classe</option>
+    <option th:each="class : ${classes}" th:value="${class.id}" th:text="${class.name}"></option>
+  </select>
+
+  <label>Date :</label>
+  <input type="date" name="date" required />
+
+  <label>Cours :</label>
+  <select id="courseSelect" name="courseId" required>
+    <option value="">Sélectionner un cours</option>
+  </select>
+
+  <h3>Liste des élèves :</h3>
+  <button type="button" id="markAllPresent">Tout marquer présent</button>
+
+  <table>
+    <tr>
+      <th>Nom</th>
+      <th>Présence</th>
+    </tr>
+    <tbody id="studentList"></tbody>
+  </table>
+
+  <button type="submit">Enregistrer</button>
+</form>
+
+</body>
+</html>

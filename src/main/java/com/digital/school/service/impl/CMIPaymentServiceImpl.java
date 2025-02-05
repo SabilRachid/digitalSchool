@@ -55,7 +55,8 @@ public class CMIPaymentServiceImpl implements PaymentService {
     @Override
     public void savePaymentReceipt(String orderId, byte[] receipt) {
         String path = "receipts/" + orderId + ".pdf";
-        storageService.store(path, receipt);
+        //storageService.store(path, receipt);
+        storageService.store(null, path);
     }
 
     private String generateSignature(String data) {

@@ -6,14 +6,16 @@ class ResourcesPage extends AdminPage {
             modalId: 'resourceModal',
             formId: 'resourceForm',
             apiEndpoint: '/admin/api/resources',
+
             columns: [
                 { data: 'title' },
                 { data: 'type' },
                 {
-                    data: 'course',
-                    render: function(data) {
-                        return data ? data.name : '-';
+                    data: 'courseName',
+                    render: function (data) {
+                        return data ? data : '-'; // ✅ Gérer les valeurs nulles ou undefined
                     }
+
                 },
                 {
                     data: null,
@@ -26,6 +28,9 @@ class ResourcesPage extends AdminPage {
                                 <button class="btn btn-sm btn-danger" onclick="window.resourcesPage.delete(${data.id})">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <a href="${data.url}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="fas fa-file-pdf text-success"></i>
+                                </a>
                             </div>`;
                     }
                 }
@@ -75,6 +80,15 @@ class ResourcesPage extends AdminPage {
         const formData = new FormData(form);
         let data = Object.fromEntries(formData.entries());
 
+        // Assure que courseId est bien envoyé sous forme de JSON
+        // Correction : S'assurer que courseId est bien ajouté comme paramètre et sous le bon nom
+        if (formData.get("course")) {
+            formData.set("courseId", formData.get("course")); // Renomme correctement en "courseId"
+            formData.delete("course"); // Supprime l'ancien champ "course"
+        }
+
+        console.log("📌 Données envoyées :", [...formData.entries()]);
+
         // Ajout du fichier dans FormData
         const fileInput = document.getElementById('file');
         if (fileInput.files.length > 0) {
@@ -116,4 +130,18 @@ class ResourcesPage extends AdminPage {
 // Initialisation de la page après chargement du DOM
 document.addEventListener('DOMContentLoaded', function() {
     window.resourcesPage = new ResourcesPage();
+
+
 });
+
+document.getElementById('resourceForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    console.log("📌 Données du formulaire envoyées :", data); // Vérifie le contenu
+});
+
+fetch('/admin/api/resources')
+    .then(response => response.json())
+    .then(data => console.log("📌 Données reçues :", data));

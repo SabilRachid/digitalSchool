@@ -6,13 +6,17 @@ import com.digital.school.model.Course;
 import com.digital.school.model.Classe;
 import com.digital.school.model.Subject;
 import com.digital.school.model.User;
+
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface CourseService {
     Page<Course> findAll(Pageable pageable);
-    CourseDto findById(Long id);
+    List<Course> findAll();
+    Optional<Course> findById(Long id);
     Course save(Course course);
     void deleteById(Long id);
     boolean existsById(Long id);
@@ -31,5 +35,6 @@ public interface CourseService {
 
     //donne moi implementation de
     Object findTodaySchedule(User professor);
+
 
 }

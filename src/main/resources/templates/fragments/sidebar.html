@@ -101,6 +101,10 @@
                 <i class="fas fa-tasks"></i>
                 <span>Devoirs</span>
             </a>
+            <a href="/professor/attendances" class="nav-item" th:classappend="${currentURI == '/professor/attendances' ? 'active' : ''}">
+                <i class="fas fa-star"></i>
+                <span>Presences</span>
+            </a>
             <a href="/professor/grades" class="nav-item" th:classappend="${currentURI == '/professor/grades' ? 'active' : ''}">
                 <i class="fas fa-star"></i>
                 <span>Notes</span>

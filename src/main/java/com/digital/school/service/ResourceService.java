@@ -11,7 +11,7 @@ public interface ResourceService {
     Resource addResource(Resource resource);
 
     // 📌 Ajouter une ressource (Admins & Professeurs uniquement)
-    ResourceDto saveResource(Resource resource);
+    Resource saveResource(Resource resource);
 
     // 📌 Modifier une ressource (Admins & Professeurs ayant créé la ressource)
     Resource updateResource(Long resourceId, Resource resource);

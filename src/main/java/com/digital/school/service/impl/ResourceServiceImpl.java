@@ -1,6 +1,8 @@
 package com.digital.school.service.impl;
 
 
+import com.digital.school.dto.ResourceDto;
+import com.digital.school.model.Course;
 import com.digital.school.model.Resource;
 import com.digital.school.repository.ResourceRepository;
 import com.digital.school.service.ResourceService;
@@ -23,6 +25,25 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public Resource addResource(Resource resource) {
         return resourceRepository.save(resource);
+    }
+
+
+    // ✅ Conversion DTO → Entité avec association du `Course`
+    public static Resource toEntity(ResourceDto dto, Course course) {
+        Resource resource = new Resource();
+        resource.setId(dto.getId());
+        resource.setTitle(dto.getTitle());
+        resource.setType(dto.getType());
+        resource.setUrl(dto.getUrl());
+        resource.setDescription(dto.getDescription());
+        resource.setCourse(course); // Associe le cours récupéré
+        return resource;
+    }
+
+    @Override
+    public Resource saveResource(Resource resource) {
+        return resourceRepository.save(resource);
+
     }
 
     // 📌 Modifier une ressource (vérification de l'existence)

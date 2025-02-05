@@ -6,7 +6,7 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Gestion des Classes - Digital School</title>
-    
+
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,27 +14,32 @@
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
-    
 
+
+    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/topbar.css}">
-    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+    <link rel="stylesheet" th:href="@{/css/components/forms.css}">
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
-    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+    <link rel="stylesheet" th:href="@{/css/components/modals.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
 
-    
-    
+
+
+
 </head>
 <body>
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
     <div th:replace="~{fragments/topbar :: topbar}"></div>
 
+
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h3 class="dashbord-title">
-                   <span class="dashbord-title-icon school">
+            <h3 class="dashboard-title">
+                   <span class="page-title-icon bg-theme text-black mr-2">
                        <i class="fas fa-school"></i>
 	               </span> Gestion des classes
 	        </h3>

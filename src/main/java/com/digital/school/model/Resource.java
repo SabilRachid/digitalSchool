@@ -2,6 +2,8 @@ package com.digital.school.model;
 
 import jakarta.persistence.*;
 
+import java.util.Optional;
+
 @Entity
 @Table(name = "resources")
 public class Resource extends AuditableEntity {

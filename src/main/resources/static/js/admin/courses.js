@@ -135,6 +135,7 @@ class CoursesPage extends AdminPage {
         if (!form) return;
 
         const formData = new FormData(form);
+        console.log("📌 FormData :", formData);
         let data = Object.fromEntries(formData.entries());
 
         // Vérification et transformation des valeurs en objets
@@ -189,7 +190,7 @@ class CoursesPage extends AdminPage {
         }
     }
 
-
+//
 }
 
 // Initialisation de la page

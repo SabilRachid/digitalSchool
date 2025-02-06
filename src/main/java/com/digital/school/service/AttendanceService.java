@@ -22,10 +22,13 @@ public interface AttendanceService {
     void deleteById(Long id);
     List<Attendance> findByStudent(User student);
     List<Attendance> findByCourse(Course course);
-    List<Attendance> findByStudentAndDateRange(User student, LocalDateTime start, LocalDateTime end);
-    List<Attendance> findByCourseAndDateRange(Course course, LocalDateTime start, LocalDateTime end);
     double getAttendanceRate(User student, Course course);
     Map<String, Double> getClassAttendanceStats(Course course);
     List<Attendance> getAttendancesByCourseAndDate(Course course, LocalDate date);
     void updateAttendance(Long id, AttendanceStatus status);
+    List<Map<String, Object>> findAllAsMapForProfessor(Long teacherId, Long classId, LocalDate startDate, LocalDate endDate);
+    Optional<Attendance> findByIdAndTeacher(Long id, Long teacherId);
+    boolean isTeacherAllowedToModify(Long teacherId, Long courseId);
+    boolean existsById(Long id);
+
 }

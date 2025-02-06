@@ -15,4 +15,5 @@ public interface ClasseService {
     boolean existsByNameAndSchoolYear(String name, String schoolYear);
     List<Classe> findByLevelId(Long levelId);
     long countStudents(Long classeId);
+    List<Classe>  getAll();
 }

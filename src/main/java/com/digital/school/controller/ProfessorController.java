@@ -37,6 +37,9 @@ public class ProfessorController {
     private CourseService courseService;
 
     @Autowired
+    private ClasseService classeService;
+
+    @Autowired
     private HomeworkService homeworkService;
 
     @Autowired
@@ -96,10 +99,18 @@ public class ProfessorController {
         return "professor/participations";
     }
 
-    @GetMapping("/")
-    public String listAttendances(HttpServletRequest request, Model model) {
-        model.addAttribute("attendances", attendanceService.findAll());
+    @GetMapping("/attendances")
+    public String listAttendances(HttpServletRequest request,  @AuthenticationPrincipal User professor, Model model) {
+
+        model.addAttribute("teacherId", professor);
+        model.addAttribute("classes", classeService.getAll());
         model.addAttribute("currentURI", request.getRequestURI());
         return "professor/attendances";
     }
+
+
+
+
+
 }
+

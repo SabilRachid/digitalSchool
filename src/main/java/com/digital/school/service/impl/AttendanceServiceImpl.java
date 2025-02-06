@@ -15,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -68,16 +65,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public List<Attendance> findByCourse(Course course) {
         return attendanceRepository.findByCourse(course);
-    }
-
-    @Override
-    public List<Attendance> findByStudentAndDateRange(User student, LocalDateTime start, LocalDateTime end) {
-        return attendanceRepository.findByStudentAndRecordedAtBetween(student, start, end);
-    }
-
-    @Override
-    public List<Attendance> findByCourseAndDateRange(Course course, LocalDateTime start, LocalDateTime end) {
-        return attendanceRepository.findByCourseAndRecordedAtBetween(course, start, end);
     }
 
     @Override
@@ -157,4 +144,38 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setStatus(status);
         attendanceRepository.save(attendance);
     }
+
+    @Override
+    public List<Map<String, Object>> findAllAsMapForProfessor(Long teacherId, Long classId, LocalDate startDate, LocalDate endDate) {
+        List<Object[]> attendances = attendanceRepository.findGroupedAttendances(teacherId, classId, startDate, endDate);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object[] a : attendances) {
+            Map<String, Object> map = new HashMap<>();
+            Course course = (Course) a[0];
+            map.put("course", course.getName());
+            map.put("class", course.getClasse().getName());
+            map.put("date", a[1]);
+            map.put("count", a[2]);
+            result.add(map);
+        }
+        return result;
+    }
+
+    @Override
+    public Optional<Attendance> findByIdAndTeacher(Long id, Long professorId) {
+        return attendanceRepository.findById(id)
+                .filter(a -> a.getCourse().getProfessor().getId().equals(professorId));
+    }
+
+    @Override
+    public boolean isTeacherAllowedToModify(Long teacherId, Long courseId) {
+        return attendanceRepository.existsByCourseIdAndRecordedBy_Id (courseId, teacherId);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return attendanceRepository.existsById(id);
+    }
+
+
 }

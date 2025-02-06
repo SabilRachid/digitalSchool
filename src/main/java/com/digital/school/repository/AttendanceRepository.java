@@ -14,11 +14,14 @@ import java.util.List;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStudent(User student);
+
+    @Query("SELECT a FROM Attendance a WHERE a.course = :course")
     List<Attendance> findByCourse(Course course);
+
     List<Attendance> findByStudentAndRecordedAtBetween(User student, LocalDateTime start, LocalDateTime end);
     List<Attendance> findByCourseAndRecordedAtBetween(Course course, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT a FROM Attendance a WHERE a.course = :course AND a.date = :date")
+    @Query("SELECT a FROM Attendance a WHERE a.course = :course AND a.dateEvent = :date")
     List<Attendance> findByCourseAndDate(Course course, LocalDate date);
 
     @Query("SELECT (SUM(CASE WHEN (a.status = 'PRESENT' OR a.status = 'RETARD') THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
@@ -49,4 +52,22 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     double calculateAverageAttendanceForProfessor(
             @Param("professor") User professor
     );
+
+        @Query("SELECT a.course, a.dateEvent, COUNT(a) FROM Attendance a " +
+                "WHERE a.course.professor.id = :professorId " +
+                "AND (:classId IS NULL OR a.course.classe.id = :classeId) " +
+                "AND (:startDate IS NULL OR a.dateEvent >= :startDate) " +
+                "AND (:endDate IS NULL OR a.dateEvent <= :endDate) " +
+                "GROUP BY a.course, a.dateEvent")
+        List<Object[]> findGroupedAttendances(@Param("professorId") Long professorId,
+                                              @Param("classeId") Long classeId,
+                                              @Param("startDate") LocalDate startDate,
+                                              @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT a FROM Attendance a WHERE a.course.id = :courseId AND a.dateEvent = :date")
+        List<Attendance> findByCourseAndDate(@Param("courseId") Long courseId, @Param("date") LocalDate date);
+
+
+
+    boolean existsByCourseIdAndRecordedBy_Id(Long courseId, Long recordedById);
 }

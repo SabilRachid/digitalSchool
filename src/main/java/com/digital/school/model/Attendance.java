@@ -23,7 +23,7 @@ public class Attendance extends AuditableEntity {
     private AttendanceStatus status;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDate dateEvent;
 
     private LocalDateTime recordedAt = LocalDateTime.now();
     
@@ -69,12 +69,12 @@ public class Attendance extends AuditableEntity {
         this.recordedAt = recordedAt;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getDateEvent() {
+        return dateEvent;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDate(LocalDate dateEvent) {
+        this.dateEvent = dateEvent;
     }
 
     public String getJustification() {

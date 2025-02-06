@@ -90,4 +90,9 @@ public class ClasseServiceImpl implements ClasseService {
     public long countStudents(Long classeId) {
         return classeRepository.countStudents(classeId);
     }
+
+    @Override
+    public List<Classe> getAll() {
+        return classeRepository.findAll();
+    }
 }

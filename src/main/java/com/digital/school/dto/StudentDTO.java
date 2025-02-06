@@ -8,6 +8,12 @@ public class StudentDTO {
     private String lastName;
     private Long classeId;
 
+    public StudentDTO(Long id, String firstName, String lastName) {
+        this.classeId = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     // Getters and setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

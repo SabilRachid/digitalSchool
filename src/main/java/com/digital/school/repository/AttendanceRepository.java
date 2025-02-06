@@ -8,6 +8,7 @@ import com.digital.school.model.Course;
 import com.digital.school.model.User;
 import com.digital.school.model.enumerated.AttendanceStatus;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,18 +54,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("professor") User professor
     );
 
-        @Query("SELECT a.course, a.dateEvent, COUNT(a) FROM Attendance a " +
-                "WHERE a.course.professor.id = :professorId " +
-                "AND (:classId IS NULL OR a.course.classe.id = :classeId) " +
-                "AND (:startDate IS NULL OR a.dateEvent >= :startDate) " +
-                "AND (:endDate IS NULL OR a.dateEvent <= :endDate) " +
-                "GROUP BY a.course, a.dateEvent")
-        List<Object[]> findGroupedAttendances(@Param("professorId") Long professorId,
-                                              @Param("classeId") Long classeId,
-                                              @Param("startDate") LocalDate startDate,
-                                              @Param("endDate") LocalDate endDate);
+    @Query("SELECT a.course, a.dateEvent, COUNT(a) FROM Attendance a " +
+            "WHERE a.course.professor.id = :professorId " +
+            "AND (:classeId IS NULL OR a.course.classe.id = :classeId) " +
+            "AND (a.dateEvent >= COALESCE(:startDate, CAST('1970-01-01' AS DATE))) " +
+            "AND (a.dateEvent <= COALESCE(:endDate, CAST('2099-12-31' AS DATE))) " +
+            "GROUP BY a.course, a.dateEvent")
+    List<Object[]> findGroupedAttendances(@Param("professorId") Long professorId,
+                                          @Param("classeId") Long classeId,
+                                          @Param("startDate") LocalDate startDate,
+                                          @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT a FROM Attendance a WHERE a.course.id = :courseId AND a.dateEvent = :date")
+
+    @Query("SELECT a FROM Attendance a WHERE a.course.id = :courseId AND a.dateEvent = :date")
         List<Attendance> findByCourseAndDate(@Param("courseId") Long courseId, @Param("date") LocalDate date);
 
 

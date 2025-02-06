@@ -7,8 +7,11 @@ import com.digital.school.model.Course;
 import com.digital.school.model.Classe;
 import com.digital.school.model.Subject;
 import com.digital.school.model.User;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByClasse(Classe classe);
@@ -27,4 +30,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     
     @Query("SELECT COUNT(c) FROM Course c WHERE c.classe = :classe AND c.startTime BETWEEN :start AND :end")
     long countByClasseAndTimeRange(@Param("classe") Classe classe, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT c FROM Course c WHERE c.classe.id = :classId AND CAST(c.startTime as DATE) = :date ")
+    Optional<Object> findByClassIdAndDate(Long classId, LocalDate date);
 }

@@ -12,7 +12,7 @@ public class Attendance extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
-    private User student;
+    private Student student;
     
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
@@ -37,11 +37,11 @@ public class Attendance extends AuditableEntity {
     public Attendance() {
     }
 
-      public User getStudent() {
+      public Student getStudent() {
         return student;
     }
 
-    public void setStudent(User student) {
+    public void setStudent(Student student) {
         this.student = student;
     }
 
@@ -73,7 +73,7 @@ public class Attendance extends AuditableEntity {
         return dateEvent;
     }
 
-    public void setDate(LocalDate dateEvent) {
+    public void setDateEvent(LocalDate dateEvent) {
         this.dateEvent = dateEvent;
     }
 

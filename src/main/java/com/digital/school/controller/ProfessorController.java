@@ -2,6 +2,7 @@ package com.digital.school.controller;
 
 import com.digital.school.dto.ParticipationDto;
 import com.digital.school.model.Homework;
+import com.digital.school.model.Professor;
 import com.digital.school.service.*;
 import com.digital.school.model.User;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class ProfessorController {
 
     /* Affiche la liste des devoirs du professeur */
     @GetMapping("/homeworks")
-    public String listHomeworks(@AuthenticationPrincipal User professor, Model model) {
+    public String listHomeworks(@AuthenticationPrincipal Professor professor, Model model) {
         List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor);
         model.addAttribute("homeworks", homeworks);
         model.addAttribute("courses", courseService.findByProfessor(professor));

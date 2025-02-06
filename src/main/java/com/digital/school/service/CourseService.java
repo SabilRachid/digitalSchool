@@ -1,11 +1,8 @@
 package com.digital.school.service;
 
+import com.digital.school.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.digital.school.model.Course;
-import com.digital.school.model.Classe;
-import com.digital.school.model.Subject;
-import com.digital.school.model.User;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
@@ -21,7 +18,7 @@ public interface CourseService {
     void deleteById(Long id);
     boolean existsById(Long id);
     List<Course> findByClasse(Classe classe);
-    List<Course> findByProfessor(User professor);
+    List<Course> findByProfessor(Professor professor);
     List<Course> findBySubject(Subject subject);
     List<Course> findByDateRange(LocalDateTime start, LocalDateTime end);
     List<Course> findUpcomingCourses(User user);

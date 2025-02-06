@@ -1,29 +1,46 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.dto.AttendanceRequest;
+import com.digital.school.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import com.digital.school.model.Attendance;
-import com.digital.school.model.Course;
-import com.digital.school.model.User;
 import com.digital.school.model.enumerated.AttendanceStatus;
 import com.digital.school.repository.AttendanceRepository;
+import com.digital.school.repository.StudentRepository;
+import com.digital.school.repository.CourseRepository;
 import com.digital.school.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AttendanceServiceImpl implements AttendanceService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttendanceServiceImpl.class);
+
 	@Autowired 
 	AttendanceRepository attendanceRepository;
+
+    @Autowired
+    CourseRepository courseRepository;
+
+    @Autowired
+    StudentRepository studentRepository;
 
     @Override
     public void save(List<Attendance> attendanceList) {
@@ -49,6 +66,25 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public Attendance save(Attendance attendance) {
         return attendanceRepository.save(attendance);
+    }
+
+    @Override
+    public void saveAttendance(AttendanceRequest request) {
+        List<Attendance> attendances = new ArrayList<>();
+        Course course = (Course) courseRepository.findByClassIdAndDate(request.getClassId(), request.getDate())
+                .orElseThrow(() -> new RuntimeException("Cours non trouvé"));
+
+        request.getAttendances().forEach((studentId, status) -> {
+            Student student = studentRepository.findById(studentId).orElseThrow();
+            Attendance attendance = new Attendance();
+            attendance.setStudent(student);
+            attendance.setCourse(course);
+            attendance.setDateEvent(request.getDate());
+            attendance.setStatus(AttendanceStatus.valueOf(status));
+            attendances.add(attendance);
+        });
+
+        attendanceRepository.saveAll(attendances);
     }
 
     @Override
@@ -145,21 +181,34 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendanceRepository.save(attendance);
     }
 
-    @Override
-    public List<Map<String, Object>> findAllAsMapForProfessor(Long teacherId, Long classId, LocalDate startDate, LocalDate endDate) {
-        List<Object[]> attendances = attendanceRepository.findGroupedAttendances(teacherId, classId, startDate, endDate);
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Object[] a : attendances) {
-            Map<String, Object> map = new HashMap<>();
-            Course course = (Course) a[0];
-            map.put("course", course.getName());
-            map.put("class", course.getClasse().getName());
-            map.put("date", a[1]);
-            map.put("count", a[2]);
-            result.add(map);
-        }
-        return result;
+    @GetMapping("/data")
+    @ResponseBody
+    public Map<String, Object> getGroupedAttendanceData(@AuthenticationPrincipal Professor professor,
+                                                        @RequestParam(required = false) Long classId,
+                                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+
+        LOGGER.debug("teacherId: {}, classId: {}, startDate: {}, endDate: {}", professor.getId(), classId, startDate, endDate);
+
+        List<Map<String, Object>> result = attendanceRepository.findGroupedAttendances(professor.getId(), classId, startDate, endDate)
+                .stream()
+                .map(a -> {
+                    Course course = (Course) a[0];
+                    return Map.of(
+                            "courseId", course.getId(),
+                            "course", course.getName(),
+                            "classe", course.getClasse().getName(),
+                            "date", a[1],
+                            "count", a[2]
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return Map.of("data", result);
     }
+
+
+
 
     @Override
     public Optional<Attendance> findByIdAndTeacher(Long id, Long professorId) {

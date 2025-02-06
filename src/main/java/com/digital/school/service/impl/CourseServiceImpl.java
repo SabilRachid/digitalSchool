@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.*;
 import com.digital.school.repository.ClasseRepository;
 import com.digital.school.repository.SubjectRepository;
 import com.digital.school.repository.UserRepository;
@@ -7,10 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.digital.school.model.Course;
-import com.digital.school.model.Classe;
-import com.digital.school.model.Subject;
-import com.digital.school.model.User;
 import com.digital.school.repository.CourseRepository;
 import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -92,7 +89,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Course> findByProfessor(User professor) {
+    public List<Course> findByProfessor(Professor professor) {
         return courseRepository.findByProfessor(professor);
     }
 

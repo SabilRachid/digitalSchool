@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
 
+
+
     @Query("SELECT COUNT(p) FROM Professor p")
     Long countProfessors();
 

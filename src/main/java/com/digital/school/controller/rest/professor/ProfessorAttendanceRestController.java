@@ -1,9 +1,14 @@
 package com.digital.school.controller.rest.professor;
 
 
+import com.digital.school.dto.StudentDTO;
 import com.digital.school.model.*;
+import com.digital.school.dto.AttendanceRequest;
 import com.digital.school.service.AttendanceService;
 import com.digital.school.service.CourseService;
+import com.digital.school.service.StudentService;
+import com.digital.school.service.ClasseService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,21 +25,44 @@ import java.util.Map;
 @RequestMapping("/professor/api/attendances")
 public class ProfessorAttendanceRestController {
 
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ProfessorAttendanceRestController.class);
+
     @Autowired
     private AttendanceService attendanceService;
 
     @Autowired
+    private StudentService studentService;
+
+    @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private ClasseService classeService;
+
+    @GetMapping("/classes/list")
+    @ResponseBody
+    public List<Map<String, Object>> getClassesList() {
+        LOGGER.debug("getClassesList " + getClass().getName());
+        return classeService.findAllBasicInfo();
+    }
 
     @GetMapping("/data")
     @ResponseBody
-    public List<Map<String, Object>> getAttendancesData(
-            @AuthenticationPrincipal User professor,
+    public Map<String, Object> getAttendancesData(
+            @AuthenticationPrincipal Professor professor,
             @RequestParam(required = false) Long classId,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-        return attendanceService.findAllAsMapForProfessor(professor.getId(), classId, startDate, endDate);
+        return attendanceService.getGroupedAttendanceData(professor, classId, startDate, endDate);
+
+    }
+
+    @GetMapping("/students/{classId}")
+    @ResponseBody
+    public List<StudentDTO> getStudentsByClass(@PathVariable Long classId) {
+        LOGGER.debug("students size : {}", studentService.getStudentsDtoByClasseId(classId).size()+", classId : "+classId);
+        return studentService.getStudentsDtoByClasseId(classId);
     }
 
     @GetMapping("/{id}")
@@ -47,14 +76,15 @@ public class ProfessorAttendanceRestController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<?> createAttendance(@AuthenticationPrincipal Professor professor, @RequestBody Attendance attendance) {
+    public ResponseEntity<?> createAttendance(@AuthenticationPrincipal Professor professor,
+                                              @RequestBody AttendanceRequest request) {
         try {
-
-            if (!attendanceService.isTeacherAllowedToModify(professor.getId(), attendance.getCourse().getId())) {
+            if (!attendanceService.isTeacherAllowedToModify(professor.getId(), request.getClassId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Non autorisé."));
             }
-            Attendance savedAttendance = attendanceService.save(attendance);
-            return ResponseEntity.ok(savedAttendance);
+
+            attendanceService.saveAttendance(request);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Erreur: " + e.getMessage()));
         }

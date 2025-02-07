@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Devoirs - Digital School</title>
+
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/parent/homework.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-tasks"></i> Suivi des Devoirs</h1>
+    </div>
+
+    <!-- Vue par enfant -->
+    <div class="children-tabs">
+        <div th:each="child : ${children}" class="child-tab">
+            <div class="child-header">
+                <div class="child-info">
+                    <div class="child-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="child-details">
+                        <h3 th:text="${child.childName}">Nom de l'enfant</h3>
+                        <span class="child-class" th:text="${child.class}">Classe</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Devoirs</h3>
+                        <div class="stat-value" th:text="${child.stats.totalHomework}">15</div>
+                        <div class="stat-label">ce trimestre</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>À Faire</h3>
+                        <div class="stat-value" th:text="${child.stats.pendingHomework}">3</div>
+                        <div class="stat-label">devoirs en attente</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Terminés</h3>
+                        <div class="stat-value" th:text="${child.stats.completedHomework}">12</div>
+                        <div class="stat-label">devoirs rendus</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon rate">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Taux de Complétion</h3>
+                        <div class="stat-value" th:text="${child.stats.completionRate + '%'}">80%</div>
+                        <div class="stat-label">des devoirs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Répartition par matière -->
+            <div class="subjects-breakdown">
+                <h3>Répartition par matière</h3>
+                <div class="subjects-grid">
+                    <div th:each="subject : ${child.stats.subjectBreakdown}" class="subject-card">
+                        <div class="subject-header">
+                            <h4 th:text="${subject.key}">Matière</h4>
+                            <div class="completion-rate"
+                                 th:text="${subject.value.completionRate + '%'}">
+                                85%
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress"
+                                 th:style="'width: ' + ${subject.value.completionRate} + '%'">
+                            </div>
+                        </div>
+                        <div class="subject-stats">
+                                <span th:text="${subject.value.completed + ' terminés'}">
+                                    8 terminés
+                                </span>
+                            <span th:text="${subject.value.pending + ' en attente'}">
+                                    2 en attente
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des devoirs -->
+            <div class="homework-sections">
+                <!-- Devoirs à faire -->
+                <div class="homework-section">
+                    <h3>À faire</h3>
+                    <div class="homework-list">
+                        <div th:each="homework : ${child.homework}"
+                             th:if="${homework.status == 'PENDING'}"
+                             class="homework-card">
+                            <div class="homework-header">
+                                <div class="subject-badge" th:text="${homework.subject}">
+                                    Matière
+                                </div>
+                                <div class="due-date">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${#temporals.format(homework.dueDate, 'dd/MM/yyyy')}">
+                                            Date limite
+                                        </span>
+                                </div>
+                            </div>
+                            <div class="homework-content">
+                                <h4 th:text="${homework.title}">Titre du devoir</h4>
+                                <p th:text="${homework.description}">Description</p>
+                            </div>
+                            <div class="homework-footer">
+                                <button class="btn btn-primary"
+                                        th:onclick="'sendReminder(' + ${homework.id} + ')'">
+                                    <i class="fas fa-bell"></i> Envoyer un rappel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devoirs rendus -->
+                <div class="homework-section">
+                    <h3>Rendus</h3>
+                    <div class="homework-list">
+                        <div th:each="homework : ${child.homework}"
+                             th:if="${homework.status == 'SUBMITTED'}"
+                             class="homework-card">
+                            <div class="homework-header">
+                                <div class="subject-badge" th:text="${homework.subject}">
+                                    Matière
+                                </div>
+                                <div class="submission-date">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span th:text="${'Rendu le ' +
+                                                       #temporals.format(homework.submissionDate, 'dd/MM/yyyy')}">
+                                            Date de rendu
+                                        </span>
+                                </div>
+                            </div>
+                            <div class="homework-content">
+                                <h4 th:text="${homework.title}">Titre du devoir</h4>
+                                <p th:text="${homework.description}">Description</p>
+                            </div>
+                            <div class="homework-footer">
+                                <button class="btn btn-secondary"
+                                        th:onclick="'viewSubmission(' + ${homework.id} + ')'">
+                                    <i class="fas fa-eye"></i> Voir le devoir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devoirs notés -->
+                <div class="homework-section">
+                    <h3>Notés</h3>
+                    <div class="homework-list">
+                        <div th:each="homework : ${child.homework}"
+                             th:if="${homework.status == 'GRADED'}"
+                             class="homework-card">
+                            <div class="homework-header">
+                                <div class="subject-badge" th:text="${homework.subject}">
+                                    Matière
+                                </div>
+                                <div class="grade">
+                                    <i class="fas fa-star"></i>
+                                    <span th:text="${homework.grade + '/20'}">Note</span>
+                                </div>
+                            </div>
+                            <div class="homework-content">
+                                <h4 th:text="${homework.title}">Titre du devoir</h4>
+                                <p th:text="${homework.description}">Description</p>
+                                <div class="feedback" th:if="${homework.feedback}">
+                                    <h5>Commentaires :</h5>
+                                    <p th:text="${homework.feedback}">Feedback du professeur</p>
+                                </div>
+                            </div>
+                            <div class="homework-footer">
+                                <button class="btn btn-secondary"
+                                        th:onclick="'viewSubmission(' + ${homework.id} + ')'">
+                                    <i class="fas fa-eye"></i> Voir le devoir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/parent/homework.js}"></script>
+</body>
+</html>
+

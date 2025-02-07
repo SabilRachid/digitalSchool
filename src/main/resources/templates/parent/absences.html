@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Absences - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/parent/absences.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1><i class="fas fa-user-clock"></i> Suivi des Absences</h1>
+        </div>
+
+        <!-- Vue par enfant -->
+        <div class="children-tabs">
+            <div th:each="child : ${children}" class="child-tab">
+                <div class="child-info">
+                    <div class="child-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="child-details">
+                        <h3 th:text="${child.childName}">Nom de l'enfant</h3>
+                        <span class="child-class" th:text="${child.class}">Classe</span>
+                    </div>
+                </div>
+
+                <!-- Statistiques -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Absences</h3>
+                            <div class="stat-value" th:text="${child.stats.totalAbsences}">12</div>
+                            <div class="stat-label">cette année</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon justified">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Justifiées</h3>
+                            <div class="stat-value" th:text="${child.stats.justifiedAbsences}">8</div>
+                            <div class="stat-label">absences justifiées</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon unjustified">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Non Justifiées</h3>
+                            <div class="stat-value" th:text="${child.stats.unjustifiedAbsences}">4</div>
+                            <div class="stat-label">à justifier</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon rate">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Taux d'Absence</h3>
+                            <div class="stat-value" th:text="${child.stats.absenceRate + '%'}">5%</div>
+                            <div class="stat-label">des cours</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des absences -->
+                <div class="absences-list">
+                    <div th:each="absence : ${child.absences}" class="absence-card">
+                        <div class="absence-date">
+                            <div class="date-day" 
+                                 th:text="${#temporals.format(absence.date, 'dd')}">15</div>
+                            <div class="date-month" 
+                                 th:text="${#temporals.format(absence.date, 'MMM')}">Jan</div>
+                        </div>
+                        <div class="absence-details">
+                            <div class="course-info">
+                                <h3 th:text="${absence.subject}">Matière</h3>
+                                <p>
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span th:text="${absence.professor}">Professeur</span>
+                                </p>
+                            </div>
+                            <div class="absence-status" 
+                                 th:classappend="${absence.status.toLowerCase()}">
+                                <span th:text="${
+                                    absence.status == 'EXCUSED' ? 'Justifiée' :
+                                    absence.status == 'ABSENT' ? 'Non justifiée' :
+                                    'En attente'
+                                }">Status</span>
+                            </div>
+                        </div>
+                        <div class="absence-actions">
+                            <button th:if="${absence.status == 'ABSENT'}"
+                                    class="btn btn-primary"
+                                    th:onclick="'submitJustification(' + ${absence.id} + ')'">
+                                <i class="fas fa-upload"></i> Justifier
+                            </button>
+                            <button th:if="${absence.status == 'EXCUSED'}"
+                                    class="btn btn-secondary"
+                                    th:onclick="'viewJustification(' + ${absence.id} + ')'">
+                                <i class="fas fa-eye"></i> Voir justificatif
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Justification -->
+    <div class="modal" id="justificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Justifier une absence</h2>
+                <button class="modal-close" onclick="closeJustificationModal()">&times;</button>
+            </div>
+            <form id="justificationForm">
+                <div class="modal-body">
+                    <input type="hidden" id="absenceId" name="absenceId">
+                    <div class="form-group">
+                        <label for="reason">Motif</label>
+                        <textarea id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="justificationFile">Justificatif</label>
+                        <input type="file" id="justificationFile" name="file" required>
+                        <small class="form-text">Formats acceptés: PDF, JPG, PNG</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeJustificationModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Soumettre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/parent/absences.js}"></script>
+</body>
+</html>
+```
+
+<boltAction type="file" filePath="src/main/resources/templates/parent/grades.html">
+```html
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Notes - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/parent/grades.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1><i class="fas fa-star"></i> Suivi des Notes</h1>
+        </div>
+
+        <!-- Vue par enfant -->
+        <div class="children-tabs">
+            <div th:each="child : ${children}" class="child-tab">
+                <div class="child-header">
+                    <div class="child-info">
+                        <div class="child-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="child-details">
+                            <h3 th:text="${child.childName}">Nom de l'enfant</h3>
+                            <span class="child-class" th:text="${child.class}">Classe</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" 
+                                th:onclick="'downloadBulletin(' + ${child.childId} + ')'">
+                            <i class="fas fa-download"></i> Télécharger le bulletin
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Performance Overview -->
+                <div class="performance-overview">
+                    <div class="stat-card">
+                        <div class="stat-icon average">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Moyenne Générale</h3>
+                            <div class="stat-value" th:text="${child.averageGrade + '/20'}">
+                                14.5/20
+                            </div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+0.5 pts vs trimestre dernier</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon rank">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Classement</h3>
+                            <div class="stat-value" th:text="${child.rank}">3/28</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+2 places</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes par matière -->
+                <div class="subjects-grid">
+                    <div th:each="subject : ${child.subjectGrades}" class="subject-card">
+                        <div class="subject-header">
+                            <h3 th:text="${subject.subject}">Matière</h3>
+                            <div class="subject-average">
+                                <span class="average-value" 
+                                      th:text="${subject.average + '/20'}"
+                                      th:classappend="${
+                                          subject.average >= 16 ? 'excellent' :
+                                          subject.average >= 14 ? 'good' :
+                                          subject.average >= 10 ? 'average' :
+                                          'poor'
+                                      }">
+                                    15/20
+                                </span>
+                                <span class="class-average">
+                                    Moyenne classe: 
+                                    <span th:text="${subject.classAverage + '/20'}">13/20</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="grades-chart">
+                            <canvas th:id="${'chart-' + child.childId + '-' + subject.subject}">
+                            </canvas>
+                        </div>
+                        <div class="grades-list">
+                            <div th:each="grade : ${subject.grades}" class="grade-item">
+                                <div class="grade-info">
+                                    <span class="grade-title" th:text="${grade.title}">
+                                        Contrôle continu
+                                    </span>
+                                    <span class="grade-date" 
+                                          th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">
+                                        01/01/2024
+                                    </span>
+                                </div>
+                                <div class="grade-value" 
+                                     th:text="${grade.value + '/20'}"
+                                     th:classappend="${
+                                         grade.value >= 16 ? 'excellent' :
+                                         grade.value >= 14 ? 'good' :
+                                         grade.value >= 10 ? 'average' :
+                                         'poor'
+                                     }">
+                                    15/20
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progression -->
+                <div class="progression-section">
+                    <div class="section-header">
+                        <h2>Progression</h2>
+                        <div class="period-selector">
+                            <button class="btn-outline active">Trimestre</button>
+                            <button class="btn-outline">Année</button>
+                        </div>
+                    </div>
+                    <div class="progression-chart">
+                        <canvas th:id="${'progression-' + child.childId}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/parent/grades.js}"></script>
+</body>
+</html>

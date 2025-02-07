@@ -1,0 +1,160 @@
+```html
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Absences - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/student/absences.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1><i class="fas fa-user-clock"></i> Mes Absences</h1>
+            <div class="period-filter">
+                <button class="btn-outline active">Mois</button>
+                <button class="btn-outline">Trimestre</button>
+                <button class="btn-outline">Année</button>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Total Absences</h3>
+                    <div class="stat-value" th:text="${stats.totalAbsences}">12</div>
+                    <div class="stat-label">cette année</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon justified">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Justifiées</h3>
+                    <div class="stat-value" th:text="${stats.justifiedAbsences}">8</div>
+                    <div class="stat-label">absences justifiées</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon unjustified">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Non Justifiées</h3>
+                    <div class="stat-value" th:text="${stats.unjustifiedAbsences}">4</div>
+                    <div class="stat-label">à justifier</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon rate">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Taux d'Absence</h3>
+                    <div class="stat-value" th:text="${stats.absenceRate + '%'}">5%</div>
+                    <div class="stat-label">des cours</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des absences -->
+        <div class="absences-list">
+            <div th:each="absence : ${absences}" class="absence-card">
+                <div class="absence-date">
+                    <div class="date-day" th:text="${#temporals.format(absence.recordedAt, 'dd')}">15</div>
+                    <div class="date-month" th:text="${#temporals.format(absence.recordedAt, 'MMM')}">Jan</div>
+                </div>
+                <div class="absence-details">
+                    <div class="course-info">
+                        <h3 th:text="${absence.course.subject.name}">Matière</h3>
+                        <p>
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(absence.course.startTime, 'HH:mm') + ' - ' + 
+                                           #temporals.format(absence.course.endTime, 'HH:mm')}">
+                                Horaire
+                            </span>
+                        </p>
+                        <p>
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span th:text="${absence.course.professor.firstName + ' ' + 
+                                           absence.course.professor.lastName}">
+                                Professeur
+                            </span>
+                        </p>
+                    </div>
+                    <div class="absence-status" th:classappend="${absence.status.toLowerCase()}">
+                        <span th:text="${absence.status == 'EXCUSED' ? 'Justifiée' : 
+                                      absence.status == 'ABSENT' ? 'Non justifiée' : 
+                                      'En attente'}">
+                            Status
+                        </span>
+                    </div>
+                </div>
+                <div class="absence-actions">
+                    <button th:if="${absence.status == 'ABSENT'}"
+                            class="btn btn-primary"
+                            th:onclick="'submitJustification(' + ${absence.id} + ')'">
+                        <i class="fas fa-upload"></i> Justifier
+                    </button>
+                    <button th:if="${absence.status == 'EXCUSED'}"
+                            class="btn btn-secondary"
+                            th:onclick="'viewJustification(' + ${absence.id} + ')'">
+                        <i class="fas fa-eye"></i> Voir justificatif
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Justification -->
+    <div class="modal" id="justificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Justifier une absence</h2>
+                <button class="modal-close" onclick="closeJustificationModal()">&times;</button>
+            </div>
+            <form id="justificationForm">
+                <div class="modal-body">
+                    <input type="hidden" id="absenceId" name="absenceId">
+                    <div class="form-group">
+                        <label for="reason">Motif</label>
+                        <textarea id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="justificationFile">Justificatif</label>
+                        <input type="file" id="justificationFile" name="file" required>
+                        <small class="form-text">Formats acceptés: PDF, JPG, PNG</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeJustificationModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Soumettre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/student/absences.js}"></script>
+</body>
+</html>
+```

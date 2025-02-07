@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Inscriptions - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/secretary/registrations.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1><i class="fas fa-user-plus"></i> Gestion des Inscriptions</h1>
+            <button class="btn btn-primary" onclick="openRegistrationModal()">
+                <i class="fas fa-plus"></i> Nouvelle Inscription
+            </button>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>En Attente</h3>
+                    <div class="stat-value" id="pendingCount">--</div>
+                    <div class="stat-label">inscriptions à traiter</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon approved">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Approuvées</h3>
+                    <div class="stat-value" id="approvedCount">--</div>
+                    <div class="stat-label">inscriptions validées</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon payment">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Paiements</h3>
+                    <div class="stat-value" id="paymentPending">--</div>
+                    <div class="stat-label">en attente de paiement</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon documents">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Documents</h3>
+                    <div class="stat-value" id="missingDocs">--</div>
+                    <div class="stat-label">dossiers incomplets</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher une inscription...">
+            </div>
+            <div class="filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="PENDING">En attente</option>
+                    <option value="APPROVED">Approuvée</option>
+                    <option value="REJECTED">Refusée</option>
+                </select>
+                <select id="classFilter" class="filter-select">
+                    <option value="">Toutes les classes</option>
+                    <option th:each="class : ${classes}"
+                            th:value="${class.id}"
+                            th:text="${class.name}">
+                        Classe
+                    </option>
+                </select>
+                <select id="paymentFilter" class="filter-select">
+                    <option value="">Tous les paiements</option>
+                    <option value="PENDING">En attente</option>
+                    <option value="PAID">Payé</option>
+                    <option value="PARTIAL">Partiel</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Liste des inscriptions -->
+        <div class="registrations-list">
+            <div th:each="registration : ${registrations}" 
+                 class="registration-card"
+                 th:data-status="${registration.status}"
+                 th:data-payment="${registration.paymentStatus}"
+                 th:data-class="${registration.classe.id}">
+                <div class="registration-header">
+                    <div class="registration-number">
+                        <i class="fas fa-hashtag"></i>
+                        <span th:text="${registration.registrationNumber}">REG-001</span>
+                    </div>
+                    <div class="registration-date">
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${#temporals.format(registration.registrationDate, 'dd/MM/yyyy')}">
+                            01/01/2024
+                        </span>
+                    </div>
+                    <div class="registration-status" th:classappend="${registration.status.toLowerCase()}">
+                        <span th:text="${
+                            registration.status == 'PENDING' ? 'En attente' :
+                            registration.status == 'APPROVED' ? 'Approuvée' :
+                            'Refusée'
+                        }">Status</span>
+                    </div>
+                </div>
+                <div class="registration-content">
+                    <div class="student-info">
+                        <div class="student-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="student-details">
+                            <h3 th:text="${registration.student.firstName + ' ' + 
+                                         registration.student.lastName}">
+                                Nom de l'élève
+                            </h3>
+                            <p>
+                                <i class="fas fa-school"></i>
+                                <span th:text="${registration.classe.name}">Classe</span>
+                            </p>
+                            <p>
+                                <i class="fas fa-user"></i>
+                                <span th:text="${registration.parent.firstName + ' ' + 
+                                               registration.parent.lastName}">
+                                    Parent
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="documents-status">
+                        <h4>Documents</h4>
+                        <ul class="documents-list">
+                            <li th:each="doc : ${registration.documents}"
+                                class="document-item complete">
+                                <i class="fas fa-check-circle"></i>
+                                <span th:text="${doc.type}">Type de document</span>
+                            </li>
+                            <li th:each="missing : ${@registrationService.getMissingDocuments(registration.id)}"
+                                class="document-item missing">
+                                <i class="fas fa-times-circle"></i>
+                                <span th:text="${missing}">Document manquant</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="payment-info">
+                        <h4>Paiement</h4>
+                        <div class="payment-status" th:classappend="${registration.paymentStatus.toLowerCase()}">
+                            <span th:text="${
+                                registration.paymentStatus == 'PENDING' ? 'En attente' :
+                                registration.paymentStatus == 'PAID' ? 'Payé' :
+                                'Partiel'
+                            }">Status</span>
+                        </div>
+                        <div class="payment-due" th:if="${registration.paymentStatus != 'PAID'}">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${'Échéance: ' + 
+                                           #temporals.format(registration.paymentDueDate, 'dd/MM/yyyy')}">
+                                Date limite
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="registration-actions">
+                    <button th:if="${registration.status == 'PENDING'}"
+                            class="btn btn-success"
+                            th:onclick="'approveRegistration(' + ${registration.id} + ')'">
+                        <i class="fas fa-check"></i> Approuver
+                    </button>
+                    <button th:if="${registration.status == 'PENDING'}"
+                            class="btn btn-danger"
+                            th:onclick="'rejectRegistration(' + ${registration.id} + ')'">
+                        <i class="fas fa-times"></i> Refuser
+                    </button>
+                    <button class="btn btn-primary"
+                            th:onclick="'viewDetails(' + ${registration.id} + ')'">
+                        <i class="fas fa-eye"></i> Détails
+                    </button>
+                    <button th:if="${registration.paymentStatus != 'PAID'}"
+                            class="btn btn-warning"
+                            th:onclick="'sendReminder(' + ${registration.id} + ')'">
+                        <i class="fas fa-bell"></i> Rappel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nouvelle Inscription -->
+    <div class="modal" id="registrationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nouvelle Inscription</h2>
+                <button class="modal-close" onclick="closeRegistrationModal()">&times;</button>
+            </div>
+            <form id="registrationForm">
+                <div class="modal-body">
+                    <!-- Informations de l'élève -->
+                    <div class="form-section">
+                        <h3>Informations de l'élève</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="studentFirstName">Prénom</label>
+                                <input type="text" id="studentFirstName" name="student.firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentLastName">Nom</label>
+                                <input type="text" id="studentLastName" name="student.lastName" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="studentBirthDate">Date de naissance</label>
+                                <input type="date" id="studentBirthDate" name="student.birthDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentGender">Genre</label>
+                                <select id="studentGender" name="student.gender" required>
+                                    <option value="">Sélectionner</option>
+                                    <option value="M">Masculin</option>
+                                    <option value="F">Féminin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations du parent -->
+                    <div class="form-section">
+                        <h3>Informations du parent</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parentFirstName">Prénom</label>
+                                <input type="text" id="parentFirstName" name="parent.firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="parentLastName">Nom</label>
+                                <input type="text" id="parentLastName" name="parent.lastName" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parentEmail">Email</label>
+                                <input type="email" id="parentEmail" name="parent.email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="parentPhone">Téléphone</label>
+                                <input type="tel" id="parentPhone" name="parent.phone" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations scolaires -->
+                    <div class="form-section">
+                        <h3>Informations scolaires</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="class">Classe</label>
+                                <select id="class" name="classe.id" required>
+                                    <option value="">Sélectionner une classe</option>
+                                    <option th:each="class : ${classes}"
+                                            th:value="${class.id}"
+                                            th:text="${class.name}">
+                                        Classe
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="schoolYear">Année scolaire</label>
+                                <input type="text" id="schoolYear" name="schoolYear" 
+                                       value="2024-2025" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRegistrationModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Créer l'inscription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Rejet -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Motif du rejet</h2>
+                <button class="modal-close" onclick="closeRejectModal()">&times;</button>
+            </div>
+            <form id="rejectForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="rejectReason">Motif</label>
+                        <textarea id="rejectReason" name="reason" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        Confirmer le rejet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Détails -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Détails de l'inscription</h2>
+                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="details-section">
+                    <h3>Informations générales</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">N° d'inscription</span>
+                            <span id="detailRegistrationNumber"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date d'inscription</span>
+                            <span id="detailRegistrationDate"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Statut</span>
+                            <span id="detailStatus"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>Élève</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Nom complet</span>
+                            <span id="detailStudentName"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date de naissance</span>
+                            <span id="detailStudentBirthDate"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Classe</span>
+                            <span id="detailStudentClass"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>Parent</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Nom complet</span>
+                            <span id="detailParentName"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email</span>
+                            <span id="detailParentEmail"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Téléphone</span>
+                            <span id="detailParentPhone"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>Documents</h3>
+                    <div class="documents-grid" id="detailDocuments">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>Paiement</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Statut</span>
+                            <span id="detailPaymentStatus"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date limite</span>
+                            <span id="detailPaymentDueDate"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Rappels envoyés</span>
+                            <span id="detailReminderCount"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/secretary/registrations.js}"></script>
+</body>
+</html>

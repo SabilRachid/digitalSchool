@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emploi du Temps - Digital School</title>
+
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/parent/schedule.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+    <div class="schedule-container">
+        <!-- Sélecteur d'enfant -->
+        <div class="child-selector">
+            <div th:each="child : ${children}"
+                 class="child-tab"
+                 th:data-child-id="${child.childId}"
+                 onclick="selectChild(this)">
+                <div class="child-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="child-info">
+                    <h3 th:text="${child.childName}">Nom de l'enfant</h3>
+                    <span class="child-class" th:text="${child.class}">Classe</span>
+                </div>
+                <div class="today-classes">
+                        <span th:text="${child.todayClasses.size() + ' cours aujourd''hui'}">
+                            5 cours aujourd'hui
+                        </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="schedule-content">
+            <!-- Stats rapides -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon hours">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Heures de cours</h3>
+                        <div class="stat-value">
+                            <span id="weeklyHours">--</span>h
+                        </div>
+                        <div class="stat-label">cette semaine</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon exams">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Examens à venir</h3>
+                        <div class="stat-value" id="upcomingExams">--</div>
+                        <div class="stat-label">ce mois</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon events">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Événements</h3>
+                        <div class="stat-value" id="upcomingEvents">--</div>
+                        <div class="stat-label">à venir</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendrier -->
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <div class="view-filters">
+                        <button class="btn-outline active" data-view="timeGridWeek">
+                            Semaine
+                        </button>
+                        <button class="btn-outline" data-view="timeGridDay">
+                            Jour
+                        </button>
+                        <button class="btn-outline" data-view="dayGridMonth">
+                            Mois
+                        </button>
+                    </div>
+                    <div class="event-filters">
+                        <label class="filter-label">
+                            <input type="checkbox" checked data-type="course">
+                            <span class="filter-text courses">Cours</span>
+                        </label>
+                        <label class="filter-label">
+                            <input type="checkbox" checked data-type="exam">
+                            <span class="filter-text exams">Examens</span>
+                        </label>
+                        <label class="filter-label">
+                            <input type="checkbox" checked data-type="event">
+                            <span class="filter-text events">Événements</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="calendar"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="schedule-sidebar">
+            <div class="upcoming-events">
+                <h3>Événements à venir</h3>
+                <div class="events-list">
+                    <div th:each="event : ${upcomingEvents}" class="event-item">
+                        <div class="event-date">
+                                <span class="date-day"
+                                      th:text="${#temporals.format(event.date, 'dd')}">15</span>
+                            <span class="date-month"
+                                  th:text="${#temporals.format(event.date, 'MMM')}">Jan</span>
+                        </div>
+                        <div class="event-content">
+                            <div th:class="'event-type ' + ${event.type.toLowerCase()}"
+                                 th:text="${
+                                         event.type == 'EXAM' ? 'Examen' :
+                                         event.type == 'EVENT' ? 'Événement' :
+                                         'Cours'
+                                     }">
+                                Type
+                            </div>
+                            <h4 th:text="${event.title}">Titre de l'événement</h4>
+                            <p th:if="${event.description}"
+                               th:text="${event.description}">
+                                Description
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subject-distribution">
+                <h3>Répartition des matières</h3>
+                <div class="distribution-chart">
+                    <canvas id="subjectDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Événement -->
+<div class="modal" id="eventModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="eventTitle">Détails de l'événement</h2>
+            <button class="modal-close" onclick="closeEventModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="event-details">
+                <div class="detail-item">
+                    <i class="fas fa-clock"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Horaire</span>
+                        <span id="eventTime"></span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Lieu</span>
+                        <span id="eventLocation"></span>
+                    </div>
+                </div>
+                <div class="detail-item" id="eventTeacherContainer">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Professeur</span>
+                        <span id="eventTeacher"></span>
+                    </div>
+                </div>
+                <div class="detail-item" id="eventDescriptionContainer">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Description</span>
+                        <p id="eventDescription"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/parent/schedule.js}"></script>
+</body>
+</html>

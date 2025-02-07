@@ -1,0 +1,140 @@
+```html
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messagerie - Digital School</title>
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/student/messages.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/topbar :: topbar}"></div>
+
+    <div class="dashboard-container">
+        <div class="messages-container">
+            <!-- Liste des professeurs -->
+            <div class="professors-list">
+                <div class="list-header">
+                    <h2>Mes Professeurs</h2>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Rechercher...">
+                    </div>
+                </div>
+                <div class="professors">
+                    <div th:each="professor : ${professors}" 
+                         class="professor-item"
+                         th:onclick="'openConversation(' + ${professor.id} + ')'">
+                        <div class="professor-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="professor-info">
+                            <span class="professor-name" 
+                                  th:text="${professor.firstName + ' ' + professor.lastName}">
+                                Nom du professeur
+                            </span>
+                            <span class="professor-subject" 
+                                  th:text="${professor.subject}">
+                                Matière
+                            </span>
+                        </div>
+                        <div class="unread-badge" 
+                             th:if="${professor.unreadCount > 0}"
+                             th:text="${professor.unreadCount}">
+                            2
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone de conversation -->
+            <div class="conversation-area">
+                <!-- État initial -->
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-comments"></i>
+                    <h3>Sélectionnez un professeur pour commencer une conversation</h3>
+                </div>
+
+                <!-- Conversation active -->
+                <div class="active-conversation" id="activeConversation" style="display: none;">
+                    <div class="conversation-header">
+                        <div class="professor-info">
+                            <div class="professor-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="professor-details">
+                                <span class="professor-name"></span>
+                                <span class="professor-subject"></span>
+                            </div>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="requestMeeting()">
+                                <i class="fas fa-calendar-plus"></i>
+                                Demander un rendez-vous
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="messages-list" id="messagesList">
+                        <!-- Messages chargés dynamiquement -->
+                    </div>
+
+                    <div class="message-input">
+                        <form id="messageForm">
+                            <textarea placeholder="Votre message..." required></textarea>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rendez-vous -->
+    <div class="modal" id="meetingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Demande de rendez-vous</h2>
+                <button class="modal-close" onclick="closeMeetingModal()">&times;</button>
+            </div>
+            <form id="meetingForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="meetingDate">Date et heure souhaitées</label>
+                        <input type="datetime-local" id="meetingDate" name="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetingReason">Motif du rendez-vous</label>
+                        <textarea id="meetingReason" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="meetingOnline" name="online">
+                            <span>Rendez-vous en ligne</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeMeetingModal()">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Envoyer la demande
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/student/messages.js}"></script>
+</body>
+</html>
+```

@@ -1,0 +1,211 @@
+```css
+/* Variables spécifiques aux notes */
+:root {
+    --grade-excellent: #059669;
+    --grade-good: #4F46E5;
+    --grade-average: #D97706;
+    --grade-poor: #DC2626;
+    --card-radius: 1rem;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Performance Overview */
+.performance-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform var(--transition-speed);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.average {
+    background-color: #E0E7FF;
+    color: #4F46E5;
+}
+
+.stat-icon.rank {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.stat-icon.success {
+    background-color: #DCFCE7;
+    color: #059669;
+}
+
+/* Grades Grid */
+.grades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.subject-card {
+    background: white;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.subject-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.subject-average {
+    text-align: right;
+}
+
+.average-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.average-value.excellent { color: var(--grade-excellent); }
+.average-value.good { color: var(--grade-good); }
+.average-value.average { color: var(--grade-average); }
+.average-value.poor { color: var(--grade-poor); }
+
+.class-average {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Grades Chart */
+.grades-chart {
+    height: 200px;
+    margin-bottom: 1.5rem;
+}
+
+/* Grades List */
+.grades-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.grade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.5rem;
+}
+
+.grade-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.grade-title {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.grade-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.grade-value {
+    font-weight: 600;
+}
+
+.grade-value.excellent { color: var(--grade-excellent); }
+.grade-value.good { color: var(--grade-good); }
+.grade-value.average { color: var(--grade-average); }
+.grade-value.poor { color: var(--grade-poor); }
+
+/* Progress Section */
+.progress-section {
+    background: white;
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.period-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.progress-chart {
+    height: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .performance-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .grades-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .subject-average {
+        text-align: center;
+    }
+
+    .period-selector {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+}
+```

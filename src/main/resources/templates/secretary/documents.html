@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents Officiels - Digital School</title>
+
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/secretary/documents.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-file-alt"></i> Documents Officiels</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="generateBulletins()">
+                <i class="fas fa-file-pdf"></i> Générer les Bulletins
+            </button>
+            <button class="btn btn-secondary" onclick="openDocumentModal()">
+                <i class="fas fa-plus"></i> Nouveau Document
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Rechercher un document...">
+        </div>
+        <div class="filters">
+            <select id="classFilter" class="filter-select">
+                <option value="">Toutes les classes</option>
+                <option th:each="class : ${classes}"
+                        th:value="${class.id}"
+                        th:text="${class.name}">
+                    Classe
+                </option>
+            </select>
+            <select id="typeFilter" class="filter-select">
+                <option value="">Tous les types</option>
+                <option value="BULLETIN">Bulletin</option>
+                <option value="CERTIFICATE">Certificat</option>
+                <option value="ATTESTATION">Attestation</option>
+            </select>
+            <select id="periodFilter" class="filter-select">
+                <option value="">Toutes les périodes</option>
+                <option value="TRIMESTER1">1er Trimestre</option>
+                <option value="TRIMESTER2">2ème Trimestre</option>
+                <option value="TRIMESTER3">3ème Trimestre</option>
+                <option value="YEAR">Année</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Documents Grid -->
+    <div class="documents-grid">
+        <!-- Bulletins -->
+        <div class="document-section">
+            <h2>Bulletins</h2>
+            <div class="document-list">
+                <div th:each="bulletin : ${bulletins}" class="document-card">
+                    <div class="document-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="document-info">
+                        <h3 th:text="${bulletin.title}">Bulletin 1er Trimestre</h3>
+                        <p class="document-meta">
+                                <span class="class-name" th:text="${bulletin.classe.name}">
+                                    3ème A
+                                </span>
+                            <span class="period" th:text="${bulletin.period}">
+                                    1er Trimestre
+                                </span>
+                        </p>
+                        <p class="document-date">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(bulletin.generatedAt, 'dd/MM/yyyy')}">
+                                    01/01/2024
+                                </span>
+                        </p>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-primary"
+                                th:onclick="'downloadDocument(' + ${bulletin.id} + ')'">
+                            <i class="fas fa-download"></i> Télécharger
+                        </button>
+                        <button class="btn btn-secondary"
+                                th:onclick="'previewDocument(' + ${bulletin.id} + ')'">
+                            <i class="fas fa-eye"></i> Aperçu
+                        </button>
+                        <button class="btn btn-warning"
+                                th:onclick="'sendDocument(' + ${bulletin.id} + ')'">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificats -->
+        <div class="document-section">
+            <h2>Certificats</h2>
+            <div class="document-list">
+                <div th:each="certificate : ${certificates}" class="document-card">
+                    <div class="document-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="document-info">
+                        <h3 th:text="${certificate.title}">Certificat de Scolarité</h3>
+                        <p class="document-meta">
+                                <span class="student-name"
+                                      th:text="${certificate.student.firstName + ' ' +
+                                               certificate.student.lastName}">
+                                    Nom de l'élève
+                                </span>
+                            <span class="class-name"
+                                  th:text="${certificate.student.classe.name}">
+                                    3ème A
+                                </span>
+                        </p>
+                        <p class="document-date">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(certificate.generatedAt, 'dd/MM/yyyy')}">
+                                    01/01/2024
+                                </span>
+                        </p>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-primary"
+                                th:onclick="'downloadDocument(' + ${certificate.id} + ')'">
+                            <i class="fas fa-download"></i> Télécharger
+                        </button>
+                        <button class="btn btn-secondary"
+                                th:onclick="'previewDocument(' + ${certificate.id} + ')'">
+                            <i class="fas fa-eye"></i> Aperçu
+                        </button>
+                        <button class="btn btn-warning"
+                                th:onclick="'sendDocument(' + ${certificate.id} + ')'">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attestations -->
+        <div class="document-section">
+            <h2>Attestations</h2>
+            <div class="document-list">
+                <div th:each="attestation : ${attestations}" class="document-card">
+                    <div class="document-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="document-info">
+                        <h3 th:text="${attestation.title}">Attestation de Réussite</h3>
+                        <p class="document-meta">
+                                <span class="student-name"
+                                      th:text="${attestation.student.firstName + ' ' +
+                                               attestation.student.lastName}">
+                                    Nom de l'élève
+                                </span>
+                            <span class="class-name"
+                                  th:text="${attestation.student.classe.name}">
+                                    3ème A
+                                </span>
+                        </p>
+                        <p class="document-date">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(attestation.generatedAt, 'dd/MM/yyyy')}">
+                                    01/01/2024
+                                </span>
+                        </p>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-primary"
+                                th:onclick="'downloadDocument(' + ${attestation.id} + ')'">
+                            <i class="fas fa-download"></i> Télécharger
+                        </button>
+                        <button class="btn btn-secondary"
+                                th:onclick="'previewDocument(' + ${attestation.id} + ')'">
+                            <i class="fas fa-eye"></i> Aperçu
+                        </button>
+                        <button class="btn btn-warning"
+                                th:onclick="'sendDocument(' + ${attestation.id} + ')'">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Génération Document -->
+<div class="modal" id="documentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nouveau Document</h2>
+            <button class="modal-close" onclick="closeDocumentModal()">&times;</button>
+        </div>
+        <form id="documentForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="documentType">Type de Document</label>
+                    <select id="documentType" name="type" class="form-select" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="BULLETIN">Bulletin</option>
+                        <option value="CERTIFICATE">Certificat de Scolarité</option>
+                        <option value="ATTESTATION">Attestation</option>
+                    </select>
+                </div>
+
+                <div id="bulletinFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="bulletinClass">Classe</label>
+                        <select id="bulletinClass" name="classeId" class="form-select">
+                            <option value="">Sélectionner une classe</option>
+                            <option th:each="class : ${classes}"
+                                    th:value="${class.id}"
+                                    th:text="${class.name}">
+                                Classe
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulletinPeriod">Période</label>
+                        <select id="bulletinPeriod" name="period" class="form-select">
+                            <option value="TRIMESTER1">1er Trimestre</option>
+                            <option value="TRIMESTER2">2ème Trimestre</option>
+                            <option value="TRIMESTER3">3ème Trimestre</option>
+                            <option value="YEAR">Année</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="studentFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="student">Élève</label>
+                        <select id="student" name="studentId" class="form-select">
+                            <option value="">Sélectionner un élève</option>
+                            <option th:each="student : ${students}"
+                                    th:value="${student.id}"
+                                    th:text="${student.firstName + ' ' + student.lastName +
+                                                 ' (' + student.classe.name + ')'}">
+                                Élève
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="documentTitle">Titre</label>
+                    <input type="text" id="documentTitle" name="title" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="documentComments">Commentaires (optionnel)</label>
+                    <textarea id="documentComments" name="comments" class="form-input" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDocumentModal()">
+                    Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Générer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Envoi Document -->
+<div class="modal" id="sendModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Envoyer le Document</h2>
+            <button class="modal-close" onclick="closeSendModal()">&times;</button>
+        </div>
+        <form id="sendForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="recipients">Destinataires</label>
+                    <select id="recipients" name="recipients" class="form-select" multiple required>
+                        <option value="ALL_PARENTS">Tous les parents</option>
+                        <option value="ALL_STUDENTS">Tous les élèves</option>
+                        <option value="SPECIFIC">Sélectionner des destinataires spécifiques</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sendMessage">Message</label>
+                    <textarea id="sendMessage" name="message" class="form-input" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSendModal()">
+                    Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/secretary/documents.js}"></script>
+</body>
+</html>

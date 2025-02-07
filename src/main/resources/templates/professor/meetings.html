@@ -1,0 +1,179 @@
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Réunions - Digital School</title>
+
+  <!-- CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+  <link rel="stylesheet" th:href="@{/css/professor/meetings.css}">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+  <div class="page-header">
+    <h1><i class="fas fa-users"></i> Gestion des Réunions</h1>
+    <button class="btn btn-primary" onclick="openMeetingModal()">
+      <i class="fas fa-plus"></i> Nouvelle Réunion
+    </button>
+  </div>
+
+  <div class="meetings-grid">
+    <!-- Réunions à venir -->
+    <div class="meeting-section">
+      <h2>À venir</h2>
+      <div class="meeting-list">
+        <div th:each="meeting : ${meetings}"
+             th:if="${meeting.startTime.isAfter(#temporals.createNow())}"
+             class="meeting-card">
+          <div class="meeting-header">
+                            <span class="meeting-type"
+                                  th:text="${meeting.type}">Type</span>
+            <span class="meeting-date">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${#temporals.format(meeting.startTime, 'dd/MM/yyyy HH:mm')}">
+Date
+        </span>
+                            </span>
+          </div>
+          <div class="meeting-content">
+            <h3 th:text="${meeting.title}">Titre de la réunion</h3>
+            <p th:text="${meeting.description}">Description</p>
+            <div class="participants">
+              <h4>Participants:</h4>
+              <div class="participant-list">
+                                    <span th:each="participant : ${meeting.participants}"
+                                          class="participant-badge"
+                                          th:text="${participant.firstName + ' ' + participant.lastName}">
+Participant
+        </span>
+              </div>
+            </div>
+          </div>
+          <div class="meeting-footer">
+            <button class="btn btn-primary"
+                    th:if="${meeting.online}"
+                    th:onclick="'joinMeeting(\'' + ${meeting.meetingLink} + '\')'">
+              <i class="fas fa-video"></i> Rejoindre
+            </button>
+            <button class="btn btn-warning"
+                    th:onclick="'sendReminders(' + ${meeting.id} + ')'">
+              <i class="fas fa-bell"></i> Rappels
+            </button>
+            <button class="btn btn-danger"
+                    th:onclick="'cancelMeeting(' + ${meeting.id} + ')'">
+              <i class="fas fa-times"></i> Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Réunions passées -->
+    <div class="meeting-section">
+      <h2>Passées</h2>
+      <div class="meeting-list">
+        <div th:each="meeting : ${meetings}"
+             th:if="${meeting.startTime.isBefore(#temporals.createNow())}"
+             class="meeting-card past">
+          <div class="meeting-header">
+                            <span class="meeting-type"
+                                  th:text="${meeting.type}">Type</span>
+            <span class="meeting-date">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${#temporals.format(meeting.startTime, 'dd/MM/yyyy HH:mm')}">
+Date
+        </span>
+                            </span>
+          </div>
+          <div class="meeting-content">
+            <h3 th:text="${meeting.title}">Titre de la réunion</h3>
+            <p th:text="${meeting.description}">Description</p>
+            <div class="meeting-summary" th:if="${meeting.summary}">
+              <h4>Compte-rendu:</h4>
+              <p th:text="${meeting.summary}">Résumé de la réunion</p>
+            </div>
+          </div>
+          <div class="meeting-footer">
+            <button class="btn btn-secondary"
+                    th:onclick="'viewSummary(' + ${meeting.id} + ')'">
+              <i class="fas fa-file-alt"></i> Compte-rendu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Réunion -->
+<div class="modal" id="meetingModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Nouvelle Réunion</h2>
+      <button class="modal-close" onclick="closeMeetingModal()">&times;</button>
+    </div>
+    <form id="meetingForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="title">Titre</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startTime">Date et heure</label>
+            <input type="datetime-local" id="startTime" name="startTime" required>
+          </div>
+          <div class="form-group">
+            <label for="duration">Durée (minutes)</label>
+            <input type="number" id="duration" name="duration" min="15" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="type">Type de réunion</label>
+          <select id="type" name="type" required>
+            <option value="PARENT_TEACHER">Parent-Professeur</option>
+            <option value="STAFF">Équipe pédagogique</option>
+            <option value="CLASS_COUNCIL">Conseil de classe</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location">Lieu</label>
+          <input type="text" id="location" name="location" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="participants">Participants</label>
+          <select id="participants" name="participants" multiple required>
+            <!-- Options remplies dynamiquement -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="online" name="online">
+            <span>Réunion en ligne</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeMeetingModal()">
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Programmer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:src="@{/js/professor/meetings.js}"></script>
+</body>
+</html>

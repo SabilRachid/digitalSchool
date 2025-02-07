@@ -1,7 +1,5 @@
 package com.digital.school.service;
 
-```java
-package com.digital.school.service;
 
 import com.digital.school.model.User;
 import java.util.List;
@@ -13,4 +11,3 @@ public interface ParentGradeService {
     byte[] generateChildReport(Long childId);
     Map<String, Object> getChildGradeStats(Long childId);
 }
-```

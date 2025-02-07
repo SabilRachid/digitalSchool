@@ -1,8 +1,5 @@
 package com.digital.school.controller.rest.parent;
 
-```java
-package com.digital.school.controller.parent;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,12 +33,12 @@ public class ParentGradesController {
         try {
             byte[] report = gradeService.generateChildReport(childId);
             return ResponseEntity.ok()
-                .header("Content-Type", "application/pdf")
-                .header("Content-Disposition", "attachment; filename=bulletin.pdf")
-                .body(report);
+                    .header("Content-Type", "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=bulletin.pdf")
+                    .body(report);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -51,4 +48,3 @@ public class ParentGradesController {
         return ResponseEntity.ok(gradeService.getChildGradeStats(childId));
     }
 }
-```

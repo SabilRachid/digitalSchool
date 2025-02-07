@@ -1,4 +1,3 @@
-```javascript
 // Gestion des notes
 document.addEventListener('DOMContentLoaded', function() {
     initializeFilters();
@@ -234,4 +233,3 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 5000);
 }
-```

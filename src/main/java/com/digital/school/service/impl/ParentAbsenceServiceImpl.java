@@ -1,7 +1,5 @@
 package com.digital.school.service.impl;
 
-```java
-package com.digital.school.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -146,4 +144,3 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
         return (double) absences / totalSessions * 100;
     }
 }
-```

@@ -1,7 +1,5 @@
 package com.digital.school.service;
 
-```java
-package com.digital.school.service;
 
 import com.digital.school.model.StudentGrade;
 import java.util.List;
@@ -16,4 +14,3 @@ public interface GradeService {
     Map<String, Double> calculateClassAverages(Long classeId);
     int calculateStudentRank(Long studentId, Long classeId);
 }
-```

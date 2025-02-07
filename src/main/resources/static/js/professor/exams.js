@@ -1,4 +1,3 @@
-```javascript
 // Gestion des examens
 document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
@@ -207,4 +206,3 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 5000);
 }
-```

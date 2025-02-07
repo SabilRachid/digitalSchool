@@ -1,7 +1,5 @@
 package com.digital.school.controller.rest.student;
 
-```java
-package com.digital.school.controller.student;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -60,4 +58,3 @@ public class StudentAbsenceController {
         return ResponseEntity.ok(absenceService.getAbsenceStatistics(student));
     }
 }
-```

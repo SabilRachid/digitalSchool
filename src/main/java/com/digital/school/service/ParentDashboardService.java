@@ -1,11 +1,9 @@
 package com.digital.school.service;
 
-```java
-package com.digital.school.service;
-
 import com.digital.school.model.User;
 import java.util.List;
 import java.util.Map;
+
 
 public interface ParentDashboardService {
     List<Map<String, Object>> getChildrenOverview(User parent);
@@ -17,4 +15,3 @@ public interface ParentDashboardService {
     List<Map<String, Object>> getChildGrades(Long childId);
     List<Map<String, Object>> getChildHomework(Long childId);
 }
-```

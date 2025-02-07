@@ -1,7 +1,5 @@
 package com.digital.school.service;
 
-```java
-package com.digital.school.service;
 
 import com.digital.school.model.Attendance;
 import com.digital.school.model.Document;
@@ -18,4 +16,3 @@ public interface StudentAbsenceService {
     Map<String, Object> getAbsenceStatistics(User student);
     boolean isAbsenceJustified(Long absenceId);
 }
-```

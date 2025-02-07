@@ -1,8 +1,5 @@
 package com.digital.school.controller.rest.student;
 
-```java
-package com.digital.school.controller.student;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -60,4 +57,3 @@ public class StudentGradesController {
         return ResponseEntity.ok(gradeService.getSubjectAverages(student));
     }
 }
-```

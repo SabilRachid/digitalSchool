@@ -1,8 +1,5 @@
 package com.digital.school.controller.rest.student;
 
-```java
-package com.digital.school.controller.student;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +18,7 @@ public class StudentMessagingController {
 
     @Autowired
     private StudentMessagingService messagingService;
-    
+
     @Autowired
     private UserService userService;
 
@@ -39,10 +36,10 @@ public class StudentMessagingController {
             @AuthenticationPrincipal User student,
             Model model) {
         User professor = userService.findById(professorId)
-            .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
-            
-        model.addAttribute("messages", 
-            messagingService.findConversationWithProfessor(student, professor));
+                .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
+
+        model.addAttribute("messages",
+                messagingService.findConversationWithProfessor(student, professor));
         model.addAttribute("professor", professor);
         return "student/conversation";
     }
@@ -58,7 +55,7 @@ public class StudentMessagingController {
             return ResponseEntity.ok(sent);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -73,7 +70,7 @@ public class StudentMessagingController {
             return ResponseEntity.ok(scheduled);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -85,7 +82,7 @@ public class StudentMessagingController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -95,4 +92,3 @@ public class StudentMessagingController {
         return ResponseEntity.ok(messagingService.getMessagingStats(student));
     }
 }
-```

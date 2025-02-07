@@ -1,4 +1,4 @@
-```javascript
+
 // Gestion du tableau de bord parent
 document.addEventListener('DOMContentLoaded', function() {
     initializeAlerts();
@@ -152,4 +152,3 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 5000);
 }
-```

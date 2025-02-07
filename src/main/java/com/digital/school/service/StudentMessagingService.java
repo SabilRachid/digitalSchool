@@ -1,7 +1,6 @@
 package com.digital.school.service;
 
-```java
-package com.digital.school.service;
+
 
 import com.digital.school.model.Message;
 import com.digital.school.model.Meeting;
@@ -18,4 +17,3 @@ public interface StudentMessagingService {
     void cancelMeetingRequest(Long meetingId);
     Map<String, Object> getMessagingStats(User student);
 }
-```

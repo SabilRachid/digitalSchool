@@ -5,6 +5,7 @@ import com.digital.school.model.Exam;
 import com.digital.school.model.ExamResult;
 import com.digital.school.model.User;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface ExamService {

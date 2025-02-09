@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     private PDFService pdfService;
 
     @Override
-    public List<StudentGrade> findRecentGrades(User student) {
+    public List<StudentGrade> findRecentGrades(Student student) {
         return gradeRepository.findRecentGrades(student);
     }
 

@@ -31,10 +31,10 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     private EventRepository eventRepository;
 
     @Override
-    public List<Map<String, Object>> getChildrenOverview(User parent) {
+    public List<Map<String, Object>> getChildrenOverview(Parent parent) {
         return parentStudentRepository.findByParent(parent).stream()
             .map(association -> {
-                User child = association.getStudent();
+                Student child = association.getStudent();
                 Map<String, Object> overview = new HashMap<>();
                 overview.put("id", child.getId());
                 overview.put("name", child.getFirstName() + " " + child.getLastName());
@@ -49,16 +49,16 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     @Override
-    public List<Map<String, Object>> getParentAlerts(User parent) {
+    public List<Map<String, Object>> getParentAlerts(Parent parent) {
         List<Map<String, Object>> alerts = new ArrayList<>();
         
         // Récupérer les enfants du parent
-        List<User> children = parentStudentRepository.findByParent(parent).stream()
+        List<Student> children = parentStudentRepository.findByParent(parent).stream()
             .map(ParentStudent::getStudent)
             .collect(Collectors.toList());
             
         // Vérifier les absences non justifiées
-        for (User child : children) {
+        for (Student child : children) {
             long unjustifiedAbsences = attendanceRepository.countUnjustifiedAbsences(child);
             if (unjustifiedAbsences > 0) {
                 Map<String, Object> alert = new HashMap<>();
@@ -75,7 +75,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         }
         
         // Vérifier les notes faibles
-        for (User child : children) {
+        for (Student child : children) {
             List<StudentGrade> lowGrades = gradeRepository.findLowGrades(child);
             if (!lowGrades.isEmpty()) {
                 Map<String, Object> alert = new HashMap<>();
@@ -92,7 +92,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         }
         
         // Vérifier les devoirs en retard
-        for (User child : children) {
+        for (Student child : children) {
             List<StudentHomework> lateHomework = homeworkRepository.findLateHomework(child);
             if (!lateHomework.isEmpty()) {
                 Map<String, Object> alert = new HashMap<>();
@@ -112,7 +112,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     @Override
-    public Map<String, Object> getParentStats(User parent) {
+    public Map<String, Object> getParentStats(Parent parent) {
         Map<String, Object> stats = new HashMap<>();
         
         List<User> children = parentStudentRepository.findByParent(parent).stream()
@@ -149,22 +149,22 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     @Override
-    public List<Map<String, Object>> getUpcomingEvents(User parent) {
+    public List<Map<String, Object>> getUpcomingEvents(Parent parent) {
         List<Map<String, Object>> events = new ArrayList<>();
         
         // Récupérer les enfants du parent
-        List<User> children = parentStudentRepository.findByParent(parent).stream()
+        List<Student> children = parentStudentRepository.findByParent(parent).stream()
             .map(ParentStudent::getStudent)
             .collect(Collectors.toList());
             
         // Récupérer les événements pour chaque enfant
-        for (User child : children) {
+        for (Student child : children) {
             // Examens à venir
             eventRepository.findUpcomingExams(child).forEach(exam -> {
                 Map<String, Object> event = new HashMap<>();
                 event.put("type", "EXAM");
-                event.put("title", exam.getName());
-                event.put("date", exam.getExamDate());
+                event.put("title", exam.getTitle());
+                event.put("date", exam.getStartTime());
                 event.put("childName", child.getFirstName());
                 event.put("subject", exam.getSubject().getName());
                 events.add(event);
@@ -191,7 +191,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     @Override
     public Map<String, Object> getChildPerformance(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -206,7 +206,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     @Override
     public Map<String, Object> getChildAttendance(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -220,7 +220,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     @Override
     public List<Map<String, Object>> getChildGrades(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -239,7 +239,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     @Override
     public List<Map<String, Object>> getChildHomework(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -257,42 +257,42 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     // Méthodes utilitaires
-    private double calculateAverageGrade(User student) {
-        return gradeRepository.calculateAverageGrade(student);
+    private double calculateAverageGrade(Student student) {
+        return gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
     }
 
-    private double calculateAttendanceRate(User student) {
+    private double calculateAttendanceRate(Student student) {
         return attendanceRepository.calculateAttendanceRate(student);
     }
 
-    private int countPendingHomework(User student) {
+    private int countPendingHomework(Student student) {
         return homeworkRepository.countPendingHomework(student);
     }
 
-    private int countUpcomingExams(User student) {
+    private int countUpcomingExams(Student student) {
         return eventRepository.countUpcomingExams(student);
     }
 
-    private int calculateRank(User student) {
+    private int calculateRank(Student student) {
         return gradeRepository.calculateStudentRank(
             student.getId(), 
             student.getClasse().getId()
         );
     }
 
-    private Map<String, Double> calculateSubjectAverages(User student) {
+    private Map<String, Double> calculateSubjectAverages(Student student) {
         return gradeRepository.calculateSubjectAverages(student);
     }
 
-    private Map<String, List<Double>> calculateProgression(User student) {
+    private Map<String, List<Double>> calculateProgression(Student student) {
         return gradeRepository.calculateProgression(student);
     }
 
-    private List<Map<String, Object>> getAbsenceDetails(User student) {
+    private List<Map<String, Object>> getAbsenceDetails(Student student) {
         return attendanceRepository.findAbsenceDetails(student);
     }
 
-    private List<Map<String, Object>> getLateDetails(User student) {
+    private List<Map<String, Object>> getLateDetails(Student student) {
         return attendanceRepository.findLateDetails(student);
     }
 }

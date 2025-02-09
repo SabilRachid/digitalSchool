@@ -1,17 +1,30 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Student;
+import com.digital.school.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import com.digital.school.model.StudentGrade;
+
+import java.awt.print.Pageable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long> {
     List<StudentGrade> findByClasse_IdAndSubject_Id(Long classeId, Long subjectId);
     
     List<StudentGrade> findByClasse_Id(Long classeId);
-    
+
+    List<StudentGrade> findByStudent_Id(Long studentId);
+
+    List<StudentGrade> findByClasseAndPeriod(Long classeId, String period);
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student.id = :studentId AND g.subject.id = :subjectId")
+    List<StudentGrade> findByStudent_IdAndSubject_Id(Long studentId, Long subjectId);
+
     @Query("SELECT AVG(g.value) FROM StudentGrade g " +
            "WHERE g.student.id = :studentId AND g.subject.id = :subjectId")
     Double calculateStudentAverage(
@@ -20,7 +33,7 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
     );
     
     @Query("SELECT g.subject.name as subject, AVG(g.value) as average " +
-           "FROM StudentGrade g WHERE g.classe.id = :classeId " +
+           "FROM StudentGrade g WHERE g.student.classe.id = :classeId " +
            "GROUP BY g.subject.name")
     Map<String, Double> calculateClassAverages(@Param("classeId") Long classeId);
     
@@ -37,4 +50,28 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
         @Param("studentId") Long studentId,
         @Param("classeId") Long classeId
     );
+
+    @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.student = :student")
+    Double calculateAverageGrade(Optional<Student> student);
+
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
+    List<StudentGrade> findRecentGrades(Student student, Pageable pageable);
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student = :student AND g.value < 8")
+    List<StudentGrade> findLowGrades(Student child);
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
+    Collection<StudentGrade> findByStudentOrderByDateDesc(Student child);
+
+
+    @Query(value = "SELECT g.subject.name as subject, AVG(g.value) as average " +
+            "FROM StudentGrade g WHERE g.student = :student " +
+            "GROUP BY g.subject.name")
+    Map<String, Double> calculateSubjectAverages(Student student);
+
+    @Query("SELECT g.subject.name as subject, AVG(g.value) as average " +
+            "FROM StudentGrade g WHERE g.student = :student " +
+            "GROUP BY g.subject.name")
+    Map<String, List<Double>> calculateProgression(Student student);
 }

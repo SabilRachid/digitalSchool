@@ -1,14 +1,11 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.model.*;
-import com.digital.school.repository.ClasseRepository;
-import com.digital.school.repository.SubjectRepository;
-import com.digital.school.repository.UserRepository;
+import com.digital.school.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.digital.school.repository.CourseRepository;
 import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +29,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ProfessorRepository professorRepository;
 
     @Autowired
     ClasseRepository classeRepository;
@@ -61,7 +61,7 @@ public class CourseServiceImpl implements CourseService {
         // Charger les entités réelles depuis la base
         Subject subject = subjectRepository.findById(course.getSubject().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Matière non trouvée"));
-        User professor = userRepository.findById(course.getProfessor().getId())
+        Professor professor = professorRepository.findById(course.getProfessor().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Professeur non trouvé"));
         Classe classe = classeRepository.findById(course.getClasse().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Classe non trouvée"));
@@ -163,7 +163,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object findByStudent(User student) {
+    public Object findByStudent(Student student) {
         return null;
     }
 
@@ -178,7 +178,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object findTodaySchedule(User professor) {
+    public Object findTodaySchedule(Professor professor) {
         return null;
     }
 

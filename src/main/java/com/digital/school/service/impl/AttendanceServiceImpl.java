@@ -5,6 +5,7 @@ import com.digital.school.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public double getAttendanceRate(User student, Course course) {
+    public double getAttendanceRate(Student student, Course course) {
         long totalSessions = attendanceRepository.countByStudentAndCourse(student, course);
         if (totalSessions == 0) {
             return 0.0;
@@ -226,5 +227,19 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.existsById(id);
     }
 
+    @Override
+    public List<Attendance> getAbsenceStatistics(Student student) {
+        return attendanceRepository.findAbsenceDetails(student);
+    }
+
+    @Override
+    public List<Attendance> getAbsenceStatistics() {
+        return attendanceRepository.findAbsenceDetails();
+    }
+
+    @Override
+    public ResponseEntity<?> getJustificationFile(Long id) {
+        return null;
+    }
 
 }

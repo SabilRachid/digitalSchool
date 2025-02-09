@@ -1,5 +1,7 @@
 package com.digital.school.service;
 
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import com.digital.school.model.Subject;
 import com.digital.school.model.User;
 
@@ -17,5 +19,6 @@ public interface SubjectService {
     boolean existsByName(String name);
     List<Subject> findByClasseId(Long classeId);
     long countCourses(Long subjectId);
-    Object findByStudent(User student);
+    List<Subject> findByStudent(Student student);
+    List<Subject> findByProfessor(Professor professor);
 }

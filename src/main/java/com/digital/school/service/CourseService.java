@@ -25,13 +25,12 @@ public interface CourseService {
     Map<String, Object> getCourseStatistics(Course course);
     List<Map<String, Object>> findAllAsMap();
     List<Map<String, Object>> findAllBasicInfo();
-    Object findByStudent(User student);
+    Object findByStudent(Student student);
 
     List<Map<String, Object>> getCourseResourcesAsMap(Long id);
     Map<String, String> generateMeetingLink(Long id);
 
-    //donne moi implementation de
-    Object findTodaySchedule(User professor);
+    Object findTodaySchedule(Professor professor);
 
-
+    Object findTodayCourses();
 }

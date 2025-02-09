@@ -8,6 +8,9 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.digital.school.service.StorageService;
 import jakarta.annotation.PostConstruct;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -123,4 +126,11 @@ public class FileSystemStorageService implements StorageService {
             throw new RuntimeException("Failed to store file.", e);
         }
     }
+
+    @Override
+    public String storeFile(byte[] fileData, String fileName) {
+        return "";
+    }
+
+
 }

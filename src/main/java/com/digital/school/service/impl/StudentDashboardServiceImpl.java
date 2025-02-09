@@ -3,6 +3,9 @@ package com.digital.school.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.digital.school.model.*;
@@ -62,7 +65,8 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
 
     @Override
     public List<StudentGrade> getRecentGrades(User student) {
-        return gradeRepository.findRecentGrades(student);
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("date").descending());
+        return gradeRepository.findRecentGrades(student, pageable);
     }
 
     @Override

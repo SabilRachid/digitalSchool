@@ -9,11 +9,11 @@ public class ParentStudent extends AuditableEntity {
     
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = false)
-    private User parent;
+    private Parent parent;
     
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
-    private User student;
+    private Student student;
     
     @Column(nullable = false)
     private String relationship;
@@ -45,19 +45,19 @@ public class ParentStudent extends AuditableEntity {
     private LocalDateTime validatedAt;
 
     // Getters and setters
-    public User getParent() {
+    public Parent getParent() {
         return parent;
     }
 
-    public void setParent(User parent) {
+    public void setParent(Parent parent) {
         this.parent = parent;
     }
 
-    public User getStudent() {
+    public Student getStudent() {
         return student;
     }
 
-    public void setStudent(User student) {
+    public void setStudent(Student student) {
         this.student = student;
     }
 

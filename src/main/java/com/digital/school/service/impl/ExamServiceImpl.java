@@ -26,7 +26,7 @@ public class ExamServiceImpl implements ExamService {
     private EmailService emailService;
 
     @Override
-    public List<Exam> findByProfessor(User professor) {
+    public List<Exam> findByProfessor(Professor professor) {
         return examRepository.findByCreatedBy(professor);
     }
 
@@ -58,11 +58,12 @@ public class ExamServiceImpl implements ExamService {
         exam = examRepository.save(exam);
         
         // Notifier les étudiants
+        Exam finalExam = exam;
         exam.getClasse().getStudents().forEach(student -> {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("examName", exam.getName());
-            variables.put("examDate", exam.getExamDate());
-            variables.put("duration", exam.getDuration());
+            variables.put("examName", finalExam.getName());
+            variables.put("examDate", finalExam.getExamDate());
+            variables.put("duration", finalExam.getDuration());
             
             emailService.sendEmail(
                 student.getEmail(),
@@ -105,13 +106,13 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public List<Exam> findUpcomingExams(User professor) {
+    public List<Exam> findUpcomingExams(Professor professor) {
         return examRepository.findUpcomingExamsByProfessor(professor);
     }
 
     @Override
     public Map<String, Object> getExamStatistics(Long examId) {
-        ExamResult results = examResultRepository.findByExam_Id(examId)
+        ExamResult results = examResultRepository.findByExamId(examId)
             .orElseThrow(() -> new RuntimeException("Résultats non trouvés"));
             
         Map<String, Object> stats = new HashMap<>();

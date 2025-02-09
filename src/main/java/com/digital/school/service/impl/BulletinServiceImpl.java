@@ -11,6 +11,7 @@ import com.digital.school.service.StorageService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,7 +44,7 @@ public class BulletinServiceImpl implements BulletinService {
                 .orElseThrow(() -> new RuntimeException("Classe non trouvée"));
 
         // Récupérer les notes de la période
-        List<StudentGrade> grades = gradeRepository.findByClasseAndPeriod(classe, period);
+        List<StudentGrade> grades = gradeRepository.findByClasseAndPeriod(classe.getId(), period);
 
         // Calculer les moyennes
         Map<String, Object> data = calculateAverages(grades);
@@ -52,10 +53,8 @@ public class BulletinServiceImpl implements BulletinService {
         byte[] pdfContent = pdfService.generateBulletin(data);
 
         // Sauvegarder le fichier
-        String filePath = storageService.store(
-                pdfContent,
-                generateBulletinFileName(classe, period)
-        );
+        String filePath = storageService.storeFile(pdfContent, generateBulletinFileName(classe, period));
+
 
         // Créer le bulletin
         Bulletin bulletin = new Bulletin();
@@ -92,6 +91,7 @@ public class BulletinServiceImpl implements BulletinService {
         Bulletin bulletin = bulletinRepository.findById(bulletinId)
                 .orElseThrow(() -> new RuntimeException("Bulletin non trouvé"));
 
+        //al
         return storageService.loadAsResource(bulletin.getFilePath()).getInputStream();
     }
 

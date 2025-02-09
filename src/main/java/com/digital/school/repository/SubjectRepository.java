@@ -1,5 +1,7 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.digital.school.model.Subject;
@@ -25,4 +27,12 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
             "WHERE r.name = 'ROLE_PROFESSOR' " +
             "GROUP BY s.name")
     List<Object[]> findProfessorCountBySubject();
+
+
+    //implement this query
+    @Query("SELECT s FROM Subject s JOIN s.classes c JOIN c.students st WHERE st = :student")
+    List<Subject> findByStudent(Student student);
+
+    @Query("SELECT s FROM Subject s JOIN s.professors p WHERE p = :professor")
+    List<Subject> findByProfessor(Professor professor);
 }

@@ -21,7 +21,10 @@ public class Event extends AuditableEntity {
     
     @Column(nullable = false)
     private LocalDateTime endTime;
-    
+
+    @ManyToOne
+    private Subject subject;
+
     private String location;
     
     @ManyToOne
@@ -133,4 +136,12 @@ public class Event extends AuditableEntity {
     public void setAllDay(boolean allDay) {
         this.allDay = allDay;
     }
+
+    public Subject getSubject() {
+        return subject;
+    }
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
 }

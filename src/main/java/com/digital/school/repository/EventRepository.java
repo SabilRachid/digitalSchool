@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -38,4 +39,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // Récupérer les 6 dernières activités
     @Query("SELECT e FROM Event e ORDER BY e.startTime DESC LIMIT 6")
     List<Event> findLastEvents();
+
+    @Query("SELECT e FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='EXAM' AND e.participants = :child")
+    Iterable<Event> findUpcomingExams(Student child);
 }

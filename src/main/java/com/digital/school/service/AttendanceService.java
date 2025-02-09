@@ -1,13 +1,11 @@
 package com.digital.school.service;
 
 import com.digital.school.dto.AttendanceRequest;
-import com.digital.school.model.Professor;
+import com.digital.school.model.*;
 import com.digital.school.model.enumerated.AttendanceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.digital.school.model.Attendance;
-import com.digital.school.model.Course;
-import com.digital.school.model.User;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,11 +29,14 @@ public interface AttendanceService {
     void save(List<Attendance> attendanceList);
 
     void deleteById(Long id);
-    double getAttendanceRate(User student, Course course);
+    double getAttendanceRate(Student student, Course course);
     Map<String, Double> getClassAttendanceStats(Course course);
     List<Attendance> getAttendancesByCourseAndDate(Course course, LocalDate date);
     void updateAttendance(Long id, AttendanceStatus status);
     boolean isTeacherAllowedToModify(Long teacherId, Long courseId);
     boolean existsById(Long id);
+    List<Attendance> getAbsenceStatistics(Student student);
+    List<Attendance> getAbsenceStatistics();
 
+    ResponseEntity<?> getJustificationFile(Long id);
 }

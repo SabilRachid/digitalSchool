@@ -62,7 +62,7 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
 
     @Override
     public Map<String, Object> getChildHomeworkStats(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
@@ -95,8 +95,8 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
         StudentHomework homework = homeworkRepository.findById(homeworkId)
                 .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
 
-        User student = homework.getStudent();
-        User parent = student.getParent();
+        Student student = homework.getStudent();
+        Parent parent = student.getParent();
 
         // Envoyer un email
         Map<String, Object> emailVars = new HashMap<>();
@@ -125,13 +125,13 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
     }
 
     @Override
-    public boolean canAccessHomework(Long homeworkId, User parent) {
+    public boolean canAccessHomework(Long homeworkId, Parent parent) {
         return homeworkRepository.findById(homeworkId)
                 .map(homework -> parentStudentRepository.existsByParentAndStudent(parent, homework.getStudent()))
                 .orElse(false);
     }
 
-    private List<Map<String, Object>> getHomeworkDetails(User child) {
+    private List<Map<String, Object>> getHomeworkDetails(Student child) {
         return homeworkRepository.findByStudent(child).stream()
                 .map(homework -> {
                     Map<String, Object> details = new HashMap<>();

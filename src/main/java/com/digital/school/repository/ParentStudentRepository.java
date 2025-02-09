@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,8 @@ import java.util.Optional;
 public interface ParentStudentRepository extends JpaRepository<ParentStudent, Long> {
     List<ParentStudent> findByParent(User parent);
     List<ParentStudent> findByStudent(User student);
+
+
     List<ParentStudent> findByRelationship(String relationship);
     List<ParentStudent> findByPrimaryContactTrue();
     
@@ -23,4 +26,7 @@ public interface ParentStudentRepository extends JpaRepository<ParentStudent, Lo
     List<ParentStudent> findValidatedAssociationsByParent(@Param("parent") User parent);
     
     boolean existsByParentAndStudent(User parent, User student);
+
+    Optional<ParentStudent> findByStudentId(Long childId);
+
 }

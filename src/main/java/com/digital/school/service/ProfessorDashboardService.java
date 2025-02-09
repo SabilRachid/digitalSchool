@@ -2,6 +2,7 @@ package com.digital.school.service;
 
 
 
+import com.digital.school.model.Professor;
 import com.digital.school.model.User;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
 public interface ProfessorDashboardService {
 
     // Dashboard statistics for the professor
-    Map<String, Object> getProfessorStats(User professor);
+    Map<String, Object> getProfessorStats(Professor professor);
 
     // Charts data for the professor dashboard
     List<Map<String, Object>> getClassPerformance(); // Moyenne des notes par classe

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import com.digital.school.model.User;
 import com.digital.school.service.ParentGradeService;
 
+import java.util.Map;
+
 @Controller
 @RequestMapping("/parent/grades")
 public class ParentGradesController {

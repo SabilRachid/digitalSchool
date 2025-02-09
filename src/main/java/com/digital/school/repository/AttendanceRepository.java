@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,7 @@ import com.digital.school.model.enumerated.AttendanceStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStudent(User student);
@@ -72,4 +74,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 
     boolean existsByCourseIdAndRecordedBy_Id(Long courseId, Long recordedById);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student AND a.status = 'ABSENT' AND a.justification IS NULL")
+    long countUnjustifiedAbsences(User child);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student")
+    long countByStudent(Student student);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student AND a.status = :attendanceStatus")
+    long countByStudentAndStatus(Student student, AttendanceStatus attendanceStatus);
+
+    @Query("SELECT a FROM Attendance a WHERE a.student = :student AND a.status = 'ABSENT' AND a.justification IS NOT NULL")
+    List<Attendance> findAbsenceDetails(Student student);
+
+    @Query("SELECT a FROM Attendance a WHERE a.status = 'ABSENT' AND a.justification IS NULL")
+    List<Attendance> findAbsenceDetails();
 }

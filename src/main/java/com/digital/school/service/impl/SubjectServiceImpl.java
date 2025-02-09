@@ -1,5 +1,7 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import com.digital.school.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,7 +97,12 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Object findByStudent(User student) {
-        return null;
+    public List<Subject> findByStudent(Student student) {
+        return subjectRepository.findByStudent(student);
+    }
+
+    @Override
+    public List<Subject> findByProfessor(Professor professor) {
+        return subjectRepository.findByProfessor(professor);
     }
 }

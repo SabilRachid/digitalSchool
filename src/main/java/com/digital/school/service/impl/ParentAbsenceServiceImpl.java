@@ -1,6 +1,7 @@
 package com.digital.school.service.impl;
 
 
+import com.digital.school.model.enumerated.AttendanceStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
     public List<Map<String, Object>> getChildrenAbsences(User parent) {
         return parentStudentRepository.findByParent(parent).stream()
             .map(association -> {
-                User child = association.getStudent();
+                Student child = association.getStudent();
                 Map<String, Object> childAbsences = new HashMap<>();
                 childAbsences.put("childId", child.getId());
                 childAbsences.put("childName", child.getFirstName() + " " + child.getLastName());
@@ -83,7 +84,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
 
     @Override
     public Map<String, Object> getChildAbsenceStats(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -121,7 +122,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
             extension);
     }
 
-    private List<Map<String, Object>> getAbsenceDetails(User child) {
+    private List<Map<String, Object>> getAbsenceDetails(Student child) {
         return attendanceRepository.findByStudent(child).stream()
             .map(absence -> {
                 Map<String, Object> details = new HashMap<>();
@@ -136,7 +137,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
             .collect(Collectors.toList());
     }
 
-    private double calculateAbsenceRate(User student) {
+    private double calculateAbsenceRate(Student student) {
         long totalSessions = attendanceRepository.countByStudent(student);
         if (totalSessions == 0) return 0.0;
         

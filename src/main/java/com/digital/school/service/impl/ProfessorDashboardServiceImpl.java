@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Professor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     private ProfessorDashboardRepository professorDashboardRepository;
 
     @Override
-    public Map<String, Object> getProfessorStats(User professor) {
+    public Map<String, Object> getProfessorStats(Professor professor) {
         Map<String, Object> stats = new HashMap<>();
 
         // Calculate total students

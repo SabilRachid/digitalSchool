@@ -53,7 +53,7 @@ public class ProfessorController {
     private AttendanceService attendanceService;
 
     @GetMapping("/dashboard")
-    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User professor, Model model) {
+    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
         // Add user to model
         model.addAttribute("user", professor);
 
@@ -76,7 +76,7 @@ public class ProfessorController {
 
     @GetMapping("/dashboard/stats")
     @ResponseBody
-    public Map<String, Object> getDashboardStats(@AuthenticationPrincipal User professor) {
+    public Map<String, Object> getDashboardStats(@AuthenticationPrincipal Professor professor) {
         return dashboardService.getProfessorStats(professor);
     }
 

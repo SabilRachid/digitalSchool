@@ -30,7 +30,7 @@ public class BillingServiceImpl implements BillingService {
     private SMSService smsService;
 
     @Override
-    public Invoice generateInvoice(User student, List<InvoiceItem> items) {
+    public Invoice generateInvoice(Student student, List<InvoiceItem> items) {
         Invoice invoice = new Invoice();
         invoice.setStudent(student);
         invoice.setParent(student.getParent());
@@ -122,7 +122,7 @@ public class BillingServiceImpl implements BillingService {
 	}
 
 	@Override
-	public List<Invoice> getParentInvoices(User parent) {
+	public List<Invoice> getParentInvoices(Parent parent) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,6 +1,7 @@
 package com.digital.school.controller.rest.student;
 
 import com.digital.school.model.Homework;
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class StudentHomeworkController {
     private SubjectService subjectService;
 
     @GetMapping
-    public String showHomework(@AuthenticationPrincipal User student, Model model) {
+    public String showHomework(@AuthenticationPrincipal Student student, Model model) {
         model.addAttribute("pendingHomework", homeworkService.findPendingHomework(student));
         model.addAttribute("submittedHomework", homeworkService.findSubmittedHomework(student));
         model.addAttribute("gradedHomework", homeworkService.findGradedHomework(student));

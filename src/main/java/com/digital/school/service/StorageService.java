@@ -17,4 +17,6 @@ public interface StorageService {
 	String getUrl(String path);
 	String storeFile(MultipartFile file) throws IOException;
     String store(MultipartFile file, String s);
+    String storeFile(byte[] fileData, String fileName);
+
 }

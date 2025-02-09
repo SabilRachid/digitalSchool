@@ -1,11 +1,8 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import com.digital.school.model.Exam;
-import com.digital.school.model.Classe;
-import com.digital.school.model.User;
-import com.digital.school.model.Subject;
 import com.digital.school.model.enumerated.ExamStatus;
 import org.springframework.data.repository.query.Param;
 
@@ -23,5 +20,11 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     List<Exam> findUpcomingExamsByClasse(Classe classe);
 
     @Query("SELECT COUNT(e) FROM Exam e WHERE e.createdBy = :professor AND e.examDate > CURRENT_TIMESTAMP")
-    int countUpcomingExamsByProfessor(@Param("professor") User professor);
+    int countUpcomingExamsByProfessor(@Param("professor") Professor professor);
+
+    @Query("SELECT e FROM Exam e WHERE e.createdBy = :professor AND e.examDate > CURRENT_TIMESTAMP ORDER BY e.examDate")
+    List<Exam> findByCreatedBy(Professor professor);
+
+    @Query("SELECT e FROM Exam e WHERE e.createdBy = :professor AND e.examDate > CURRENT_TIMESTAMP ORDER BY e.examDate")
+    List<Exam> findUpcomingExamsByProfessor(Professor professor);
 }

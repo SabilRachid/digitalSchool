@@ -21,6 +21,9 @@ public class User extends AuditableEntity implements UserDetails {
     
     @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
+    private String phone;
     
     private String password;
     
@@ -148,8 +151,9 @@ public class User extends AuditableEntity implements UserDetails {
         return getClass().hashCode();
     }
 
-	public User getParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getPhone() { return phone;}
+
+    public void setPhone(String phone) { this.phone = phone;}
+
+
 }

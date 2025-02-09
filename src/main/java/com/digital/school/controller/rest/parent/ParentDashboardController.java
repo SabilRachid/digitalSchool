@@ -2,6 +2,7 @@ package com.digital.school.controller.rest.parent;
 
 
 
+import com.digital.school.model.Parent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,7 @@ public class ParentDashboardController {
     private ParentDashboardService dashboardService;
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal User parent, Model model) {
+    public String dashboard(@AuthenticationPrincipal Parent parent, Model model) {
         // Ajouter les informations des enfants
         model.addAttribute("children", dashboardService.getChildrenOverview(parent));
         
@@ -32,13 +33,12 @@ public class ParentDashboardController {
         
         // Ajouter les prochains événements
         model.addAttribute("upcomingEvents", dashboardService.getUpcomingEvents(parent));
-        
         return "parent/dashboard";
     }
 
     @GetMapping("/dashboard/stats")
     @ResponseBody
-    public Map<String, Object> getStats(@AuthenticationPrincipal User parent) {
+    public Map<String, Object> getStats(@AuthenticationPrincipal Parent parent) {
         return dashboardService.getParentStats(parent);
     }
 }

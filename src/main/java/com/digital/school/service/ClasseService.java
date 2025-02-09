@@ -1,6 +1,8 @@
 package com.digital.school.service;
 
 import com.digital.school.model.Classe;
+import com.digital.school.model.Professor;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,4 +18,6 @@ public interface ClasseService {
     List<Classe> findByLevelId(Long levelId);
     long countStudents(Long classeId);
     List<Classe>  getAll();
+
+    Object findByProfessor(Professor professor);
 }

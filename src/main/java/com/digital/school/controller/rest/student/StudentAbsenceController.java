@@ -1,6 +1,7 @@
 package com.digital.school.controller.rest.student;
 
 
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,7 @@ public class StudentAbsenceController {
     private StudentAbsenceService absenceService;
 
     @GetMapping
-    public String showAbsences(@AuthenticationPrincipal User student, Model model) {
+    public String showAbsences(@AuthenticationPrincipal Student student, Model model) {
         model.addAttribute("absences", absenceService.findStudentAbsences(student));
         model.addAttribute("stats", absenceService.getAbsenceStatistics(student));
         return "student/absences";
@@ -31,7 +32,7 @@ public class StudentAbsenceController {
     @GetMapping("/data")
     @ResponseBody
     public ResponseEntity<?> getAbsenceData(
-            @AuthenticationPrincipal User student,
+            @AuthenticationPrincipal Student student,
             @RequestParam LocalDateTime start,
             @RequestParam LocalDateTime end) {
         return ResponseEntity.ok(absenceService.findAbsencesByDateRange(student, start, end));
@@ -43,7 +44,7 @@ public class StudentAbsenceController {
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @RequestParam String reason,
-            @AuthenticationPrincipal User student) {
+            @AuthenticationPrincipal Student student) {
         try {
             absenceService.submitJustification(id, file, reason, student);
             return ResponseEntity.ok().build();
@@ -54,7 +55,7 @@ public class StudentAbsenceController {
 
     @GetMapping("/statistics")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getStatistics(@AuthenticationPrincipal User student) {
+    public ResponseEntity<Map<String, Object>> getStatistics(@AuthenticationPrincipal Student student) {
         return ResponseEntity.ok(absenceService.getAbsenceStatistics(student));
     }
 }

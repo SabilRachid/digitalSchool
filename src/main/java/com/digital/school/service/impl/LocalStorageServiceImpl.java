@@ -13,6 +13,8 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,6 +100,24 @@ public class LocalStorageServiceImpl implements StorageService {
     @Override
     public String store(MultipartFile file, String s) {
         return "";
+    }
+
+    public String storeFile(byte[] fileData, String fileName) {
+        try {
+            Path destinationFile = this.rootLocation.resolve(
+                            Paths.get(fileName))
+                    .normalize().toAbsolutePath();
+
+
+            File file = new File(destinationFile.toString(), fileName);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(fileData);
+            }
+
+            return file.getAbsolutePath();
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving file", e);
+        }
     }
 
 

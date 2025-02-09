@@ -1,6 +1,7 @@
 package com.digital.school.service.impl;
 
 
+import com.digital.school.model.enumerated.AttendanceStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +28,18 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
     private StorageService storageService;
 
     @Override
-    public List<Attendance> findStudentAbsences(User student) {
+    public List<Attendance> findStudentAbsences(Student student) {
         return attendanceRepository.findByStudent(student);
     }
 
     @Override
-    public List<Attendance> findAbsencesByDateRange(User student, LocalDateTime start, LocalDateTime end) {
+    public List<Attendance> findAbsencesByDateRange(Student student, LocalDateTime start, LocalDateTime end) {
         return attendanceRepository.findByStudentAndRecordedAtBetween(student, start, end);
     }
 
     @Override
     @Transactional
-    public Document submitJustification(Long absenceId, MultipartFile file, String reason, User student) {
+    public Document submitJustification(Long absenceId, MultipartFile file, String reason, Student student) {
         Attendance absence = attendanceRepository.findById(absenceId)
             .orElseThrow(() -> new RuntimeException("Absence non trouvée"));
             
@@ -66,14 +67,14 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
         
         // Mettre à jour le statut de l'absence
         absence.setJustification(reason);
-        absence.setStatus(AttendanceStatus.EXCUSED);
+        absence.setStatus(AttendanceStatus.EXCUSE);
         attendanceRepository.save(absence);
         
         return justification;
     }
 
     @Override
-    public Map<String, Object> getAbsenceStatistics(User student) {
+    public Map<String, Object> getAbsenceStatistics(Student student) {
         Map<String, Object> stats = new HashMap<>();
         
         LocalDateTime startOfYear = LocalDateTime.now().withMonth(9).withDayOfMonth(1)
@@ -83,7 +84,7 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
         
         long totalAbsences = absences.size();
         long justifiedAbsences = absences.stream()
-            .filter(a -> a.getStatus() == AttendanceStatus.EXCUSED)
+            .filter(a -> a.getStatus() == AttendanceStatus.EXCUSE)
             .count();
         long unjustifiedAbsences = totalAbsences - justifiedAbsences;
         
@@ -98,7 +99,7 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
     @Override
     public boolean isAbsenceJustified(Long absenceId) {
         return attendanceRepository.findById(absenceId)
-            .map(absence -> absence.getStatus() == AttendanceStatus.EXCUSED)
+            .map(absence -> absence.getStatus() == AttendanceStatus.EXCUSE)
             .orElse(false);
     }
 
@@ -111,7 +112,7 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
             extension);
     }
 
-    private double calculateAbsenceRate(User student) {
+    private double calculateAbsenceRate(Student student) {
         long totalSessions = attendanceRepository.countByStudent(student);
         if (totalSessions == 0) return 0.0;
         

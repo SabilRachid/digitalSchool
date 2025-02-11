@@ -3,8 +3,8 @@ package com.digital.school.service.impl;
 import com.digital.school.model.Student;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.digital.school.model.StudentGrade;
@@ -13,7 +13,10 @@ import com.digital.school.repository.StudentGradeRepository;
 import com.digital.school.service.StudentGradeService;
 import com.digital.school.service.PDFService;
 
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,7 +33,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public List<StudentGrade> findRecentGrades(Student student) {
         //add pageable parameter to the method findRecentGrades(student);
-        Pageable pageable = (Pageable) PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("date").descending());
 
         Page<StudentGrade> pagedGrades =gradeRepository.findRecentGrades(student, pageable);
 

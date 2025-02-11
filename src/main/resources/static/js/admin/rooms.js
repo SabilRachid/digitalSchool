@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            const response = await fetch(data.id ? `/admin/api/rooms/${data.id}` : '/admin/rooms', {
+            const response = await fetch(data.id ? `/admin/api/rooms/${data.id}` : '/admin/api/rooms', {
                 method: data.id ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',

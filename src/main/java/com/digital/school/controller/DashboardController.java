@@ -56,6 +56,9 @@ public class DashboardController {
                 } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"))) {
                     return "redirect:/student/dashboard";
                 }
+                else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SECRETARY"))) {
+                    return "redirect:/secretary/dashboard";
+                }
                 else  return "dashboard";
             }     
         }

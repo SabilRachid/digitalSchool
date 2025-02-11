@@ -168,7 +168,7 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
                 ));
     }
 
-    private Map<String, Long> getMonthlyTrend(User child) {
+    private Map<String, Long> getMonthlyTrend(Student child) {
         LocalDateTime startOfYear = LocalDateTime.now()
                 .withMonth(9)  // Septembre
                 .withDayOfMonth(1)

@@ -27,6 +27,7 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
     @Query("SELECT c FROM Classe c JOIN FETCH c.subjects WHERE c.id = ?1")
     Classe findByIdWithSubjects(Long id);
 
-    @Query("SELECT c FROM Classe c JOIN FETCH c.students WHERE c.id = ?1")
+    // A CORRIGER
+    @Query("SELECT c FROM Classe c JOIN FETCH c.students WHERE ?1 MEMBER OF c.students ")
     List<Classe> findByProfessor(Professor professor);
 }

@@ -26,7 +26,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     
     @Autowired
     private StudentHomeworkRepository homeworkRepository;
-    
+
     @Autowired
     private EventRepository eventRepository;
 
@@ -242,9 +242,11 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
-            
-        return homeworkRepository.findByStudent(child).stream()
-            .map(homework -> {
+
+
+        List<StudentHomework> homeworks = homeworkRepository.findByStudent(child);
+
+        return homeworks.stream().map(homework  -> {
                 Map<String, Object> homeworkMap = new HashMap<>();
                 homeworkMap.put("subject", homework.getSubject().getName());
                 homeworkMap.put("title", homework.getTitle());

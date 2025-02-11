@@ -22,27 +22,27 @@ public interface StudentHomeworkRepository extends JpaRepository<StudentHomework
     @Query("SELECT COUNT(h) FROM StudentHomework h WHERE h.assignedBy = :professor AND h.dueDate >= :today")
     int countSubmissionsToday(@Param("professor") Professor professor, @Param("today") LocalDateTime today);
 
-    @Query("SELECT h FROM StudentHomework h WHERE h.assignedBy = :professor AND h.status = 'SUBMITTED' ORDER BY h.dueDate ASC")
-    List<StudentHomework> findLateHomework(Student child);
+    @Query("SELECT h FROM StudentHomework h WHERE h.student = :student AND h.status = 'SUBMITTED' ORDER BY h.dueDate ASC")
+    List<StudentHomework> findLateHomework(Student student);
 
     @Query("SELECT h FROM StudentHomework h WHERE h.student = :student ORDER BY h.dueDate DESC")
-    Collection<StudentHomework> findByStudent(Student child);
+    List<StudentHomework> findByStudent(Student student);
 
     @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :student AND h.status = 'PENDING'")
     int countPendingHomework(Student student);
 
-    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.dueDate > CURRENT_TIMESTAMP")
-    int countByStudent(Student child);
+    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :student AND h.dueDate > CURRENT_TIMESTAMP")
+    int countByStudent(Student student);
 
-    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.status = 'COMPLETED'")
-    int countCompletedHomework(Student child);
+    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :student AND h.status = 'COMPLETED'")
+    int countCompletedHomework(Student student);
 
-    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.status = 'SUBMITTED'")
-    int countLateHomework(Student child);
+    @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :student AND h.status = 'SUBMITTED'")
+    int countLateHomework(Student student);
 
-    @Query("SELECT h FROM StudentHomework h WHERE h.student = :child AND h.dueDate > :startOfYear")
-    Collection<StudentHomework> findByStudentAndDueDateAfter(User child, LocalDateTime startOfYear);
+    @Query("SELECT h FROM StudentHomework h WHERE h.student = :student AND h.dueDate > :startOfYear")
+    Collection<StudentHomework> findByStudentAndDueDateAfter(Student student, LocalDateTime startOfYear);
 
-    @Query("SELECT h FROM StudentHomework h WHERE h.student = :child AND h.status = 'PENDING'")
-    Iterable<StudentHomework> findPendingHomework(Student child);
+    @Query("SELECT h FROM StudentHomework h WHERE h.student = :student AND h.status = 'PENDING'")
+    Iterable<StudentHomework> findPendingHomework(Student student);
 }

@@ -100,7 +100,8 @@ class UserManagement {
         };
 
         try {
-            const response = await fetch(data.id ? `/admin/api/users/${data.id}` : '/admin/users', {
+            console.log("call post api users");
+            const response = await fetch(data.id ? `/admin/api/users/${data.id}` : '/admin/api/users', {
                 method: data.id ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,12 +1,9 @@
 package com.digital.school.repository;
 
-import com.digital.school.model.Student;
+import com.digital.school.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import com.digital.school.model.Attendance;
-import com.digital.school.model.Course;
-import com.digital.school.model.User;
 import com.digital.school.model.enumerated.AttendanceStatus;
 
 
@@ -21,7 +18,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a FROM Attendance a WHERE a.course = :course")
     List<Attendance> findByCourse(Course course);
 
-    List<Attendance> findByStudentAndRecordedAtBetween(User student, LocalDateTime start, LocalDateTime end);
+    List<Attendance> findByStudentAndRecordedAtBetween(Student student, LocalDateTime start, LocalDateTime end);
     List<Attendance> findByCourseAndRecordedAtBetween(Course course, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT a FROM Attendance a WHERE a.course = :course AND a.dateEvent = :date")
@@ -36,10 +33,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT (SUM(CASE WHEN a.status = 'ABSENT' THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
     Double getUnjustifiedAbsencesRate();
 
-    long countByStudentAndCourse(User student, Course course);
+    long countByStudentAndCourse(Student student, Course course);
     
     long countByStudentAndStatusAndCourse(
-        @Param("student") User student, 
+        @Param("student") Student student,
         @Param("status") AttendanceStatus status, 
         @Param("course") Course course
     );
@@ -47,13 +44,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a.status, COUNT(a) FROM Attendance a WHERE a.course = :course GROUP BY a.status")
     List<Object[]> getAttendanceStatsByCourse(@Param("course") Course course);
     
-    @Query("SELECT COUNT(a) FROM Attendance a")
-	double calculateAttendanceRate(User student);
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student=:student")
+	double calculateAttendanceRate(Student student);
 
     @Query("SELECT COALESCE(AVG(CASE WHEN a.status = 'PRESENT' THEN 1.0 WHEN a.status = 'RETARD' THEN 0.5 ELSE 0.0 END), 0.0) " +
             "FROM Attendance a WHERE a.course.professor = :professor ")
     double calculateAverageAttendanceForProfessor(
-            @Param("professor") User professor
+            @Param("professor") Professor professor
     );
 
     @Query("SELECT a.course, a.dateEvent, COUNT(a) FROM Attendance a " +
@@ -76,7 +73,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     boolean existsByCourseIdAndRecordedBy_Id(Long courseId, Long recordedById);
 
     @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student AND a.status = 'ABSENT' AND a.justification IS NULL")
-    long countUnjustifiedAbsences(User child);
+    long countUnjustifiedAbsences(Student student);
 
     @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student")
     long countByStudent(Student student);
@@ -92,10 +89,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 
     @Query("SELECT a.course.subject.name as subject, COUNT(a) as count FROM Attendance a WHERE a.student = :student GROUP BY a.course.subject.name")
-    Object getAbsencesBySubject(Student child);
+    Object getAbsencesBySubject(Student student);
 
     @Query("SELECT a.course.subject.name as subject, COUNT(a) as count FROM Attendance a WHERE a.student = :student GROUP BY a.course.subject.name")
-    Object getMonthlyAbsenceTrend(Student child);
+    Object getMonthlyAbsenceTrend(Student student);
 
     @Query("SELECT a FROM Attendance a WHERE a.student = :student")
     List<Map<String, Object>> findLateDetails(Student student);

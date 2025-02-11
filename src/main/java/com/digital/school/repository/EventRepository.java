@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Classe;
 import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,22 +34,23 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e")
 	List<Event> findUpcomingEventsByStudent(User student);
 
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.participants = :student")
-	int countUpcomingEvents(Student student);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND :student MEMBER OF e.participants")
+    int countUpcomingEvents(Student student);
 
     // Récupérer les 6 dernières activités
     @Query("SELECT e FROM Event e ORDER BY e.startTime DESC LIMIT 6")
     List<Event> findLastEvents();
 
-    @Query("SELECT e FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='EXAM' AND e.participants = :child")
-    List<Event> findUpcomingExams(Student child);
+    @Query("SELECT e FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='EXAM' AND :student MEMBER OF e.participants")
+    List<Event> findUpcomingExams(Student student);
 
-    @Query("SELECT e FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='COURSE' AND e.participants = :child")
-    List<Event> findByParticipantAndDateBetween(Student child, LocalDateTime start, LocalDateTime end);
+    @Query("SELECT e FROM Event e WHERE e.startTime > :start AND e.startTime < :end AND e.type='COURSE' AND :student MEMBER OF e.participants")
+    List<Event> findByParticipantAndDateBetween(Student student, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='EXAM' AND e.participants = :student")
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.type='EXAM' AND :student MEMBER OF e.participants")
     int countUpcomingExams(Student student);
 
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND e.participants = :student")
-    List<Event> findUpcomingEvents(Student child);
+    @Query("SELECT e FROM Event e WHERE e.startTime > CURRENT_TIMESTAMP AND :student MEMBER OF e.participants")
+    List<Event> findUpcomingEvents(Student student);
 }

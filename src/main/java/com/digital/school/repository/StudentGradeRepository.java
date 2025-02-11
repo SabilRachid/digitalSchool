@@ -2,6 +2,7 @@ package com.digital.school.repository;
 
 import com.digital.school.model.Student;
 import com.digital.school.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,12 +15,17 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long> {
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId AND g.subject.id = :subjectId")
     List<StudentGrade> findByClasse_IdAndSubject_Id(Long classeId, Long subjectId);
-    
+
+    @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId")
     List<StudentGrade> findByClasse_Id(Long classeId);
 
+    @Query("SELECT g FROM StudentGrade g WHERE g.student.id = :studentId")
     List<StudentGrade> findByStudent_Id(Long studentId);
 
+    @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId AND '1' = :period")
     List<StudentGrade> findByClasseAndPeriod(Long classeId, String period);
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student.id = :studentId AND g.subject.id = :subjectId")
@@ -56,13 +62,13 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
 
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
-    List<StudentGrade> findRecentGrades(Student student, Pageable pageable);
+    Page<StudentGrade> findRecentGrades(Student student, Pageable pageable);
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student = :student AND g.value < 8")
-    List<StudentGrade> findLowGrades(Student child);
+    List<StudentGrade> findLowGrades(Student student);
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
-    List<StudentGrade> findByStudentOrderByDateDesc(Student child);
+    List<StudentGrade> findByStudentOrderByDateDesc(Student student);
 
 
     @Query(value = "SELECT g.subject.name as subject, AVG(g.value) as average " +

@@ -44,6 +44,7 @@ public class BulletinServiceImpl implements BulletinService {
         Classe classe = classeRepository.findById(classeId)
                 .orElseThrow(() -> new RuntimeException("Classe non trouvée"));
 
+        period="1";
         // Récupérer les notes de la période
         List<StudentGrade> grades = gradeRepository.findByClasseAndPeriod(classe.getId(), period);
 

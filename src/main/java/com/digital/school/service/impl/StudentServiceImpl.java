@@ -1,6 +1,7 @@
 package com.digital.school.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.digital.school.dto.StudentDTO;
@@ -34,6 +35,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public User getStudentById(long l) {
         return studentRepository.findById(l).orElse(null);
+    }
+
+    @Override
+    public Optional<Student> findById(long studentId) {
+        return studentRepository.findById(studentId);
     }
 
 

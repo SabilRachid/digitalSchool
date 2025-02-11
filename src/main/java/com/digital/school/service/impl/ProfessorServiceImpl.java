@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Classe;
 import com.digital.school.model.Professor;
 import com.digital.school.repository.ProfessorRepository;
 import com.digital.school.service.ProfessorService;
@@ -39,4 +40,11 @@ public class ProfessorServiceImpl implements ProfessorService {
     public boolean existsById(Long id) {
         return professorRepository.existsById(id);
     }
+
+    @Override
+    public List<Professor> findByClasse(Classe classe) {
+        return professorRepository.findByClasse(classe);
+    }
+
+
 }

@@ -4,13 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.digital.school.model.*;
 import com.digital.school.repository.*;
 import com.digital.school.service.StudentDashboardService;
+
+import java.awt.print.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,25 +59,21 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         return stats;
     }
 
-    @Override
-    public StudentDashboardStats getStudentStats(User student) {
-        return null;
-    }
 
     @Override
-    public List<StudentGrade> getRecentGrades(User student) {
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("date").descending());
+    public List<StudentGrade> getRecentGrades(Student student) {
+        java.awt.print.Pageable pageable = (Pageable) PageRequest.of(0, 5, Sort.by("date").descending());
         return gradeRepository.findRecentGrades(student, pageable);
     }
 
     @Override
-    public List<Homework> getPendingHomework(User student) {
+    public List<Homework> getPendingHomework(Student student) {
         return homeworkRepository.findByStudentAndStatusOrderByDueDateAsc(student, "PENDING");
     }
 
     @Override
     @Transactional
-    public List<Map<String, Object>> getSubjectsWithResources(User student) {
+    public List<Map<String, Object>> getSubjectsWithResources(Student student) {
         Classe classeWithSubjects = classeRepository.findByIdWithSubjects(student.getClasse().getId());
 
         // gerer si classeWithSubjects est null
@@ -95,7 +92,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     }
 
     @Override
-    public List<Event> getUpcomingEvents(User student) {
+    public List<Event> getUpcomingEvents(Student student) {
         return eventRepository.findUpcomingEventsByStudent(student);
     }
 

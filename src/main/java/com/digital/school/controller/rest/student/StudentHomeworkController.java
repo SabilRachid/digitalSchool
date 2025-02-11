@@ -48,7 +48,7 @@ public class StudentHomeworkController {
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @RequestParam(required = false) String comment,
-            @AuthenticationPrincipal User student) {
+            @AuthenticationPrincipal Student student) {
         try {
             Homework homework = homeworkService.submitHomework(id, student, file, comment);
             return ResponseEntity.ok(homework);

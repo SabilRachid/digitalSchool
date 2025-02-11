@@ -25,7 +25,7 @@ public class StudentMessagingServiceImpl implements StudentMessagingService {
     private EmailService emailService;
 
     @Override
-    public List<Message> findStudentMessages(User student) {
+    public List<Message> findStudentMessages(Student student) {
         return messageRepository.findByStudentOrderByDateDesc(student);
     }
 
@@ -53,7 +53,7 @@ public class StudentMessagingServiceImpl implements StudentMessagingService {
     }
 
     @Override
-    public List<Message> findConversationWithProfessor(User student, User professor) {
+    public List<Message> findConversationWithProfessor(Student student, Professor professor) {
         return messageRepository.findConversation(student, professor);
     }
 
@@ -89,7 +89,7 @@ public class StudentMessagingServiceImpl implements StudentMessagingService {
     }
 
     @Override
-    public List<Meeting> findUpcomingMeetings(User student) {
+    public List<Meeting> findUpcomingMeetings(Student student) {
         return meetingRepository.findUpcomingMeetingsByStudent(student);
     }
 
@@ -123,7 +123,7 @@ public class StudentMessagingServiceImpl implements StudentMessagingService {
     }
 
     @Override
-    public Map<String, Object> getMessagingStats(User student) {
+    public Map<String, Object> getMessagingStats(Student student) {
         Map<String, Object> stats = new HashMap<>();
         
         // Messages non lus

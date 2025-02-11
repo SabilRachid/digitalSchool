@@ -9,6 +9,7 @@ import com.digital.school.service.BulletinService;
 import com.digital.school.service.PDFService;
 import com.digital.school.service.StorageService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,7 +93,11 @@ public class BulletinServiceImpl implements BulletinService {
                 .orElseThrow(() -> new RuntimeException("Bulletin non trouvé"));
 
         //al
-        return storageService.loadAsResource(bulletin.getFilePath()).getInputStream();
+        try {
+            return storageService.loadAsResource(bulletin.getFilePath()).getInputStream().readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, Object> calculateAverages(List<StudentGrade> grades) {

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -228,7 +227,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<Attendance> getAbsenceStatistics(Student student) {
+    public List<Map<String, Object>> getAbsenceStatistics(Student student) {
         return attendanceRepository.findAbsenceDetails(student);
     }
 
@@ -240,6 +239,21 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public ResponseEntity<?> getJustificationFile(Long id) {
         return null;
+    }
+
+    @Override
+    public Attendance validateJustification(Long id) {
+        return null;
+    }
+
+    @Override
+    public Attendance rejectJustification(Long id) {
+        return null;
+    }
+
+    @Override
+    public void sendAbsenceReminder(Long id) {
+
     }
 
 }

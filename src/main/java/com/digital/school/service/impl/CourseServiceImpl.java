@@ -89,8 +89,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Course> findByProfessor(Professor professor) {
-        return courseRepository.findByProfessor(professor);
+    public List<Map<String, Object>> findByProfessor(Professor professor) {
+
+        return courseRepository.findByProfessor(professor).stream()
+                .map(course -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", course.getId());
+                    map.put("name", course.getName());
+                    map.put("subject", course.getSubject().getName());
+                    map.put("class", course.getClasse().getName());
+                    map.put("startTime", course.getStartTime().toString());
+                    map.put("endTime", course.getEndTime().toString());
+                    map.put("room", course.getRoom());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+
     }
 
     @Override
@@ -179,6 +194,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Object findTodaySchedule(Professor professor) {
+        return null;
+    }
+
+    @Override
+    public Object findTodayCourses() {
+        return null;
+    }
+
+    @Override
+    public Object findTodayCoursesForStudent(Long studentId) {
         return null;
     }
 

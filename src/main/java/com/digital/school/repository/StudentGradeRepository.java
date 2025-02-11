@@ -62,7 +62,7 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
     List<StudentGrade> findLowGrades(Student child);
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
-    Collection<StudentGrade> findByStudentOrderByDateDesc(Student child);
+    List<StudentGrade> findByStudentOrderByDateDesc(Student child);
 
 
     @Query(value = "SELECT g.subject.name as subject, AVG(g.value) as average " +
@@ -70,8 +70,20 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
             "GROUP BY g.subject.name")
     Map<String, Double> calculateSubjectAverages(Student student);
 
-    @Query("SELECT g.subject.name as subject, AVG(g.value) as average " +
+    @Query(value = "SELECT g.subject.name as subject, AVG(g.value) as average " +
             "FROM StudentGrade g WHERE g.student = :student " +
             "GROUP BY g.subject.name")
     Map<String, List<Double>> calculateProgression(Student student);
+
+    @Query("SELECT COUNT(g) FROM StudentGrade g WHERE g.student.classe.id = :classId")
+    Long countStudentsInClass(Long classId);
+
+    @Query("SELECT COUNT(g) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Long countGradesForClass(Long subjectId, String title, Long classId);
+
+    @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Double calculateClassAverage(Long subjectId, String title, Long classId);
+
+    @Query("SELECT AVG(CASE WHEN g.value >= 10 THEN 1 ELSE 0 END) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
+    Double calculateSuccessRate(Long subjectId, String title, Long classId);
 }

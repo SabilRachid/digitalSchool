@@ -6,4 +6,5 @@ public interface PDFService {
     byte[] generateBulletin(Map<String, Object> data);
     byte[] generateCertificate(Map<String, Object> data);
     byte[] generateAttestation(Map<String, Object> data);
+    byte[] generateReport(String s, Map<String, Object> data);
 }

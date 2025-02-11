@@ -48,14 +48,15 @@ public class MeetingServiceImpl implements MeetingService {
         
         if (isNew) {
             // Notifier les participants
+            Meeting finalMeeting = meeting;
             meeting.getParticipants().forEach(participant -> {
                 // Email
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("organizerName", 
-                    meeting.getOrganizer().getFirstName() + " " + 
-                    meeting.getOrganizer().getLastName());
-                variables.put("meetingDate", meeting.getStartTime());
-                variables.put("meetingLocation", meeting.getLocation());
+                    finalMeeting.getOrganizer().getFirstName() + " " +
+                    finalMeeting.getOrganizer().getLastName());
+                variables.put("meetingDate", finalMeeting.getStartTime());
+                variables.put("meetingLocation", finalMeeting.getLocation());
                 
                 emailService.sendEmail(
                     participant.getEmail(),
@@ -68,9 +69,9 @@ public class MeetingServiceImpl implements MeetingService {
                 if (participant.getPhone() != null) {
                     String message = String.format(
                         "Nouvelle réunion le %s avec %s. Lieu: %s",
-                        meeting.getStartTime(),
-                        meeting.getOrganizer().getLastName(),
-                        meeting.getLocation()
+                        finalMeeting.getStartTime(),
+                        finalMeeting.getOrganizer().getLastName(),
+                        finalMeeting.getLocation()
                     );
                     smsService.sendSMS(participant.getPhone(), message);
                 }

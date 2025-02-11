@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Classe;
 import com.digital.school.model.Professor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +24,7 @@ public interface ProfessorRepository extends JpaRepository<Professor, Long> {
     @Query("SELECT p FROM Professor p JOIN p.subjects s WHERE s.name = :subjectName")
     List<Professor> findBySubjectsName(String subjectName); // Récupérer les profs d'une matière
 
-
+    @Query("SELECT p FROM Professor p WHERE p.classe = :classe")
+    List<Professor> findByClasse(Classe classe);
 }
 

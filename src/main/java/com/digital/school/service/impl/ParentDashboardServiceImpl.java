@@ -115,7 +115,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     public Map<String, Object> getParentStats(Parent parent) {
         Map<String, Object> stats = new HashMap<>();
         
-        List<User> children = parentStudentRepository.findByParent(parent).stream()
+        List<Student> children = parentStudentRepository.findByParent(parent).stream()
             .map(ParentStudent::getStudent)
             .collect(Collectors.toList());
             

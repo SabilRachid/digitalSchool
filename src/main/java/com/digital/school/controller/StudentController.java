@@ -1,5 +1,6 @@
 package com.digital.school.controller;
 
+import com.digital.school.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class StudentController {
     
     
     @GetMapping("/dashboard")
-    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal User student, Model model) {
+    public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && 
             !(authentication instanceof AnonymousAuthenticationToken)) {

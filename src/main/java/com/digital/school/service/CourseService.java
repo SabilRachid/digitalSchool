@@ -4,7 +4,6 @@ import com.digital.school.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ public interface CourseService {
     void deleteById(Long id);
     boolean existsById(Long id);
     List<Course> findByClasse(Classe classe);
-    List<Course> findByProfessor(Professor professor);
+    List<Map<String, Object>> findByProfessor(Professor professor);
     List<Course> findBySubject(Subject subject);
     List<Course> findByDateRange(LocalDateTime start, LocalDateTime end);
     List<Course> findUpcomingCourses(User user);
@@ -33,4 +32,6 @@ public interface CourseService {
     Object findTodaySchedule(Professor professor);
 
     Object findTodayCourses();
+
+    Object findTodayCoursesForStudent(Long studentId);
 }

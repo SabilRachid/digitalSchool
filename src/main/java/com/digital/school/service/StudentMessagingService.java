@@ -2,18 +2,17 @@ package com.digital.school.service;
 
 
 
-import com.digital.school.model.Message;
-import com.digital.school.model.Meeting;
-import com.digital.school.model.User;
+import com.digital.school.model.*;
+
 import java.util.List;
 import java.util.Map;
 
 public interface StudentMessagingService {
-    List<Message> findStudentMessages(User student);
+    List<Message> findStudentMessages(Student student);
     Message sendMessage(Message message);
-    List<Message> findConversationWithProfessor(User student, User professor);
+    List<Message> findConversationWithProfessor(Student student, Professor professor);
     Meeting requestMeeting(Meeting meeting);
-    List<Meeting> findUpcomingMeetings(User student);
+    List<Meeting> findUpcomingMeetings(Student student);
     void cancelMeetingRequest(Long meetingId);
-    Map<String, Object> getMessagingStats(User student);
+    Map<String, Object> getMessagingStats(Student student);
 }

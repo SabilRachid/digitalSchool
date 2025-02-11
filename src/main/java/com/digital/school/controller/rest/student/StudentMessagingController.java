@@ -1,5 +1,6 @@
 package com.digital.school.controller.rest.student;
 
+import com.digital.school.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,21 +22,23 @@ public class StudentMessagingController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProfessorService professorService;
 
     @GetMapping
-    public String showMessages(@AuthenticationPrincipal User student, Model model) {
+    public String showMessages(@AuthenticationPrincipal Student student, Model model) {
         model.addAttribute("messages", messagingService.findStudentMessages(student));
         model.addAttribute("stats", messagingService.getMessagingStats(student));
-        model.addAttribute("professors", userService.findProfessors(student.getClasse()));
+        model.addAttribute("professors", professorService.findByClasse(student.getClasse()));
         return "student/messages";
     }
 
     @GetMapping("/conversation/{professorId}")
     public String showConversation(
             @PathVariable Long professorId,
-            @AuthenticationPrincipal User student,
+            @AuthenticationPrincipal Student student,
             Model model) {
-        User professor = userService.findById(professorId)
+        Professor professor = professorService.findById(professorId)
                 .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
 
         model.addAttribute("messages",
@@ -88,7 +91,7 @@ public class StudentMessagingController {
 
     @GetMapping("/stats")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getStats(@AuthenticationPrincipal User student) {
+    public ResponseEntity<Map<String, Object>> getStats(@AuthenticationPrincipal Student student) {
         return ResponseEntity.ok(messagingService.getMessagingStats(student));
     }
 }

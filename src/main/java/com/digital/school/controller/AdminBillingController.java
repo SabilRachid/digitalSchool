@@ -25,6 +25,8 @@ public class AdminBillingController {
     
     @Autowired
     private UserService userService;
+    @Autowired
+    private StudentService studentService;
 
 
     @GetMapping("/dashboard")
@@ -48,7 +50,7 @@ public class AdminBillingController {
     @ResponseBody
     public ResponseEntity<?> generateInvoice(@RequestBody Map<String, Object> data) {
         try {
-            User student = userService.findById(Long.parseLong(data.get("studentId").toString()))
+            Student student = studentService.findById(Long.parseLong(data.get("studentId").toString()))
                 .orElseThrow(() -> new RuntimeException("Student not found"));
                 
             //List<InvoiceItem> items = parseInvoiceItems(data.get("items"));

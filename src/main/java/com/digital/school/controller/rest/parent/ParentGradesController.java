@@ -1,5 +1,6 @@
 package com.digital.school.controller.rest.parent;
 
+import com.digital.school.model.Parent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +20,7 @@ public class ParentGradesController {
     private ParentGradeService gradeService;
 
     @GetMapping
-    public String showGrades(@AuthenticationPrincipal User parent, Model model) {
+    public String showGrades(@AuthenticationPrincipal Parent parent, Model model) {
         model.addAttribute("children", gradeService.getChildrenGrades(parent));
         return "parent/grades";
     }

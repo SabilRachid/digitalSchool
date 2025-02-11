@@ -87,6 +87,11 @@ public class PDFServiceImpl implements PDFService {
         }
     }
 
+    @Override
+    public byte[] generateReport(String s, Map<String, Object> data) {
+        return new byte[0];
+    }
+
     private void addHeader(Document document, String title) {
         Paragraph header = new Paragraph(title)
                 .setTextAlignment(TextAlignment.CENTER)

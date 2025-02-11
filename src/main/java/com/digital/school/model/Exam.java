@@ -45,6 +45,13 @@ public class Exam extends AuditableEntity {
     @Column(nullable = false)
     private Boolean isPublished = false;
 
+
+   private LocalDateTime publishedAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+   private Room room;
+
     public Exam() {
     }
 
@@ -134,5 +141,13 @@ public class Exam extends AuditableEntity {
 
     public void setIsPublished(Boolean isPublished) {
         this.isPublished = isPublished;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

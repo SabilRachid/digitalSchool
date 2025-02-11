@@ -1,5 +1,7 @@
 package com.digital.school.controller.rest.professor;
 
+import com.digital.school.model.Course;
+import com.digital.school.model.Professor;
 import com.digital.school.service.CourseService;
 import com.digital.school.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,25 +28,9 @@ public class ProfessorCourseRestController {
 
     @GetMapping("/my-courses")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getCoursesForProfessor(@AuthenticationPrincipal UserDetails userDetails) {
-        // Récupérer l'ID du professeur connecté
-        Professor professor = professorService.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
+    public ResponseEntity<List<Map<String, Object>>> getCoursesForProfessor(@AuthenticationPrincipal Professor professor) {
 
-        // Récupérer les cours du professeur
-        List<Map<String, Object>> courses = courseService.findByProfessorId(professor.getId())
-                .stream()
-                .map(course -> Map.of(
-                        "id", course.getId(),
-                        "name", course.getName(),
-                        "subject", course.getSubject().getName(),
-                        "class", course.getClasse().getName(),
-                        "startTime", course.getStartTime().toString(),
-                        "endTime", course.getEndTime().toString(),
-                        "room", course.getRoom()
-                ))
-                .collect(Collectors.toList());
-
+        List<Map<String, Object>> courses = courseService.findByProfessor(professor);
         return ResponseEntity.ok(courses);
     }
 }

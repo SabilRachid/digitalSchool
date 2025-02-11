@@ -1,6 +1,7 @@
 package com.digital.school.repository;
 
 
+import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +30,10 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
         @Param("end") LocalDateTime end,
         @Param("meetingId") Long meetingId
     );
+
+    @Query("SELECT COUNT(m) FROM Meeting m WHERE m.organizer = :organizer AND m.startTime < :now")
+    long countPendingMeetings(User student);
+
+    @Query("SELECT m FROM Meeting m WHERE :student MEMBER OF m.participants AND m.startTime > :now ORDER BY m.startTime")
+    List<Meeting> findUpcomingMeetingsByStudent(Student student);
 }

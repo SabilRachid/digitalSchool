@@ -1,5 +1,6 @@
-package com.digital.school.controller.parent;
+package com.digital.school.controller.rest.parent;
 
+import com.digital.school.model.Parent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +20,7 @@ public class ParentHomeworkController {
     private ParentHomeworkService homeworkService;
 
     @GetMapping
-    public String showHomework(@AuthenticationPrincipal User parent, Model model) {
+    public String showHomework(@AuthenticationPrincipal Parent parent, Model model) {
         model.addAttribute("children", homeworkService.getChildrenHomework(parent));
         return "parent/homework";
     }

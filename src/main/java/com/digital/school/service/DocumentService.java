@@ -1,5 +1,7 @@
 package com.digital.school.service;
 
+import com.digital.school.model.Parent;
+import com.digital.school.model.Student;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import com.digital.school.model.Document;
@@ -18,14 +20,24 @@ public interface DocumentService {
     Document validate(Long id);
     void deleteById(Long id);
 	List<Document> findAll();
-	List<Document> findByStudent(User student);
-	List<Document> findByParent(User parent);
+	List<Document> findByStudent(Student student);
+	List<Document> findByParent(Parent parent);
 	List<Document> findByCategory(String category);
 	List<Document> findByType(String type);
-	List<Document> findByStudentAndType(User student, String type);
+	List<Document> findByStudentAndType(Student student, String type);
 	Document validate(Long id, User validator);
-	boolean existsByStudentAndType(User student, String type);
-	boolean existsByParentAndType(User parent, String type);
-	List<Document> findByParentAndType(User parent, String type);
-	Document upload(MultipartFile file, String type, String category, User uploader, User student, User parent);
+	boolean existsByStudentAndType(Student student, String type);
+	boolean existsByParentAndType(Parent parent, String type);
+	List<Document> findByParentAndType(Parent parent, String type);
+	Document upload(MultipartFile file, String type, String category, User uploader, Student student, Parent parent);
+
+	ResponseEntity<?> downloadDocument(Long id);
+
+	ResponseEntity<?> previewDocument(Long id);
+
+	Object generateCertificate(Long studentId, String title, String comments);
+
+	Object generateAttestation(Long studentId, String title, String comments);
+
+	void sendDocument(Long id, Map<String, Object> request);
 }

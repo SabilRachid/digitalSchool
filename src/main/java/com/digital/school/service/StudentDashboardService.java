@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface StudentDashboardService {
-    StudentDashboardStats getStudentStats(User student);
-    List<StudentGrade> getRecentGrades(User student);
-    List<Homework> getPendingHomework(User student);
-    List<Map<String, Object>> getSubjectsWithResources(User student);
-    List<Event> getUpcomingEvents(User student);
+    StudentDashboardStats getStudentStats(Student student);
+    List<StudentGrade> getRecentGrades(Student student);
+    List<Homework> getPendingHomework(Student student);
+    List<Map<String, Object>> getSubjectsWithResources(Student student);
+    List<Event> getUpcomingEvents(Student student);
     public Map<String, Object> getStudentStats();
 }

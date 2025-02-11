@@ -1,5 +1,6 @@
 package com.digital.school.controller.rest.student;
 
+import com.digital.school.model.Student;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class StudentCourseController {
     private SubjectService subjectService;
 
     @GetMapping
-    public String showCourses(HttpServletRequest request, @AuthenticationPrincipal User student, Model model) {
+    public String showCourses(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
 
         model.addAttribute("courses", courseService.findByStudent(student));
         model.addAttribute("subjects", subjectService.findByStudent(student));

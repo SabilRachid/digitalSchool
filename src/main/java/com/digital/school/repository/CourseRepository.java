@@ -33,4 +33,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT c FROM Course c WHERE c.classe.id = :classId AND CAST(c.startTime as DATE) = :date ")
     Optional<Object> findByClassIdAndDate(Long classId, LocalDate date);
+
+    @Query("SELECT c FROM Course c WHERE c.classe = :classe AND c.startTime BETWEEN :start AND :end")
+    List<Course> findByClasseAndStartTimeBetween(Classe classe, LocalDateTime start, LocalDateTime end);
 }

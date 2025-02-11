@@ -31,7 +31,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
     public List<Map<String, Object>> getChildrenSchedule(User parent) {
         return parentStudentRepository.findByParent(parent).stream()
                 .map(association -> {
-                    User child = association.getStudent();
+                    Student child = association.getStudent();
                     Map<String, Object> childSchedule = new HashMap<>();
                     childSchedule.put("childId", child.getId());
                     childSchedule.put("childName", child.getFirstName() + " " + child.getLastName());
@@ -45,7 +45,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
 
     @Override
     public List<Map<String, Object>> getChildSchedule(Long childId, LocalDateTime start, LocalDateTime end) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
@@ -93,7 +93,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
 
     @Override
     public List<Map<String, Object>> getChildEvents(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
@@ -128,7 +128,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
 
     @Override
     public Map<String, Object> getChildScheduleStats(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
@@ -149,7 +149,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
         return stats;
     }
 
-    private List<Map<String, Object>> getTodayClasses(User child) {
+    private List<Map<String, Object>> getTodayClasses(Student child) {
         LocalDateTime start = LocalDateTime.now().withHour(0).withMinute(0);
         LocalDateTime end = start.plusDays(1);
 
@@ -167,7 +167,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
                 .collect(Collectors.toList());
     }
 
-    private List<Map<String, Object>> getUpcomingEvents(User child) {
+    private List<Map<String, Object>> getUpcomingEvents(Student child) {
         List<Map<String, Object>> events = new ArrayList<>();
 
         // Examens à venir

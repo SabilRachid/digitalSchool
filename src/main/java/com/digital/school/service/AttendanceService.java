@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,8 +34,14 @@ public interface AttendanceService {
     void updateAttendance(Long id, AttendanceStatus status);
     boolean isTeacherAllowedToModify(Long teacherId, Long courseId);
     boolean existsById(Long id);
-    List<Attendance> getAbsenceStatistics(Student student);
+    List<Map<String, Object>> getAbsenceStatistics(Student student);
     List<Attendance> getAbsenceStatistics();
 
     ResponseEntity<?> getJustificationFile(Long id);
+
+    Attendance validateJustification(Long id);
+
+    Attendance rejectJustification(Long id);
+
+    void sendAbsenceReminder(Long id);
 }

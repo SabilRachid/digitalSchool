@@ -30,10 +30,10 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
     private SMSService smsService;
 
     @Override
-    public List<Map<String, Object>> getChildrenHomework(User parent) {
+    public List<Map<String, Object>> getChildrenHomework(Parent parent) {
         return parentStudentRepository.findByParent(parent).stream()
                 .map(association -> {
-                    User child = association.getStudent();
+                    Student child = association.getStudent();
                     Map<String, Object> childHomework = new HashMap<>();
                     childHomework.put("childId", child.getId());
                     childHomework.put("childName", child.getFirstName() + " " + child.getLastName());
@@ -47,7 +47,7 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
 
     @Override
     public Map<String, Object> getDetailedChildHomework(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
@@ -147,7 +147,7 @@ public class ParentHomeworkServiceImpl implements ParentHomeworkService {
                 .collect(Collectors.toList());
     }
 
-    private Map<String, Object> getSubjectBreakdown(User child) {
+    private Map<String, Object> getSubjectBreakdown(Student child) {
         return homeworkRepository.findByStudent(child).stream()
                 .collect(Collectors.groupingBy(
                         homework -> homework.getSubject().getName(),

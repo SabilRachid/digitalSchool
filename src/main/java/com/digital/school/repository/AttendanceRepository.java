@@ -84,9 +84,19 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student AND a.status = :attendanceStatus")
     long countByStudentAndStatus(Student student, AttendanceStatus attendanceStatus);
 
-    @Query("SELECT a FROM Attendance a WHERE a.student = :student AND a.status = 'ABSENT' AND a.justification IS NOT NULL")
-    List<Attendance> findAbsenceDetails(Student student);
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.student = :student AND a.status = 'ABSENT' AND a.justification IS NULL")
+    List<Map<String, Object>> findAbsenceDetails(Student student);
 
     @Query("SELECT a FROM Attendance a WHERE a.status = 'ABSENT' AND a.justification IS NULL")
     List<Attendance> findAbsenceDetails();
+
+
+    @Query("SELECT a.course.subject.name as subject, COUNT(a) as count FROM Attendance a WHERE a.student = :student GROUP BY a.course.subject.name")
+    Object getAbsencesBySubject(Student child);
+
+    @Query("SELECT a.course.subject.name as subject, COUNT(a) as count FROM Attendance a WHERE a.student = :student GROUP BY a.course.subject.name")
+    Object getMonthlyAbsenceTrend(Student child);
+
+    @Query("SELECT a FROM Attendance a WHERE a.student = :student")
+    List<Map<String, Object>> findLateDetails(Student student);
 }

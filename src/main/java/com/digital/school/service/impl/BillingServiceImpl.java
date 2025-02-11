@@ -122,7 +122,7 @@ public class BillingServiceImpl implements BillingService {
 	}
 
 	@Override
-	public List<Invoice> getParentInvoices(Parent parent) {
+	public List<Invoice> getParentInvoices(User user) {
 		// TODO Auto-generated method stub
 		return null;
 	}

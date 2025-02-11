@@ -27,4 +27,13 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 
     @Query("SELECT e FROM Exam e WHERE e.createdBy = :professor AND e.examDate > CURRENT_TIMESTAMP ORDER BY e.examDate")
     List<Exam> findUpcomingExamsByProfessor(Professor professor);
+
+    @Query("SELECT e FROM Exam e WHERE e.classe = :classe AND e.examDate > CURRENT_TIMESTAMP ORDER BY e.examDate")
+    List<Exam> findByClasseAndDateBetween(Classe classe, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT e FROM Exam e WHERE e.examDate > CURRENT_TIMESTAMP AND e.status = 'PENDING' AND e.classe = :classe")
+    List<Exam> findUpcomingExams(Classe classe);
+
+    @Query("SELECT COUNT(e) FROM Exam e WHERE e.examDate > CURRENT_TIMESTAMP AND e.status = 'PENDING' AND e.classe = :classe")
+    int countUpcomingExams(Classe classe);
 }

@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,10 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     private PDFService pdfService;
 
     @Override
-    public List<Map<String, Object>> getChildrenGrades(User parent) {
+    public List<Map<String, Object>> getChildrenGrades(Parent parent) {
         return parentStudentRepository.findByParent(parent).stream()
             .map(association -> {
-                User child = association.getStudent();
+                Student child = association.getStudent();
                 Map<String, Object> childGrades = new HashMap<>();
                 childGrades.put("childId", child.getId());
                 childGrades.put("childName", child.getFirstName() + " " + child.getLastName());
@@ -43,7 +44,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
 
     @Override
     public Map<String, Object> getDetailedChildGrades(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -58,7 +59,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
 
     @Override
     public byte[] generateChildReport(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -73,7 +74,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
 
     @Override
     public Map<String, Object> getChildGradeStats(Long childId) {
-        User child = parentStudentRepository.findByStudentId(childId)
+        Student child = parentStudentRepository.findByStudentId(childId)
             .map(ParentStudent::getStudent)
             .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
             
@@ -96,8 +97,8 @@ public class ParentGradeServiceImpl implements ParentGradeService {
         return stats;
     }
 
-    private double calculateAverageGrade(User student) {
-        return gradeRepository.calculateAverageGrade(student);
+    private double calculateAverageGrade(Student student) {
+        return gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
     }
 
     private int calculateRank(User student) {
@@ -107,7 +108,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
         );
     }
 
-    private List<Map<String, Object>> getSubjectGrades(User student) {
+    private List<Map<String, Object>> getSubjectGrades(Student student) {
         return gradeRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 grade -> grade.getSubject().getName(),
@@ -133,7 +134,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
             .collect(Collectors.toList());
     }
 
-    private Map<String, Double> calculateSubjectAverages(User student) {
+    private Map<String, Double> calculateSubjectAverages(Student student) {
         return gradeRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 grade -> grade.getSubject().getName(),
@@ -141,7 +142,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
             ));
     }
 
-    private Map<String, List<Double>> calculateProgression(User student) {
+    private @NotNull Map<String, List<Float>> calculateProgression(Student student) {
         return gradeRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 grade -> grade.getSubject().getName(),
@@ -152,7 +153,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
             ));
     }
 
-    private Map<String, Long> calculateGradeDistribution(User student) {
+    private Map<String, Long> calculateGradeDistribution(Student student) {
         return gradeRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 this::getGradeRange,

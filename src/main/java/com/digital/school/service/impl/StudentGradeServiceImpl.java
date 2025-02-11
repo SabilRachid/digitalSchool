@@ -1,7 +1,9 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.model.Student;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.digital.school.model.StudentGrade;
@@ -10,7 +12,7 @@ import com.digital.school.repository.StudentGradeRepository;
 import com.digital.school.service.StudentGradeService;
 import com.digital.school.service.PDFService;
 
-import java.time.LocalDateTime;
+import java.awt.print.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,11 +28,15 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public List<StudentGrade> findRecentGrades(Student student) {
-        return gradeRepository.findRecentGrades(student);
+        //add pageable parameter to the method findRecentGrades(student);
+        Pageable pageable = (Pageable) PageRequest.of(0, 5);
+
+        return gradeRepository.findRecentGrades(student, pageable);
+
     }
 
     @Override
-    public List<Map<String, Object>> findGradesBySubject(User student) {
+    public List<Map<String, Object>> findGradesBySubject(Student student) {
         List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()
@@ -59,7 +65,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public Map<String, Object> calculatePerformanceStats(User student) {
+    public Map<String, Object> calculatePerformanceStats(Student student) {
         Map<String, Object> stats = new HashMap<>();
         
         List<StudentGrade> allGrades = gradeRepository.findByStudentOrderByDateDesc(student);
@@ -76,7 +82,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         stats.put("rank", rank);
         
         // Progression
-        Map<String, List<Double>> progression = getGradesProgression(student);
+        Map<String, List<Float>> progression = getGradesProgression(student);
         stats.put("progression", progression);
         
         // Moyennes par matière
@@ -87,7 +93,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public byte[] generateReport(User student) {
+    public byte[] generateReport(Student student) {
         Map<String, Object> data = new HashMap<>();
         data.put("student", student);
         data.put("grades", findGradesBySubject(student));
@@ -97,7 +103,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public Map<String, List<Double>> getGradesProgression(User student) {
+    public @NotNull Map<String, List<Float>> getGradesProgression(Student student) {
         List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()
@@ -111,7 +117,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public int getStudentRank(User student) {
+    public int getStudentRank(Student student) {
         return gradeRepository.calculateStudentRank(
             student.getId(), 
             student.getClasse().getId()
@@ -119,7 +125,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public Map<String, Double> getSubjectAverages(User student) {
+    public Map<String, Double> getSubjectAverages(Student student) {
         List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()

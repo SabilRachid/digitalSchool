@@ -1,5 +1,7 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class HomeworkServiceImpl implements HomeworkService {
 
         /* Crée un nouveau devoir */
         @Override
-        public void createHomework(User professor, Homework homework) {
+        public void createHomework(Professor professor, Homework homework) {
             homework.setProfessor(professor);
             homeworkRepository.save(homework);
         }
@@ -41,7 +43,7 @@ public class HomeworkServiceImpl implements HomeworkService {
 
         /* Récupère la liste des devoirs d'un professeur */
         @Override
-        public List<Homework> findHomeworksByProfessor(User professor) {
+        public List<Homework> findHomeworksByProfessor(Professor professor) {
             return homeworkRepository.findByProfessor(professor);
         }
 
@@ -58,19 +60,19 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     /* Récupère les devoirs en attente d'un étudiant. */
     @Override
-    public List<Homework> findPendingHomework(User student) {
+    public List<Homework> findPendingHomework(Student student) {
         return homeworkRepository.findByStudentAndStatusOrderByDueDateAsc(student, "PENDING");
     }
 
     /* Récupère les devoirs soumis par un étudiant. */
     @Override
-    public List<Homework> findSubmittedHomework(User student) {
+    public List<Homework> findSubmittedHomework(Student student) {
         return homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(student, "SUBMITTED");
     }
 
     /* Récupère les devoirs notés d'un étudiant. */
     @Override
-    public List<Homework> findGradedHomework(User student) {
+    public List<Homework> findGradedHomework(Student student) {
         return homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(student, "GRADED");
     }
 
@@ -83,7 +85,7 @@ public class HomeworkServiceImpl implements HomeworkService {
     /* Permet à un étudiant de soumettre un devoir avec un fichier et un commentaire. */
     @Override
     @Transactional
-    public Homework submitHomework(Long id, User student, MultipartFile file, String comment) {
+    public Homework submitHomework(Long id, Student student, MultipartFile file, String comment) {
         Homework homework = findById(id)
                 .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
 
@@ -118,14 +120,14 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     /* Récupère les devoirs en attente de correction par un professeur. */
     @Override
-    public List<Homework> findPendingGradingByProfessor(User professor) {
+    public List<Homework> findPendingGradingByProfessor(Professor professor) {
         return homeworkRepository.findPendingGradingByProfessor(professor);
     }
 
     /* Permet à un professeur de noter un devoir. */
     @Override
     @Transactional
-    public Homework gradeHomework(Long homeworkId, User professor, double grade, String feedback) {
+    public Homework gradeHomework(Long homeworkId, Professor professor, double grade, String feedback) {
         Homework homework = findById(homeworkId)
                 .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
 
@@ -140,14 +142,14 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     /* Récupère la liste des devoirs donnés par un professeur. */
     @Override
-    public List<Homework> findHomeworkByProfessor(User professor) {
+    public List<Homework> findHomeworkByProfessor(Professor professor) {
         return homeworkRepository.findByProfessor(professor);
     }
 
     /* Supprime un devoir donné par un professeur. */
     @Override
     @Transactional
-    public ResponseEntity<String> deleteHomework(Long homeworkId, User professor) {
+    public ResponseEntity<String> deleteHomework(Long homeworkId, Professor professor) {
         Homework homework = findById(homeworkId)
                 .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
 

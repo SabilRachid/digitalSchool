@@ -1,5 +1,7 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Parent;
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public Document upload(MultipartFile file, String type, String category, 
-                         User uploader, User student, User parent) {
+                         User uploader, Student student, Parent parent) {
         try {
             // Générer un nom de fichier unique
             String fileName = generateUniqueFileName(file.getOriginalFilename());
@@ -72,6 +74,31 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public ResponseEntity<?> downloadDocument(Long id) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> previewDocument(Long id) {
+        return null;
+    }
+
+    @Override
+    public Object generateCertificate(Long studentId, String title, String comments) {
+        return null;
+    }
+
+    @Override
+    public Object generateAttestation(Long studentId, String title, String comments) {
+        return null;
+    }
+
+    @Override
+    public void sendDocument(Long id, Map<String, Object> request) {
+
+    }
+
+    @Override
     @Transactional
     public void deleteById(Long id) {
         documentRepository.findById(id).ifPresent(document -> {
@@ -83,12 +110,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> findByStudent(User student) {
+    public List<Document> findByStudent(Student student) {
         return documentRepository.findByStudent(student);
     }
 
     @Override
-    public List<Document> findByParent(User parent) {
+    public List<Document> findByParent(Parent parent) {
         return documentRepository.findByParent(parent);
     }
 
@@ -103,12 +130,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> findByStudentAndType(User student, String type) {
+    public List<Document> findByStudentAndType(Student student, String type) {
         return documentRepository.findByStudentAndType(student, type);
     }
 
     @Override
-    public List<Document> findByParentAndType(User parent, String type) {
+    public List<Document> findByParentAndType(Parent parent, String type) {
         return documentRepository.findByParentAndType(parent, type);
     }
 
@@ -124,12 +151,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public boolean existsByStudentAndType(User student, String type) {
+    public boolean existsByStudentAndType(Student student, String type) {
         return documentRepository.existsByStudentAndType(student, type);
     }
 
     @Override
-    public boolean existsByParentAndType(User parent, String type) {
+    public boolean existsByParentAndType(Parent parent, String type) {
         return documentRepository.existsByParentAndType(parent, type);
     }
 

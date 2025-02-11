@@ -78,7 +78,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
         
         // Mettre à jour le statut de l'absence
         absence.setJustification(reason);
-        absence.setStatus(AttendanceStatus.EXCUSED);
+        absence.setStatus(AttendanceStatus.EXCUSE);
         attendanceRepository.save(absence);
     }
 
@@ -91,8 +91,8 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
         Map<String, Object> stats = new HashMap<>();
         
         // Statistiques générales
-        stats.put("totalAbsences", attendanceRepository.countAbsences(child));
-        stats.put("justifiedAbsences", attendanceRepository.countJustifiedAbsences(child));
+        stats.put("totalAbsences", attendanceRepository.countByStudentAndStatus(child, AttendanceStatus.ABSENT));
+        stats.put("justifiedAbsences", attendanceRepository.countByStudentAndStatus(child, AttendanceStatus.EXCUSE));
         stats.put("unjustifiedAbsences", attendanceRepository.countUnjustifiedAbsences(child));
         stats.put("absenceRate", calculateAbsenceRate(child));
         

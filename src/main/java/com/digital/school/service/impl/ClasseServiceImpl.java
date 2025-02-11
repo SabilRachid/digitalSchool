@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Professor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,5 +95,10 @@ public class ClasseServiceImpl implements ClasseService {
     @Override
     public List<Classe> getAll() {
         return classeRepository.findAll();
+    }
+
+    @Override
+    public List<Classe> findByProfessor(Professor professor) {
+        return classeRepository.findByProfessor(professor);
     }
 }

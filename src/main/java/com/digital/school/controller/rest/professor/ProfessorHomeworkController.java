@@ -1,6 +1,7 @@
 package com.digital.school.controller.rest.professor;
 
 import com.digital.school.model.Homework;
+import com.digital.school.model.Professor;
 import com.digital.school.model.User;
 import com.digital.school.service.HomeworkService;
 import com.digital.school.service.CourseService;
@@ -43,7 +44,7 @@ public class ProfessorHomeworkController {
 
     /* Ajoute un nouveau devoir */
     @PostMapping("/add")
-    public String addHomework(@AuthenticationPrincipal User professor, @ModelAttribute Homework homework, RedirectAttributes redirectAttributes) {
+    public String addHomework(@AuthenticationPrincipal Professor professor, @ModelAttribute Homework homework, RedirectAttributes redirectAttributes) {
         homeworkService.createHomework(professor, homework);
         redirectAttributes.addFlashAttribute("successMessage", "Devoir ajouté avec succès !");
         return "redirect:/professor/homework";

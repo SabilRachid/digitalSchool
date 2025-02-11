@@ -29,17 +29,20 @@ public interface StudentHomeworkRepository extends JpaRepository<StudentHomework
     Collection<StudentHomework> findByStudent(Student child);
 
     @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :student AND h.status = 'PENDING'")
-    long countPendingHomework(Student student);
+    int countPendingHomework(Student student);
 
     @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.dueDate > CURRENT_TIMESTAMP")
-    long countByStudent(Student child);
+    int countByStudent(Student child);
 
     @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.status = 'COMPLETED'")
-    long countCompletedHomework(Student child);
+    int countCompletedHomework(Student child);
 
     @Query("SELECT count(h) FROM StudentHomework h WHERE h.student = :child AND h.status = 'SUBMITTED'")
-    long countLateHomework(Student child);
+    int countLateHomework(Student child);
 
     @Query("SELECT h FROM StudentHomework h WHERE h.student = :child AND h.dueDate > :startOfYear")
     Collection<StudentHomework> findByStudentAndDueDateAfter(User child, LocalDateTime startOfYear);
+
+    @Query("SELECT h FROM StudentHomework h WHERE h.student = :child AND h.status = 'PENDING'")
+    Iterable<StudentHomework> findPendingHomework(Student child);
 }

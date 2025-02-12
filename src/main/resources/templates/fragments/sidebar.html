@@ -50,7 +50,11 @@
                 <div class="nav-group-content">
                     <a href="/admin/users" class="nav-item" th:classappend="${currentURI == '/admin/users' ? 'active' : ''}">
                         <i class="fas fa-user-cog"></i>
-                        <span>Gestion</span>
+                        <span>Les Utilisateurs</span>
+                    </a>
+                    <a href="/admin/parentStudent" class="nav-item" th:classappend="${currentURI == '/admin/parentStudent' ? 'active' : ''}">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Association parent/eleve</span>
                     </a>
                     <a href="/admin/profiles" class="nav-item" th:classappend="${currentURI == '/admin/profiles' ? 'active' : ''}">
                         <i class="fas fa-id-card"></i>
@@ -142,6 +146,31 @@
                 <i class="fas fa-tasks"></i>
                 <span>Devoirs</span>
             </a>
+            <a href="/student/grades" class="nav-item" th:classappend="${currentURI == '/student/grades' ? 'active' : ''}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Notes</span>
+            </a>
+        </div>
+
+        <!-- Menu Parents -->
+        <div sec:authorize="hasRole('ROLE_PARENT')">
+            <a href="/parent/dashboard" class="nav-item" th:classappend="${currentURI == '/parent/dashboard' ? 'active' : ''}">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </a>
+            <a href="/parent/absences" class="nav-item" th:classappend="${currentURI == '/parent/absences' ? 'active' : ''}">
+                <i class="fas fa-book"></i>
+                <span>Absences</span>
+            </a>
+            <a href="/parent/homeworks" class="nav-item" th:classappend="${currentURI == '/parent/homeworks' ? 'active' : ''}">
+                <i class="fas fa-tasks"></i>
+                <span>Devoirs</span>
+            </a>
+            <a href="/calendar" class="nav-item" th:classappend="${currentURI == '/calendar' ? 'active' : ''}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Emploi du temps</span>
+            </a>
+
             <a href="/student/grades" class="nav-item" th:classappend="${currentURI == '/student/grades' ? 'active' : ''}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Notes</span>

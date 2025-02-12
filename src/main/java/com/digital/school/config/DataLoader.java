@@ -36,6 +36,16 @@ public class DataLoader {
             LevelRepository levelRepository,
             SubjectRepository subjectRepository) {
         return args -> {
+            Role secretaryRole = new Role(RoleName.ROLE_SECRETARY);
+            secretaryRole.setPermissions(Set.of(
+                    permissionRepository.findByName(PermissionName.VIEW_DASHBOARD).get(),
+                    permissionRepository.findByName(PermissionName.MANAGE_COURSES).get(),
+                    permissionRepository.findByName(PermissionName.MANAGE_EXAMS).get(),
+                    permissionRepository.findByName(PermissionName.MANAGE_ATTENDANCE).get()
+            ));
+            roleRepository.save(secretaryRole);
+
+            /*
             // Création de la séquence si elle n'existe pas
             createSequenceIfNotExists();
 
@@ -181,6 +191,7 @@ public class DataLoader {
                     subjectRepository.save(subject);
                 }
             }
+            */
         };
 
     }

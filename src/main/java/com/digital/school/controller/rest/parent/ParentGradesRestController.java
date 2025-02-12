@@ -7,14 +7,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.digital.school.model.User;
 import com.digital.school.service.ParentGradeService;
 
 import java.util.Map;
 
 @Controller
 @RequestMapping("/parent/grades")
-public class ParentGradesController {
+public class ParentGradesRestController {
 
     @Autowired
     private ParentGradeService gradeService;

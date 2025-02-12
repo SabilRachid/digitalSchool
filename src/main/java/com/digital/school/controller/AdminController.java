@@ -1,11 +1,15 @@
 package com.digital.school.controller;
 
+import com.digital.school.model.Administrator;
 import com.digital.school.model.enumerated.RoleName;
 import com.digital.school.service.ClasseService;
+import com.digital.school.service.ParentService;
+import com.digital.school.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -28,6 +32,10 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private StudentService studentService;
+    @Autowired
+    private ParentService parentService;
 
     @Autowired
     private ClasseService classeService;
@@ -117,7 +125,16 @@ public class AdminController {
         return "admin/users";
     }
 
+    @GetMapping("/parentStudent")
+    public String listAttendances(HttpServletRequest request, @AuthenticationPrincipal Administrator admin, Model model) {
 
+        model.addAttribute("user", admin);
+        model.addAttribute("classes", classeService.findAllBasicInfo());
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("parents", parentService.findAll());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/parentStudent";
+    }
 
 
 }

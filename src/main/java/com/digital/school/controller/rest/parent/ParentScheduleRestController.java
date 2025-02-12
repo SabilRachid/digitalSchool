@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/parent/schedule")
-public class ParentScheduleController {
+public class ParentScheduleRestController {
 
     @Autowired
     private ParentScheduleService scheduleService;

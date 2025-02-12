@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface StudentService {
 
+    List<Student> findAll();
     List<Student> getStudentsByClasseId(Long classId); // Récupère les étudiants d'une classe donnée
     List<StudentDTO> getStudentsDtoByClasseId(Long classId);
     User getStudentById(long l);

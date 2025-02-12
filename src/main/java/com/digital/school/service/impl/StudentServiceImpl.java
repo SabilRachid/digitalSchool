@@ -19,6 +19,11 @@ public class StudentServiceImpl implements StudentService {
     private StudentRepository studentRepository;
 
     @Override
+    public List<Student> findAll() {
+        return studentRepository.findAll();
+    }
+
+    @Override
     public List<Student> getStudentsByClasseId(Long classId) {
         return studentRepository.getStudentsByClasseId(classId);
     }

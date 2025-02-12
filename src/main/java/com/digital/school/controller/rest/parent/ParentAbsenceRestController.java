@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/parent/absences")
-public class ParentAbsenceController {
+public class ParentAbsenceRestController {
 
     @Autowired
     private ParentAbsenceService absenceService;

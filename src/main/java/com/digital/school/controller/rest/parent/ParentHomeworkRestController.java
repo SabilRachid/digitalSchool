@@ -7,14 +7,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.digital.school.model.User;
 import com.digital.school.service.ParentHomeworkService;
 
 import java.util.Map;
 
 @Controller
 @RequestMapping("/parent/homework")
-public class ParentHomeworkController {
+public class ParentHomeworkRestController {
 
     @Autowired
     private ParentHomeworkService homeworkService;

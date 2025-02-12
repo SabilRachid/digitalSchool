@@ -47,7 +47,6 @@ public class DashboardController {
                 model.addAttribute("user", user);
                 model.addAttribute("currentURI", request.getRequestURI());
                 
-
                 if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
                    // return "redirect:/admin/dashboard";
                 	return "redirect:/admin/dashboard";
@@ -55,6 +54,9 @@ public class DashboardController {
                     return "redirect:/professor/dashboard";
                 } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"))) {
                     return "redirect:/student/dashboard";
+                }
+                else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_PARENT"))) {
+                    return "redirect:/parent/dashboard";
                 }
                 else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SECRETARY"))) {
                     return "redirect:/secretary/dashboard";

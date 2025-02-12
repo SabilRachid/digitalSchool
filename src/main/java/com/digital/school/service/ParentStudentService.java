@@ -14,4 +14,11 @@ public interface ParentStudentService {
     List<ParentStudent> findByParent(Long parentId);
     List<ParentStudent> findByStudent(Long studentId);
     List<ParentStudent> findByValidationStatus(boolean validated);
+    
+    List<Map<String, Object>> getAssociationsByClass(Long classId);
+    Map<String, Object> getAssociationById(Long id);
+    void saveAssociation(Map<String, Object> associationData);
+    void updateAssociation(Long id, Map<String, Object> associationData);
+
+    void associateStudentToParents(Long studentId, List<Long> parentIds);
 }

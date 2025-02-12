@@ -1,150 +1,166 @@
-```html
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de Bord Parent - Digital School</title>
-    
-    <!-- CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
-    <link rel="stylesheet" th:href="@{/css/parent/dashboard.css}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord Parent - Digital School</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+  <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+  <link rel="stylesheet" th:href="@{/css/topbar.css}">
+  <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+  <link rel="stylesheet" th:href="@{/css/components/forms.css}">
+  <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+  <link rel="stylesheet" th:href="@{/css/components/modals.css}">
+  <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+
 </head>
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    <div th:replace="~{fragments/topbar :: topbar}"></div>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
 
-    <div class="dashboard-container">
-        <!-- En-tête -->
-        <div class="dashboard-header">
-            <h1>Tableau de Bord</h1>
-            <div class="alerts-badge" th:if="${not #lists.isEmpty(alerts)}">
-                <i class="fas fa-bell"></i>
-                <span class="badge" th:text="${#lists.size(alerts)}">3</span>
-            </div>
-        </div>
+<div class="dashboard-container">
+  <!-- En-tête -->
+  <div class="welcome-section">
+    <div class="welcome-header">
+      <h1>Bienvenue, <span th:text="${user.firstName}">Professeur</span></h1>
+      <div class="alerts-badge" th:if="${not #lists.isEmpty(alerts)}">
+      <i class="fas fa-bell"></i>
+      <span class="badge" th:text="${#lists.size(alerts)}">3</span>
+    </div>
+  </div>
 
-        <!-- Alertes -->
-        <div class="alerts-section" th:if="${not #lists.isEmpty(alerts)}">
-            <div class="alerts-list">
-                <div th:each="alert : ${alerts}" 
-                     th:class="'alert-item ' + ${alert.severity.toLowerCase()}">
-                    <div class="alert-icon">
-                        <i th:class="'fas ' + ${
+  <!-- Alertes -->
+  <div class="alerts-section" th:if="${not #lists.isEmpty(alerts)}">
+    <div class="alerts-list">
+      <div th:each="alert : ${alerts}"
+           th:class="'alert-item ' + ${alert.severity.toLowerCase()}">
+        <div class="alert-icon">
+          <i th:class="'fas ' + ${
                             alert.type == 'ABSENCE' ? 'fa-user-clock' :
                             alert.type == 'GRADE' ? 'fa-star' :
                             'fa-exclamation-circle'
                         }"></i>
-                    </div>
-                    <div class="alert-content">
-                        <p th:text="${alert.message}">Message d'alerte</p>
-                        <span class="alert-time" 
-                              th:text="${#temporals.format(alert.date, 'dd/MM/yyyy HH:mm')}">
+        </div>
+        <div class="alert-content">
+          <p th:text="${alert.message}">Message d'alerte</p>
+          <span class="alert-time"
+                th:text="${#temporals.format(alert.date, 'dd/MM/yyyy HH:mm')}">
                             Date
                         </span>
-                    </div>
-                    <div class="alert-actions">
-                        <button class="btn btn-primary" 
-                                th:onclick="'viewDetails(\'' + ${alert.type} + '\', ' + ${alert.childId} + ')'">
-                            Voir détails
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
+        <div class="alert-actions">
+          <button class="btn btn-primary"
+                  th:onclick="'viewDetails(\'' + ${alert.type} + '\', ' + ${alert.childId} + ')'">
+            Voir détails
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Vue d'ensemble des enfants -->
-        <div class="children-overview">
-            <div th:each="child : ${children}" class="child-card">
-                <div class="child-header">
-                    <div class="child-info">
-                        <div class="child-avatar">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="child-details">
-                            <h3 th:text="${child.name}">Nom de l'enfant</h3>
-                            <span class="child-class" th:text="${child.class}">Classe</span>
-                        </div>
-                    </div>
-                    <div class="quick-stats">
-                        <div class="stat">
+  <!-- Vue d'ensemble des enfants -->
+  <div class="children-overview">
+    <div th:each="child : ${children}" class="child-card">
+      <div class="child-header">
+        <div class="child-info">
+          <div class="child-avatar">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div class="child-details">
+            <h3 th:text="${child.name}">Nom de l'enfant</h3>
+            <span class="child-class" th:text="${child.class}">Classe</span>
+          </div>
+        </div>
+        <div class="quick-stats">
+          <div class="stat">
                             <span class="stat-value" th:text="${child.averageGrade + '/20'}">
                                 15/20
                             </span>
-                            <span class="stat-label">Moyenne</span>
-                        </div>
-                        <div class="stat">
+            <span class="stat-label">Moyenne</span>
+          </div>
+          <div class="stat">
                             <span class="stat-value" th:text="${child.attendanceRate + '%'}">
                                 95%
                             </span>
-                            <span class="stat-label">Présence</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="child-content">
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <i class="fas fa-tasks"></i>
-                            <span th:text="${child.pendingHomework + ' devoirs à rendre'}">
+            <span class="stat-label">Présence</span>
+          </div>
+        </div>
+      </div>
+      <div class="child-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <i class="fas fa-tasks"></i>
+            <span th:text="${child.pendingHomework + ' devoirs à rendre'}">
                                 Devoirs
                             </span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-file-alt"></i>
-                            <span th:text="${child.upcomingExams + ' examens à venir'}">
+          </div>
+          <div class="info-item">
+            <i class="fas fa-file-alt"></i>
+            <span th:text="${child.upcomingExams + ' examens à venir'}">
                                 Examens
                             </span>
-                        </div>
-                    </div>
-                    <div class="child-actions">
-                        <button class="btn btn-primary" 
-                                th:onclick="'viewChildDetails(' + ${child.id} + ')'">
-                            Voir détails
-                        </button>
-                        <button class="btn btn-secondary" 
-                                th:onclick="'contactTeachers(' + ${child.id} + ')'">
-                            Contacter les professeurs
-                        </button>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+        <div class="child-actions">
+          <button class="btn btn-primary"
+                  th:onclick="'viewChildDetails(' + ${child.id} + ')'">
+            Voir détails
+          </button>
+          <button class="btn btn-secondary"
+                  th:onclick="'contactTeachers(' + ${child.id} + ')'">
+            Contacter les professeurs
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Événements à venir -->
-        <div class="upcoming-events">
-            <h2>Événements à venir</h2>
-            <div class="events-timeline">
-                <div th:each="event : ${upcomingEvents}" class="event-item">
-                    <div class="event-date">
-                        <span class="date-day" 
+  <!-- Événements à venir -->
+  <div class="upcoming-events">
+    <h2>Événements à venir</h2>
+    <div class="events-timeline">
+      <div th:each="event : ${upcomingEvents}" class="event-item">
+        <div class="event-date">
+                        <span class="date-day"
                               th:text="${#temporals.format(event.date, 'dd')}">15</span>
-                        <span class="date-month" 
-                              th:text="${#temporals.format(event.date, 'MMM')}">Jan</span>
-                    </div>
-                    <div class="event-content">
-                        <div th:class="'event-type ' + ${event.type.toLowerCase()}"
-                             th:text="${
+          <span class="date-month"
+                th:text="${#temporals.format(event.date, 'MMM')}">Jan</span>
+        </div>
+        <div class="event-content">
+          <div th:class="'event-type ' + ${event.type.toLowerCase()}"
+               th:text="${
                                  event.type == 'EXAM' ? 'Examen' :
                                  event.type == 'HOMEWORK' ? 'Devoir' :
                                  'Événement'
                              }">
-                            Type
-                        </div>
-                        <h4 th:text="${event.title}">Titre de l'événement</h4>
-                        <p>
-                            <span th:text="${event.childName}">Prénom</span> -
-                            <span th:text="${event.subject}">Matière</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            Type
+          </div>
+          <h4 th:text="${event.title}">Titre de l'événement</h4>
+          <p>
+            <span th:text="${event.childName}">Prénom</span> -
+            <span th:text="${event.subject}">Matière</span>
+          </p>
         </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script th:src="@{/js/parent/dashboard.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+<script th:src="@{/js/admin/common.js}"></script>
+
+<script th:src="@{/js/parent/dashboard.js}"></script>
 </body>
 </html>
-```

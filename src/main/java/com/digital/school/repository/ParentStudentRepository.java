@@ -1,6 +1,7 @@
 package com.digital.school.repository;
 
 import aj.org.objectweb.asm.commons.Remapper;
+import com.digital.school.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,20 +14,15 @@ public interface ParentStudentRepository extends JpaRepository<ParentStudent, Lo
     List<ParentStudent> findByParent(User parent);
     List<ParentStudent> findByStudent(User student);
 
+    List<ParentStudent> findByParentId(Long parentId);
 
-    List<ParentStudent> findByRelationship(String relationship);
-    List<ParentStudent> findByPrimaryContactTrue();
-    
-    Optional<ParentStudent> findByParentAndStudent(User parent, User student);
-    
-    @Query("SELECT ps FROM ParentStudent ps WHERE ps.student = :student AND ps.emergencyContact = true")
-    List<ParentStudent> findEmergencyContactsByStudent(@Param("student") User student);
-    
-    @Query("SELECT ps FROM ParentStudent ps WHERE ps.parent = :parent AND ps.validated = true")
-    List<ParentStudent> findValidatedAssociationsByParent(@Param("parent") User parent);
-    
+    @Query("SELECT ps FROM ParentStudent ps WHERE ps.student.classe.id = :classId")
+    List<ParentStudent> findByStudent_Classe_Id(@Param("classId") Long classId);
+
     boolean existsByParentAndStudent(User parent, User student);
 
     Optional<ParentStudent> findByStudentId(Long childId);
 
+
+    void deleteByStudent(Student student);
 }

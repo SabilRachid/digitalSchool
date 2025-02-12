@@ -6,6 +6,7 @@ public final class Constants {
     public static final String ROLE_PROFESSOR = "ROLE_PROFESSOR";
     public static final String ROLE_STUDENT = "ROLE_STUDENT";
     public static final String ROLE_PARENT = "ROLE_PARENT";
+    public static final String ROLE_SECRETARY = "ROLE_SECRETARYT";
 
     // Statuts
     public static final String STATUS_ACTIVE = "ACTIVE";

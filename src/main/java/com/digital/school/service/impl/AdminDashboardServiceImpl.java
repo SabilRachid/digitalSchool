@@ -120,7 +120,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     @Override
     public List<Map<String, Object>> getUserDistribution() {
-        List<RoleName> roles = Arrays.asList(RoleName.ROLE_ADMIN, RoleName.ROLE_PROFESSOR, RoleName.ROLE_STUDENT);
+        List<RoleName> roles = Arrays.asList(RoleName.ROLE_ADMIN, RoleName.ROLE_PROFESSOR, RoleName.ROLE_STUDENT, RoleName.ROLE_PARENT, RoleName.ROLE_SECRETARY);
 
         List<Object[]> results = userRepository.countUsersByRole(roles);
 
@@ -128,7 +128,9 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         Map<RoleName, String> roleLabels = Map.of(
                 RoleName.ROLE_ADMIN, "Administrateurs",
                 RoleName.ROLE_PROFESSOR, "Professeurs",
-                RoleName.ROLE_STUDENT, "Étudiants"
+                RoleName.ROLE_STUDENT, "Étudiants",
+                RoleName.ROLE_PARENT, "Parents",
+                RoleName.ROLE_SECRETARY, "Scolarité"
         );
 
         for (Object[] row : results) {

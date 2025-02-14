@@ -26,7 +26,7 @@ public class Classe extends AuditableEntity {
     private String schoolYear;
     
     @OneToMany(mappedBy = "classe")
-    private Set<User> students = new HashSet<>();
+    private Set<Student> students = new HashSet<>();
     
     @ManyToMany
     @JoinTable(
@@ -35,6 +35,10 @@ public class Classe extends AuditableEntity {
         inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
     private Set<Subject> subjects = new HashSet<>();
+
+
+    @ManyToMany(mappedBy = "classes") // Relation bidirectionnelle avec Professor
+    private Set<Professor> professors = new HashSet<>();
 
     public Classe() {
     }
@@ -72,11 +76,11 @@ public class Classe extends AuditableEntity {
         this.schoolYear = schoolYear;
     }
 
-    public Set<User> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(Set<User> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students != null ? students : new HashSet<>();
     }
 
@@ -86,6 +90,14 @@ public class Classe extends AuditableEntity {
 
     public void setSubjects(Set<Subject> subjects) {
         this.subjects = subjects != null ? subjects : new HashSet<>();
+    }
+
+    public
+    Set<Professor> getProfessors() {
+        return professors;
+    }
+    public void setProfessors(Set<Professor> professors) {
+        this.professors = professors != null ? professors : new HashSet<>();
     }
 
     @Override

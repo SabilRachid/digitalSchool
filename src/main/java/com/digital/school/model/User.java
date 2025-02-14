@@ -37,10 +37,6 @@ public class User extends AuditableEntity implements UserDetails {
     )
     private Set<Role> roles = new HashSet<>();
     
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private Classe classe;
-
     public User() {
     }
 
@@ -103,13 +99,6 @@ public class User extends AuditableEntity implements UserDetails {
         this.roles = roles != null ? roles : new HashSet<>();
     }
 
-    public Classe getClasse() {
-        return classe;
-    }
-
-    public void setClasse(Classe classe) {
-        this.classe = classe;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

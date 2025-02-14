@@ -22,6 +22,15 @@ public class Professor extends User {
     @Column(name = "employment_type", nullable = true)
     private EmploymentType employmentType; // Temps plein ou temps partiel
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "professor_classes",
+            joinColumns = @JoinColumn(name = "professor_id"),
+            inverseJoinColumns = @JoinColumn(name = "classe_id")
+    )
+    private Set<Classe> classes = new HashSet<>();
+
+
     public Set<Subject> getSubjects() {
         return subjects;
     }
@@ -37,4 +46,14 @@ public class Professor extends User {
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
     }
+
+    // Getters et setters
+    public Set<Classe> getClasses() {
+        return classes;
+    }
+    public void setClasses(Set<Classe> classes) {
+        this.classes = classes;
+    }
+
+
 }

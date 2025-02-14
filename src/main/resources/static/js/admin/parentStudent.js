@@ -1,58 +1,67 @@
-// Configuration spécifique pour la page des associations Parent–Élève
+// Configuration spécifique pour la page des associations parent-élève
 class ParentStudentPage extends AdminPage {
     constructor() {
         super({
             tableId: 'associationTable',
             modalId: 'associationModal',
             formId: 'associationForm',
-            // L'endpoint API pour la création/mise à jour des associations
-            apiEndpoint: '/admin/api/parentStudent/associations',
+            apiEndpoint: '/admin/api/parentStudent/association',
             columns: [
-                { data: 'studentName' },
-                { data: 'className' },
-                { data: 'parentName' },
-                { data: 'relationship' },
+                { data: 'studentName', title: "Élève" },
+                { data: 'className', title: "Classe" },
+                { data: 'parentName', title: "Parent" },
+                { data: 'relationship', title: "Relation" },
                 {
-                    data: 'primaryContact',
+                    data: 'primaryContact', title: "Contact Principal",
                     render: function(data) {
                         return data
                             ? '<i class="fas fa-check text-success"></i>'
                             : '<i class="fas fa-times text-danger"></i>';
                     }
                 },
-                { data: 'createdAt' },
+                { data: 'createdAt', title: "Date de Création" },
                 {
-                    data: "id",
-                    render: function(data, type, row) {
+                    data: null,
+                    render: function(data) {
                         return `
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-primary" onclick="window.parentStudentPage.edit(${data})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="window.parentStudentPage.delete(${data})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>`;
+                            <button class="btn btn-sm btn-primary" onclick="window.parentStudentPage.edit(${data.id})">
+                                <i class="fas fa-edit"></i> Modifier
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="window.parentStudentPage.delete(${data.id})">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        `;
                     }
                 }
             ]
+
         });
 
-        // Initialisation du filtre par classe
+        console.log("📌 Initialisation de ParentStudentPage...");
         this.initClassFilterHandler();
     }
 
-    // Méthode pour gérer le filtrage par classe via l'élément select "classFilter"
+    // Gérer le filtrage par classe
     initClassFilterHandler() {
         const classFilter = document.getElementById('classFilter');
         if (classFilter) {
             classFilter.addEventListener('change', () => {
-                this.table.ajax.reload();
+                console.log("🔄 Filtrage appliqué : Classe ID =", classFilter.value);
+                const newUrl = `/admin/api/parentStudent/association/data?classId=${classFilter.value}`;
+                console.log("📌 Nouvelle URL DataTables :", newUrl);
+                this.table.ajax.url(newUrl).load();
             });
         }
     }
 
-    // Surcharge de la méthode save pour gérer la soumission du formulaire du modal
+
+    // Méthode pour recharger les données
+    reloadDataTable() {
+        console.log("🔄 Rechargement manuel des données DataTable...");
+        this.table.ajax.reload();
+    }
+
+    // Méthode pour soumettre le formulaire
     async save() {
         const form = document.getElementById(this.formId);
         if (!form) return;
@@ -60,8 +69,10 @@ class ParentStudentPage extends AdminPage {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
-        // Conversion de la case à cocher en booléen
-        data.primaryContact = data.primaryContact === 'on' ? true : false;
+        // Conversion des cases à cocher
+        data.primaryContact = data.primaryContact === 'on';
+
+        console.log("📌 Données du formulaire avant envoi :", data);
 
         try {
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
@@ -76,99 +87,81 @@ class ParentStudentPage extends AdminPage {
                     body: JSON.stringify(data)
                 }
             );
+
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Error saving association');
+                throw new Error(error.message || 'Erreur lors de la sauvegarde');
             }
+
+            console.log("✅ Sauvegarde réussie !");
             this.closeModal();
-            this.table.ajax.reload();
+            this.reloadDataTable();
         } catch (error) {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la sauvegarde : ' + error.message);
+            console.error('🚨 Erreur lors de la sauvegarde :', error);
+            alert('Erreur : ' + error.message);
         }
     }
 
-    // Méthode pour ouvrir le modal en mode modification et charger les données de l'association sélectionnée
+    // Méthode pour modifier une association
     async edit(id) {
         try {
+            console.log("📌 Édition de l'association ID :", id);
             const response = await fetch(`/admin/api/parentStudent/association/${id}`);
             if (!response.ok) throw new Error('Erreur lors de la récupération des données');
             const data = await response.json();
-            // Remplir le formulaire du modal avec les données récupérées
+
+            console.log("📊 Données reçues pour édition :", data);
+
             document.getElementById('associationId').value = data.id;
             document.getElementById('studentSelect').value = data.studentId;
             document.getElementById('parentSelect').value = data.parentId;
             document.getElementById('relationship').value = data.relationship;
             document.getElementById('primaryContact').checked = data.primaryContact;
-            // Ouvrir le modal
+
             const modal = new bootstrap.Modal(document.getElementById(this.modalId));
             modal.show();
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('🚨 Erreur lors de l\'édition :', error);
             alert('Erreur lors de la récupération des données : ' + error.message);
         }
     }
 
     // Méthode pour supprimer une association
     async delete(id) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cette association ?")) {
-            try {
-                const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-                const response = await fetch(`${this.apiEndpoint}/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken
-                    }
-                });
-                if (!response.ok) throw new Error('Erreur lors de la suppression');
-                this.table.ajax.reload();
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('Erreur lors de la suppression : ' + error.message);
-            }
+        if (!confirm("Êtes-vous sûr de vouloir supprimer cette association ?")) return;
+
+        try {
+            console.log("🗑 Suppression de l'association ID :", id);
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const response = await fetch(`${this.apiEndpoint}/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken
+                }
+            });
+
+            if (!response.ok) throw new Error('Erreur lors de la suppression');
+
+            console.log("✅ Suppression réussie !");
+            this.reloadDataTable();
+        } catch (error) {
+            console.error('🚨 Erreur lors de la suppression :', error);
+            alert('Erreur : ' + error.message);
         }
     }
-    openNewAttendanceModal() {
-        // Charger les étudiants et les parents depuis l'API
-        //this.loadStudents();
-        //this.loadParents();
 
+    // Méthode pour ouvrir le modal pour une nouvelle association
+    openNewAssociationModal() {
+        console.log("📌 Ouverture du modal pour une nouvelle association");
+        document.getElementById(this.formId).reset();
         const modal = new bootstrap.Modal(document.getElementById(this.modalId));
         modal.show();
     }
-
-    async loadStudents() {
-        try {
-            const response = await fetch("/admin/api/students");
-            if (!response.ok) throw new Error("Erreur lors du chargement des étudiants");
-            const students = await response.json();
-            let options = `<option value="" disabled selected>Choisissez un élève</option>`;
-            students.forEach(student => {
-                options += `<option value="${student.id}">${student.firstName} ${student.lastName}</option>`;
-            });
-            document.getElementById("studentSelect").innerHTML = options;
-        } catch (error) {
-            console.error("Erreur:", error);
-        }
-    }
-
-    async loadParents() {
-        try {
-            const response = await fetch("/admin/api/parents");
-            if (!response.ok) throw new Error("Erreur lors du chargement des parents");
-            const parents = await response.json();
-            let options = `<option value="" disabled selected>Choisissez un parent</option>`;
-            parents.forEach(parent => {
-                options += `<option value="${parent.id}">${parent.firstName} ${parent.lastName}</option>`;
-            });
-            document.getElementById("parentSelect").innerHTML = options;
-        } catch (error) {
-            console.error("Erreur:", error);
-        }
-    }
 }
 
-// Initialisation de la page lorsque le DOM est prêt
+
+
+// Initialisation de la page
 document.addEventListener('DOMContentLoaded', function() {
     window.parentStudentPage = new ParentStudentPage();
 });

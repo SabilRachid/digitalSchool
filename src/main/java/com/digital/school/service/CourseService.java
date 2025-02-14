@@ -20,7 +20,7 @@ public interface CourseService {
     List<Map<String, Object>> findByProfessor(Professor professor);
     List<Course> findBySubject(Subject subject);
     List<Course> findByDateRange(LocalDateTime start, LocalDateTime end);
-    List<Course> findUpcomingCourses(User user);
+    List<Course> findUpcomingCourses(Professor professor);
     Map<String, Object> getCourseStatistics(Course course);
     List<Map<String, Object>> findAllAsMap();
     List<Map<String, Object>> findAllBasicInfo();

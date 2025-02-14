@@ -119,12 +119,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Course> findUpcomingCourses(User user) {
+    public List<Course> findUpcomingCourses(Professor professor) {
         LocalDateTime now = LocalDateTime.now();
-        if (user.getRoles().stream().anyMatch(r -> r.getName().toString().equals("ROLE_PROFESSOR"))) {
-            return courseRepository.findByProfessorAndStartTimeAfter(user, now);
+        if (professor.getRoles().stream().anyMatch(r -> r.getName().toString().equals("ROLE_PROFESSOR"))) {
+            return courseRepository.findByProfessorAndStartTimeAfter(professor, now);
         } else {
-            return courseRepository.findByClasseAndStartTimeAfter(user.getClasse(), now);
+            return courseRepository.findByClasseAndStartTimeAfter(professor.getClasses().iterator().next(), now);
         }
     }
 

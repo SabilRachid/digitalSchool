@@ -43,20 +43,22 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
            "FROM StudentGrade g WHERE g.student.classe.id = :classeId " +
            "GROUP BY g.subject.name")
     Map<String, Double> calculateClassAverages(@Param("classeId") Long classeId);
-    
+
     @Query(value = "WITH StudentAverages AS (" +
-                   "  SELECT student_id, AVG(value) as avg_grade, " +
-                   "         DENSE_RANK() OVER (ORDER BY AVG(value) DESC) as rank " +
-                   "  FROM student_grades " +
-                   "  WHERE classe_id = :classeId " +
-                   "  GROUP BY student_id" +
-                   ") " +
-                   "SELECT rank FROM StudentAverages WHERE student_id = :studentId",
-           nativeQuery = true)
+            "  SELECT g.student_id, AVG(g.grade_value) as avg_grade, " +
+            "         DENSE_RANK() OVER (ORDER BY AVG(g.grade_value) DESC) as rank " +
+            "  FROM student_grades g " +
+            "  JOIN students s ON g.student_id = s.user_id " +
+            "  WHERE s.class_id = :classeId " +
+            "  GROUP BY g.student_id" +
+            ") " +
+            "SELECT rank FROM StudentAverages WHERE student_id = :studentId",
+            nativeQuery = true)
     int calculateStudentRank(
-        @Param("studentId") Long studentId,
-        @Param("classeId") Long classeId
+            @Param("studentId") Long studentId,
+            @Param("classeId") Long classeId
     );
+
 
     @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.student = :student")
     Double calculateAverageGrade(Optional<Student> student);

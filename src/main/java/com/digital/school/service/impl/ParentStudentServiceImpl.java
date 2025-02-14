@@ -51,12 +51,12 @@ public class ParentStudentServiceImpl implements ParentStudentService {
 	@Override
 	public ParentStudent save(ParentStudent association) {
 		// TODO Auto-generated method stub
-		return null;
+		return parentStudentRepository.save(association);
 	}
 
 	@Override
 	public void deleteById(Long id) {
-		// TODO Auto-generated method stub
+		parentStudentRepository.deleteById(id);
 		
 	}
 
@@ -87,10 +87,11 @@ public class ParentStudentServiceImpl implements ParentStudentService {
 
 	@Override
 	public List<Map<String, Object>> getAssociationsByClass(Long classId) {
-		LOGGER.debug("getAssociationsByClass by ClassId"+ classId);
+		LOGGER.debug("getAssociationsByClass by ClassId="+ classId);
 		List<ParentStudent> associations;
 		if (classId == null) {
 			associations = parentStudentRepository.findAll();
+			LOGGER.debug("associations size()="+associations.size());
 		} else {
 			associations = parentStudentRepository.findByStudent_Classe_Id(classId);
 		}

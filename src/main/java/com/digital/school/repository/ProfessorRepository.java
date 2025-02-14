@@ -24,7 +24,7 @@ public interface ProfessorRepository extends JpaRepository<Professor, Long> {
     @Query("SELECT p FROM Professor p JOIN p.subjects s WHERE s.name = :subjectName")
     List<Professor> findBySubjectsName(String subjectName); // Récupérer les profs d'une matière
 
-    @Query("SELECT p FROM Professor p WHERE p.classe = :classe")
+    @Query("SELECT p FROM Professor p WHERE :classe MEMBER OF p.classes")
     List<Professor> findByClasse(Classe classe);
 }
 

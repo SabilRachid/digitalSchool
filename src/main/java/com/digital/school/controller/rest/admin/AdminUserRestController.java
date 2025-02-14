@@ -1,5 +1,7 @@
 package com.digital.school.controller.rest.admin;
 
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -108,8 +110,16 @@ public class AdminUserRestController {
         // Gérer la classe pour les étudiants
         if (dto.getClasseId() != null && user.getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.ROLE_STUDENT)) {
-            classeService.findById(dto.getClasseId())
-                .ifPresent(user::setClasse);
+
+            if (user instanceof Student) {
+                Student student = (Student) user;
+                if (student.getClasse() != null) {
+                    classeService.findById(dto.getClasseId())
+                            .ifPresent(student::setClasse);
+                    ;
+                }
+            }
+
         }
     }
 
@@ -125,11 +135,25 @@ public class AdminUserRestController {
             .map(role -> role.getName().toString())
             .collect(Collectors.toList()));
 
-        if (user.getClasse() != null) {
-            map.put("classe", Map.of(
-                "id", user.getClasse().getId(),
-                "name", user.getClasse().getName()
-            ));
+        if (user instanceof Student) {
+            Student student = (Student) user;
+            if (student.getClasse() != null) {
+                map.put("classe", Map.of(
+                        "id", student.getClasse().getId(),
+                        "name", student.getClasse().getName(),
+                        "additionalInfo", "Student-specific class info"
+                ));
+            }
+        } else if (user instanceof Professor) {
+            Professor professor = (Professor) user;
+            if (professor.getClasses().iterator().next() != null) {
+                map.put("classe", Map.of(
+                        "id", professor.getClasses().iterator().next().getId(),
+                        "name", professor.getClasses().iterator().next().getName(),
+                        "additionalInfo", "Professor-specific class info"
+                ));
+            }
+
         }
 
         return map;

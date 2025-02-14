@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.digital.school.service.ParentStudentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,16 +18,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin/api/parentStudent")
 public class AdminParentStudentRestController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminParentStudentRestController.class);
 
         @Autowired
         private ParentStudentService parentStudentService;
 
     // Récupérer toutes les associations (optionnellement filtrées par classe)
-    @GetMapping("/associations/data")
+    @GetMapping("/association/data")
     @ResponseBody
-    public Map<String, Object> getAssociations(@RequestParam(required = false) Long classId) {
+    public List<Map<String, Object>> getAssociations(@RequestParam(required = false) Long classId) {
         List<Map<String, Object>> associations = parentStudentService.getAssociationsByClass(classId);
-        return Collections.singletonMap("data", associations);
+        LOGGER.debug("getAssociations of ParentStudent");
+        return associations;
+       // return Collections.singletonMap("data", associations);
     }
 
     // Récupérer une association par ID (pour modification)
@@ -35,10 +40,39 @@ public class AdminParentStudentRestController {
         return ResponseEntity.ok(association);
     }
 
+
+    // Modification d'une association existante
+    @PutMapping("/association/{id}")
+    public ResponseEntity<?> updateAssociation(@PathVariable Long id, @RequestBody Map<String, Object> associationData) {
+        try {
+
+            LOGGER.debug("updateAssociation of ParentStudent id="+id);
+            parentStudentService.updateAssociation(id, associationData);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/association/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteAssociation(@PathVariable Long id) {
+        try {
+            LOGGER.debug("deleteAssociation of ParentStudent id="+id);
+            parentStudentService.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
     // Création d'une nouvelle association
     @PostMapping("/association")
     public ResponseEntity<?> createAssociation(@RequestBody Map<String, Object> associationData) {
         try {
+
+
             parentStudentService.saveAssociation(associationData);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -46,16 +80,6 @@ public class AdminParentStudentRestController {
         }
     }
 
-    // Modification d'une association existante
-    @PutMapping("/association/{id}")
-    public ResponseEntity<?> updateAssociation(@PathVariable Long id, @RequestBody Map<String, Object> associationData) {
-        try {
-            parentStudentService.updateAssociation(id, associationData);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
-        }
-    }
 
         @PostMapping("/associate")
         public String associateStudentWithParents(
@@ -71,5 +95,7 @@ public class AdminParentStudentRestController {
             }
             return "redirect:/admin/parentStudent/associate"; // Redirige vers la page d'association ou dashboard
         }
+
+
 
 }

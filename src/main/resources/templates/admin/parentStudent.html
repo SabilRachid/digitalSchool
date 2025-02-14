@@ -2,9 +2,10 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Associations Parent–Élève - Digital School</title>
-
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -12,8 +13,6 @@
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
-
-    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/topbar.css}">
@@ -23,13 +22,11 @@
     <link rel="stylesheet" th:href="@{/css/components/modals.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
     <link rel="stylesheet" th:href="@{/css/components/badges.css}">
-
 </head>
 <body>
 <!-- Sidebar & Topbar -->
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 <div th:replace="~{fragments/topbar :: topbar}"></div>
-
 
 <div class="dashboard-container">
     <div class="dashboard-header">
@@ -38,33 +35,23 @@
                     <i class="fas fa-graduation-cap"></i>
                 </span> Associations Parent–Élève
         </h3>
-        <button class="btn btn-primary" onclick="window.parentStudentPage.openNewAttendanceModal()">
+        <button class="btn btn-primary" onclick="window.parentStudentPage.openNewAssociationModal()">
             <i class="fas fa-layer-group"></i>
             <span>Ajouter une association</span>
         </button>
     </div>
 
+    <!-- Filtre par Classe -->
     <div class="mb-3">
-        <label for="studentSelect" class="form-label">Élève</label>
-        <select id="studentSelecte" name="studentId" class="form-select" required>
-            <option value="" disabled selected>Choisissez un élève</option>
-            <option th:each="student : ${students}" th:value="${student.id}"
-                    th:text="${student.firstName + ' ' + student.lastName}"></option>
+        <label for="classFilter" class="form-label">Filtrer par classe :</label>
+        <select id="classFilter" class="form-select">
+            <option value="">Toutes les classes</option>
+            <option th:each="classe : ${classes}" th:value="${classe.id}" th:text="${classe.name}"></option>
         </select>
     </div>
 
+    <!-- DataTable pour afficher les associations -->
     <div class="content-card">
-
-        <!-- Filtre par Classe -->
-        <div class="mb-3">
-            <label for="classFilter" class="form-label">Filtrer par classe :</label>
-            <select id="classFilter" class="form-select">
-                <option value="">Toutes les classes</option>
-                <option th:each="classe : ${classes}" th:value="${classe.id}" th:text="${classe.name}"></option>
-            </select>
-        </div>
-
-        <!-- DataTable pour afficher les associations -->
         <table id="associationTable" class="table table-striped">
             <thead>
             <tr>
@@ -78,11 +65,12 @@
             </tr>
             </thead>
             <tbody>
-            <!-- Les données seront chargées en AJAX -->
+            <!-- Les données seront chargées via AJAX -->
             </tbody>
         </table>
     </div>
 </div>
+
 <!-- Modal pour Ajouter/Modifier une Association -->
 <div class="modal fade" id="associationModal" tabindex="-1" aria-labelledby="associationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -137,7 +125,6 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -149,7 +136,6 @@
 <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
 <script th:src="@{/js/admin/common.js}"></script>
-
 <script th:src="@{/js/admin/parentStudent.js}"></script>
 </body>
 </html>

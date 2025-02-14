@@ -2,8 +2,8 @@ package com.digital.school.controller;
 
 import com.digital.school.model.Administrator;
 import com.digital.school.model.enumerated.RoleName;
+import com.digital.school.repository.ParentRepository;
 import com.digital.school.service.ClasseService;
-import com.digital.school.service.ParentService;
 import com.digital.school.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +31,15 @@ public class AdminController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
-    private UserService userService;
+    UserService userService;
     @Autowired
-    private StudentService studentService;
+    StudentService studentService;
     @Autowired
-    private ParentService parentService;
+    ParentRepository parentRepository;
+
 
     @Autowired
-    private ClasseService classeService;
+    ClasseService classeService;
 
 
     @GetMapping("/dashboard")
@@ -131,7 +132,7 @@ public class AdminController {
         model.addAttribute("user", admin);
         model.addAttribute("classes", classeService.findAllBasicInfo());
         model.addAttribute("students", studentService.findAll());
-        model.addAttribute("parents", parentService.findAll());
+        model.addAttribute("parents", parentRepository.findAll());
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/parentStudent";
     }

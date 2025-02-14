@@ -203,7 +203,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
         return events.stream().limit(5).collect(Collectors.toList());
     }
 
-    private double calculateWeeklyHours(User child) {
+    private double calculateWeeklyHours(Student child) {
         LocalDateTime start = LocalDateTime.now().withHour(0).withMinute(0);
         LocalDateTime end = start.plusDays(7);
 
@@ -219,7 +219,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
                 .sum();
     }
 
-    private Map<String, Double> calculateSubjectDistribution(User child) {
+    private Map<String, Double> calculateSubjectDistribution(Student child) {
         LocalDateTime start = LocalDateTime.now().withHour(0).withMinute(0);
         LocalDateTime end = start.plusDays(7);
 

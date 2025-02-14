@@ -87,6 +87,26 @@
             </div>
         </div>
 
+        <!-- Menu Secretary -->
+        <div sec:authorize="hasRole('ROLE_SECRETARY')">
+            <a href="/secretary/dashboard" class="nav-item" th:classappend="${currentURI == '/secretary/dashboard' ? 'active' : ''}">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </a>
+            <a href="/secretary/documents" class="nav-item" th:classappend="${currentURI == '/secretary/documents' ? 'active' : ''}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>documents</span>
+            </a>
+            <a href="/secretary/inscriptions" class="nav-item" th:classappend="${currentURI == '/secretary/inscriptions' ? 'active' : ''}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Inscriptions</span>
+            </a>
+            <a href="/secretary/invoices" class="nav-item" th:classappend="${currentURI == '/secretary/invoices' ? 'active' : ''}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Facturation</span>
+            </a>
+        </div>
+
         <!-- Menu Professeur -->
         <div sec:authorize="hasRole('ROLE_PROFESSOR')">
             <a href="/professor/dashboard" class="nav-item" th:classappend="${currentURI == '/professor/dashboard' ? 'active' : ''}">
@@ -116,6 +136,10 @@
             <a href="/professor/grades" class="nav-item" th:classappend="${currentURI == '/professor/grades' ? 'active' : ''}">
                 <i class="fas fa-star"></i>
                 <span>Notes</span>
+            </a>
+            <a href="/professor/resources" class="nav-item" th:classappend="${currentURI == '/professor/resources' ? 'active' : ''}">
+                <i class="fas fa-file-alt"></i>
+                <span>Resources</span>
             </a>
             <a href="/professor/meetings" class="nav-item" th:classappend="${currentURI == '/professor/meetings' ? 'active' : ''}">
                 <i class="fas fa-tasks"></i>
@@ -150,6 +174,11 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Notes</span>
             </a>
+            <a href="/student/resources" class="nav-item" th:classappend="${currentURI == '/student/resources' ? 'active' : ''}">
+                <i class="fas fa-file-alt"></i>
+                <span>Resources</span>
+            </a>
+
         </div>
 
         <!-- Menu Parents -->
@@ -166,6 +195,9 @@
                 <i class="fas fa-tasks"></i>
                 <span>Devoirs</span>
             </a>
+            <a href="/parent/schedule" class="nav-item" th:classappend="${currentURI == '/parent/schedule' ? 'active' : ''}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Schedules</span>
             <a href="/calendar" class="nav-item" th:classappend="${currentURI == '/calendar' ? 'active' : ''}">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Emploi du temps</span>
@@ -175,6 +207,7 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Notes</span>
             </a>
+
         </div>
 
         <!-- Menu commun -->

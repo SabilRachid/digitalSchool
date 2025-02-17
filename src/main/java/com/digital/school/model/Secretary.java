@@ -5,8 +5,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "secretaries")
 @PrimaryKeyJoinColumn(name = "user_id")
-public class Administrator extends User {
-    // Vous pouvez ajouter des attributs spécifiques à l'administrateur ici si nécessaire
+public class Secretary extends User {
+    // Vous pouvez ajouter des attributs spécifiques au secrétaire ici si nécessaire
 }

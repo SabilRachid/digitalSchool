@@ -12,31 +12,31 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED) // Stratégie pour gérer les sous-classes
 @Table(name = "users")
 public class User extends AuditableEntity implements UserDetails {
-    
+
     @Column(nullable = false, unique = true)
     private String username;
-    
+
     private String firstName;
     private String lastName;
-    
+
     @Column(unique = true)
     private String email;
 
     @Column(unique = true)
     private String phone;
-    
+
     private String password;
-    
+
     private boolean enabled = true;
-    
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-    
+
     public User() {
     }
 
@@ -73,6 +73,14 @@ public class User extends AuditableEntity implements UserDetails {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     @Override
     public String getPassword() {
         return password;
@@ -99,6 +107,14 @@ public class User extends AuditableEntity implements UserDetails {
         this.roles = roles != null ? roles : new HashSet<>();
     }
 
+    /**
+     * Méthode transitoire permettant de récupérer la classe associée.
+     * Par défaut, renvoie null. Les entités filles (comme Student) surchargeront cette méthode.
+     */
+    @Transient
+    public Classe getClasse() {
+        return null;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -106,7 +122,7 @@ public class User extends AuditableEntity implements UserDetails {
         roles.forEach(role -> {
             authorities.add(new SimpleGrantedAuthority(role.getName().toString()));
             role.getPermissions().forEach(permission ->
-                authorities.add(new SimpleGrantedAuthority(permission.getName().toString()))
+                    authorities.add(new SimpleGrantedAuthority(permission.getName().toString()))
             );
         });
         return authorities;
@@ -139,10 +155,4 @@ public class User extends AuditableEntity implements UserDetails {
     public int hashCode() {
         return getClass().hashCode();
     }
-
-    public String getPhone() { return phone;}
-
-    public void setPhone(String phone) { this.phone = phone;}
-
-
 }

@@ -54,10 +54,11 @@ public class ClasseServiceImpl implements ClasseService {
             })
             .collect(Collectors.toList());
     }
-    
+
     @Override
-    public Optional<Classe> findById(Long id) {
-        return classeRepository.findById(id);
+    public Classe findById(Long id) {
+        return classeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Classe non trouvée : " + id));
     }
 
     @Override

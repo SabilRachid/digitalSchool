@@ -83,6 +83,12 @@ a:hover {
     color: #6D28D9;
 }
 
+.my-divider {
+    border: none;
+    border-top: 1px solid #0EA5E9; /* couleur du trait */
+    margin: 2rem 0; /* espace au-dessus et en-dessous */
+}
+
 /* Utilitaires */
 .text-primary { color: var(--text-primary); }
 .text-secondary { color: var(--text-secondary); }

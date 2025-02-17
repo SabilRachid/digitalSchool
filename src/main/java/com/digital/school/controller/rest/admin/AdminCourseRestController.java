@@ -72,7 +72,7 @@ public class AdminCourseRestController {
             // Récupération des entités associées
             Subject subject = subjectService.findById(subjectId).orElseThrow(() -> new RuntimeException("Matière non trouvée"));
             Professor professor = professorService.findById(professorId).orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
-            Classe classe = classeService.findById(classId).orElseThrow(() -> new RuntimeException("Classe non trouvée"));
+            Classe classe = classeService.findById(classId);
 
             // Construction de l'objet Course
             Course course = new Course();

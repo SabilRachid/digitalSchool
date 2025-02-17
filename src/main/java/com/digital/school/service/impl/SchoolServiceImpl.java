@@ -16,21 +16,28 @@ public class SchoolServiceImpl implements SchoolService {
     @Autowired
     private SchoolRepository schoolRepository;
 
+
+
+
+    @Override
+    public School updateSchool(School school) {
+        return schoolRepository.save(school);
+    }
+
     @Override
     public List<Map<String, Object>> findAllAsMap() {
         return schoolRepository.findAll().stream()
-            .map(school -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", school.getId());
-                map.put("name", school.getName());
-                map.put("code", school.getCode());
-                map.put("city", school.getCity());
-                map.put("country", school.getCountry());
-                map.put("status", school.getStatus());
-                map.put("createdAt", school.getCreatedAt());
-                return map;
-            })
-            .collect(Collectors.toList());
+                .map(school -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", school.getId());
+                    map.put("name", school.getName());
+                    map.put("code", school.getCode());
+                    map.put("city", school.getCity());
+                    map.put("status", "Active");
+                    map.put("createdAt", school.getAuditable().getCreated());
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -46,7 +53,7 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     @Transactional
     public School save(School school) {
-        school.setUpdatedAt(java.time.LocalDateTime.now());
+
         return schoolRepository.save(school);
     }
 
@@ -56,10 +63,7 @@ public class SchoolServiceImpl implements SchoolService {
         schoolRepository.deleteById(id);
     }
 
-    @Override
-    public List<School> findByStatus(String status) {
-        return schoolRepository.findByStatus(status);
-    }
+
 
     @Override
     public List<School> findRecentlyCreated() {
@@ -78,5 +82,10 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public boolean existsById(Long id) {
         return schoolRepository.existsById(id);
+    }
+
+    @Override
+    public School getSchools() {
+        return schoolRepository.findAll().get(0);
     }
 }

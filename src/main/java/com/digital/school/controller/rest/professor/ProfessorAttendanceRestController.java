@@ -1,7 +1,7 @@
 package com.digital.school.controller.rest.professor;
 
 
-import com.digital.school.dto.StudentDTO;
+import com.digital.school.dto.UserDTO;
 import com.digital.school.model.*;
 import com.digital.school.dto.AttendanceRequest;
 import com.digital.school.service.AttendanceService;
@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,8 +59,9 @@ public class ProfessorAttendanceRestController {
 
     @GetMapping("/students/{classId}")
     @ResponseBody
-    public List<StudentDTO> getStudentsByClass(@PathVariable Long classId) {
-        LOGGER.debug("students size : {}", studentService.getStudentsDtoByClasseId(classId).size()+", classId : "+classId);
+    public List<UserDTO> getStudentsByClass(@PathVariable Long classId) {
+        LOGGER.debug("students size : {} , classId : {}",
+                studentService.getStudentsDtoByClasseId(classId).size(), classId);
         return studentService.getStudentsDtoByClasseId(classId);
     }
 

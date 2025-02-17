@@ -6,10 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.digital.school.model.Room;
 import com.digital.school.repository.RoomRepository;
 import com.digital.school.service.RoomService;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -93,16 +92,43 @@ public class RoomServiceImpl implements RoomService {
         }).orElseThrow(() -> new RuntimeException("Salle non trouvée"));
     }
 
-	@Override
-	public List<Map<String, Object>> findAllAsMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Map<String, Object>> findAllAsMap(String building, Integer floor, String equipment, String status) {
+        return roomRepository.findAll().stream()
+                // Filtrer par bâtiment (si renseigné)
+                .filter(room -> building == null || building.isEmpty()
+                        || room.getBuildingName().equalsIgnoreCase(building))
+                // Filtrer par étage (si renseigné)
+                .filter(room -> floor == null || room.getFloorNumber().equals(floor))
+                // Filtrer par statut (si renseigné)
+                .filter(room -> status == null || status.isEmpty()
+                        || room.getStatus().equalsIgnoreCase(status))
+                // Filtrer par équipement (si renseigné)
+                .filter(room -> equipment == null || equipment.isEmpty()
+                        || room.getEquipment().contains(equipment))
+                .map(room -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", room.getId());
+                    map.put("name", room.getName());
+                    map.put("maxCapacity", room.getMaxCapacity());
+                    map.put("description", room.getDescription());
+                    // On retourne la liste des équipements
+                    map.put("equipment", new ArrayList<>(room.getEquipment()));
+                    map.put("status", room.getStatus());
+                    map.put("floorNumber", room.getFloorNumber());
+                    map.put("buildingName", room.getBuildingName());
+                    map.put("accessible", room.isAccessible());
+                    map.put("maintenanceNotes", room.getMaintenanceNotes());
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
 
-	@Override
+
+
+    @Override
 	public boolean existsById(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+        return roomRepository.existsById(id);
 	}
 
 	@Override

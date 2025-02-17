@@ -3,6 +3,7 @@ package com.digital.school.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Entity

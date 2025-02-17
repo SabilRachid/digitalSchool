@@ -5,6 +5,7 @@ import com.digital.school.model.enumerated.RoleName;
 import com.digital.school.repository.ParentRepository;
 import com.digital.school.service.ClasseService;
 import com.digital.school.service.StudentService;
+import com.digital.school.service.SubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,8 @@ public class AdminController {
     StudentService studentService;
     @Autowired
     ParentRepository parentRepository;
-
-
+    @Autowired
+    SubjectService subjectService;
     @Autowired
     ClasseService classeService;
 
@@ -97,17 +98,42 @@ public class AdminController {
         return "admin/profiles";
     }
 
-    @GetMapping("/rooms")
-    public String showRooms(HttpServletRequest request, Model model) {
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/rooms";
-    }
 
     @GetMapping("/subjects")
     public String showSubjects(HttpServletRequest request, Model model) {
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/subjects";
     }
+
+
+    @GetMapping("/users")
+    public String listUsers(HttpServletRequest request, Model model) {
+        model.addAttribute("roles", RoleName.values());
+        model.addAttribute("classes", classeService.findAllBasicInfo());
+        model.addAttribute("subjects", subjectService.findAllBasicInfo());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/users";
+    }
+
+    @GetMapping("/parentStudent")
+    public String listAttendances(HttpServletRequest request, @AuthenticationPrincipal Administrator admin, Model model) {
+
+        LOGGER.debug("listAttendances Get Controller");
+        model.addAttribute("user", admin);
+        model.addAttribute("classes", classeService.findAllBasicInfo());
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("parents", parentRepository.findAll());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/parentStudent";
+    }
+
+
+    @GetMapping("/rooms")
+    public String showRooms(HttpServletRequest request, Model model) {
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/rooms";
+    }
+
 
     @GetMapping("/resources")
     public String showResources(HttpServletRequest request, Model model) {
@@ -116,26 +142,13 @@ public class AdminController {
         return "admin/resources";
     }
 
-
-
-    @GetMapping("/users")
-    public String listUsers(HttpServletRequest request, Model model) {
-        model.addAttribute("roles", RoleName.values());
-        model.addAttribute("classes", classeService.findAllBasicInfo());
+    @GetMapping("/settings")
+    public String showSettings(HttpServletRequest request, Model model) {
+        LOGGER.debug("showSettings Controller");
         model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/users";
+        return "admin/settings";
     }
 
-    @GetMapping("/parentStudent")
-    public String listAttendances(HttpServletRequest request, @AuthenticationPrincipal Administrator admin, Model model) {
-
-        model.addAttribute("user", admin);
-        model.addAttribute("classes", classeService.findAllBasicInfo());
-        model.addAttribute("students", studentService.findAll());
-        model.addAttribute("parents", parentRepository.findAll());
-        model.addAttribute("currentURI", request.getRequestURI());
-        return "admin/parentStudent";
-    }
 
 
 }

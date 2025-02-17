@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface RoomService {
-    List<Map<String, Object>> findAllAsMap();
+    List<Map<String, Object>> findAllAsMap(String building, Integer floor, String equipment, String status);
     Optional<Room> findById(Long id);
     Room save(Room room);
     void deleteById(Long id);

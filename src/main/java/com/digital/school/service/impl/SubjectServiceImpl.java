@@ -105,4 +105,11 @@ public class SubjectServiceImpl implements SubjectService {
     public List<Subject> findByProfessor(Professor professor) {
         return subjectRepository.findByProfessor(professor);
     }
+
+    @Override
+    public Set<Subject> findSubjectsByIds(Set<Long> ids) {
+        Set<Subject> subjects = new HashSet<>();
+        subjectRepository.findAllById(ids).forEach(subjects::add);
+        return subjects;
+    }
 }

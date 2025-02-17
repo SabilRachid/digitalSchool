@@ -5,12 +5,11 @@ import com.digital.school.model.Professor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface ClasseService {
     List<Map<String, Object>> findAllAsMap();
     List<Map<String, Object>> findAllBasicInfo();
-    Optional<Classe> findById(Long id);
+    Classe findById(Long id);
     Classe save(Classe classe);
     void deleteById(Long id);
     boolean existsById(Long id);

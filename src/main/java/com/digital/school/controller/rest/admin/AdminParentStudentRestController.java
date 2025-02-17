@@ -27,15 +27,15 @@ public class AdminParentStudentRestController {
     @GetMapping("/association/data")
     @ResponseBody
     public List<Map<String, Object>> getAssociations(@RequestParam(required = false) Long classId) {
+        LOGGER.debug("Datas getAssociations of ParentStudent");
         List<Map<String, Object>> associations = parentStudentService.getAssociationsByClass(classId);
-        LOGGER.debug("getAssociations of ParentStudent");
         return associations;
-       // return Collections.singletonMap("data", associations);
     }
 
     // Récupérer une association par ID (pour modification)
     @GetMapping("/association/{id}")
     public ResponseEntity<Map<String, Object>> getAssociation(@PathVariable Long id) {
+        LOGGER.debug("getAssociation of ParentStudent id="+id);
         Map<String, Object> association = parentStudentService.getAssociationById(id);
         return ResponseEntity.ok(association);
     }
@@ -44,8 +44,8 @@ public class AdminParentStudentRestController {
     // Modification d'une association existante
     @PutMapping("/association/{id}")
     public ResponseEntity<?> updateAssociation(@PathVariable Long id, @RequestBody Map<String, Object> associationData) {
-        try {
 
+        try {
             LOGGER.debug("updateAssociation of ParentStudent id="+id);
             parentStudentService.updateAssociation(id, associationData);
             return ResponseEntity.ok().build();
@@ -70,9 +70,9 @@ public class AdminParentStudentRestController {
     // Création d'une nouvelle association
     @PostMapping("/association")
     public ResponseEntity<?> createAssociation(@RequestBody Map<String, Object> associationData) {
+
         try {
-
-
+            LOGGER.debug("createAssociation of ParentStudent");
             parentStudentService.saveAssociation(associationData);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -88,6 +88,7 @@ public class AdminParentStudentRestController {
                 RedirectAttributes redirectAttributes) {
 
             try {
+                LOGGER.debug("associateStudentWithParents studentId="+studentId+" parentIds="+parentIds);
                 parentStudentService.associateStudentToParents(studentId, parentIds);
                 redirectAttributes.addFlashAttribute("successMessage", "Association enregistrée avec succès.");
             } catch (Exception e) {

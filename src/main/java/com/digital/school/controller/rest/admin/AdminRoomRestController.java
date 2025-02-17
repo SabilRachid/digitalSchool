@@ -1,5 +1,8 @@
 package com.digital.school.controller.rest.admin;
 
+import com.digital.school.controller.AdminController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,14 +17,23 @@ import java.util.Set;
 @RequestMapping("/admin/api/rooms")
 public class AdminRoomRestController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminRoomRestController.class);
+
     @Autowired
     private RoomService roomService;
 
     @GetMapping("/data")
     @ResponseBody
-    public List<Map<String, Object>> getRoomsData() {
-        return roomService.findAllAsMap();
+    public List<Map<String, Object>> getRoomsData(
+            @RequestParam(required = false) String buildingFilter,
+            @RequestParam(required = false) Integer floorFilter,
+            @RequestParam(required = false) String statusFilter,
+            @RequestParam(required = false) String equipmentFilter) {
+        LOGGER.debug("Fetching rooms data with filters: building={}, floor={}, status={}, equipment={}",
+                buildingFilter, floorFilter, statusFilter, equipmentFilter);
+        return roomService.findAllAsMap(buildingFilter, floorFilter, equipmentFilter, statusFilter);
     }
+
 
     @GetMapping("/available")
     @ResponseBody
@@ -55,6 +67,7 @@ public class AdminRoomRestController {
     @ResponseBody
     public ResponseEntity<?> updateRoom(@PathVariable Long id, @RequestBody Room room) {
         try {
+            LOGGER.debug("Updating room with id: {}", id);
             if (!roomService.existsById(id)) {
                 return ResponseEntity.notFound().build();
             }

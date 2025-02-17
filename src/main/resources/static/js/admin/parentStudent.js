@@ -77,9 +77,9 @@ class ParentStudentPage extends AdminPage {
         try {
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
             const response = await fetch(
-                data.id ? `${this.apiEndpoint}/${data.id}` : this.apiEndpoint,
+                data.associationId ? `${this.apiEndpoint}/${data.associationId}` : this.apiEndpoint,
                 {
-                    method: data.id ? 'PUT' : 'POST',
+                    method: data.associationId ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
@@ -95,7 +95,7 @@ class ParentStudentPage extends AdminPage {
 
             console.log("✅ Sauvegarde réussie !");
             this.closeModal();
-            this.reloadDataTable();
+            this.table.ajax.reload();
         } catch (error) {
             console.error('🚨 Erreur lors de la sauvegarde :', error);
             alert('Erreur : ' + error.message);
@@ -156,6 +156,16 @@ class ParentStudentPage extends AdminPage {
         document.getElementById(this.formId).reset();
         const modal = new bootstrap.Modal(document.getElementById(this.modalId));
         modal.show();
+    }
+
+    closeModal() {
+        console.log("📌 Fermeture du modal");
+        const modalEl = document.getElementById(this.modalId);
+        let modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modalEl);
+        }
+        modalInstance.hide();
     }
 }
 

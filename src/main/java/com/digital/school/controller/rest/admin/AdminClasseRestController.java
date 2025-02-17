@@ -51,10 +51,9 @@ public class AdminClasseRestController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<Classe> getClass(@PathVariable Long id) {
-        return classeService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Classe> getClasse(@PathVariable Long id) {
+        Classe classe = classeService.findById(id);
+        return (classe != null) ? ResponseEntity.ok(classe) : ResponseEntity.notFound().build();
     }
 
     @PostMapping

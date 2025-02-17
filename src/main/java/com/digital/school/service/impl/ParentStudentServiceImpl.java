@@ -152,17 +152,41 @@ public class ParentStudentServiceImpl implements ParentStudentService {
 
 	@Override
 	public void updateAssociation(Long id, Map<String, Object> associationData) {
+		// Récupérer l'association existante
+		LOGGER.debug("updateAssociation of ParentStudent id="+id);
 		ParentStudent association = parentStudentRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Association non trouvée"));
 
-		// Mettre à jour les champs
-		if (associationData.containsKey("relationship"))
-			association.setRelationship(associationData.get("relationship").toString());
-		if (associationData.containsKey("primaryContact"))
-			association.setPrimaryContact(Boolean.parseBoolean(associationData.get("primaryContact").toString()));
+		// Mettre à jour le lien avec l'étudiant si fourni
+		if (associationData.containsKey("studentId")) {
+			Long studentId = Long.parseLong(associationData.get("studentId").toString());
+			Student student = studentRepository.findById(studentId)
+					.orElseThrow(() -> new RuntimeException("Étudiant non trouvé : " + studentId));
+			association.setStudent(student);
+		}
 
+		// Mettre à jour le lien avec le parent si fourni
+		if (associationData.containsKey("parentId")) {
+			Long parentId = Long.parseLong(associationData.get("parentId").toString());
+			Parent parent = parentRepository.findById(parentId)
+					.orElseThrow(() -> new RuntimeException("Parent non trouvé : " + parentId));
+			association.setParent(parent);
+		}
+
+		// Mettre à jour la relation
+		if (associationData.containsKey("relationship")) {
+			association.setRelationship(associationData.get("relationship").toString());
+		}
+
+		// Mettre à jour le champ contact principal
+		if (associationData.containsKey("primaryContact")) {
+			association.setPrimaryContact(Boolean.parseBoolean(associationData.get("primaryContact").toString()));
+		}
+
+		// Sauvegarder l'association mise à jour
 		parentStudentRepository.save(association);
 	}
+
 
 	@Override
 	public void associateStudentToParents(Long studentId, List<Long> parentIds) {

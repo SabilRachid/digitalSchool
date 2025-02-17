@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bulletins")
-public class Bulletin {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Bulletin extends AuditableEntity {
 
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)

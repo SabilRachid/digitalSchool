@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.digital.school.dto.StudentDTO;
+import com.digital.school.dto.UserDTO;
 import com.digital.school.model.User;
 import com.digital.school.repository.StudentRepository;
 import com.digital.school.service.StudentService;
@@ -29,11 +29,21 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentDTO> getStudentsDtoByClasseId(Long classId) {
+    public List<UserDTO> getStudentsDtoByClasseId(Long classId) {
         List<Student> students = studentRepository.getStudentsByClasseId(classId);
-        return students.stream()
-                .map(s -> new StudentDTO(s.getId(), s.getFirstName(), s.getLastName()))
-                .collect(Collectors.toList());
+        return students.stream().map(s -> {
+            UserDTO dto = new UserDTO();
+            dto.setId(s.getId());
+            dto.setFirstName(s.getFirstName());
+            dto.setLastName(s.getLastName());
+            dto.setEmail(s.getEmail());
+            dto.setUsername(s.getUsername());
+            // Pour un étudiant, renseigner la classe
+            if (s.getClasse() != null) {
+                dto.setClasseId(s.getClasse().getId());
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 

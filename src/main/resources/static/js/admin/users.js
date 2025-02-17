@@ -5,7 +5,7 @@ class UserManagement {
         this.form = document.getElementById('userForm');
         this.initializeEventListeners();
 
-        // Expose global functions
+        // Exposer la fonction globale pour ouvrir le modal
         window.openAddUserModal = (type) => this.openAddUserModal(type);
     }
 
@@ -16,32 +16,15 @@ class UserManagement {
                 dataSrc: ''
             },
             columns: [
-                {
-                    data: null,
-                    render: data => `${data.firstName} ${data.lastName}`
-                },
+                { data: null, render: data => `${data.firstName} ${data.lastName}` },
                 { data: 'email' },
                 { data: 'username' },
-                {
-                    data: 'roles',
-                    render: data => this.renderRoles(data)
-                },
-                {
-                    data: 'classe',
-                    render: data => data ? data.name : 'N/A'
-                },
-                {
-                    data: 'enabled',
-                    render: data => this.renderStatus(data)
-                },
-                {
-                    data: null,
-                    render: data => this.renderActions(data)
-                }
+                { data: 'roles', render: data => this.renderRoles(data) },
+                { data: 'classe', render: data => data ? data.name : 'N/A' },
+                { data: 'enabled', render: data => this.renderStatus(data) },
+                { data: null, render: data => this.renderActions(data) }
             ],
-            language: {
-                url: '/js/datatables/fr-FR.json'
-            },
+            language: { url: '/js/datatables/fr-FR.json' },
             responsive: true,
             order: [[0, 'asc']]
         });
@@ -50,18 +33,15 @@ class UserManagement {
     initializeEventListeners() {
         this.form.addEventListener('submit', e => this.handleSubmit(e));
 
-        // Gestion de l'affichage du champ classe
+        // Gestion de l'affichage des sections spécifiques selon les rôles
         const roleCheckboxes = document.querySelectorAll('input[name="roles"]');
         roleCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => this.toggleClasseField());
+            checkbox.addEventListener('change', () => this.toggleRoleFields());
         });
     }
 
     renderRoles(roles) {
-        return roles.map(role => {
-            const roleName = role.replace('ROLE_', '');
-            return `<span class="badge bg-primary">${roleName}</span>`;
-        }).join(' ');
+        return roles.map(role => `<span class="badge bg-primary">${role.replace('ROLE_', '')}</span>`).join(' ');
     }
 
     renderStatus(enabled) {
@@ -95,12 +75,21 @@ class UserManagement {
             lastName: formData.get('lastName'),
             enabled: formData.get('enabled') === 'on',
             roles: Array.from(document.querySelectorAll('input[name="roles"]:checked'))
-                .map(cb => cb.value),
-            classeId: formData.get('classe')
+                .map(cb => cb.value)
         };
 
+        // Si l'utilisateur est un étudiant, ajouter classeId
+        if (data.roles.includes('ROLE_STUDENT')) {
+            data.classeId = formData.get('classe');
+        }
+        // Pour un professeur, ajouter l'employmentType et la multi-sélection de subjects
+        if (data.roles.includes('ROLE_PROFESSOR')) {
+            data.employmentType = formData.get('employmentType');
+            data.subjectIds = Array.from(document.getElementById('subjects').selectedOptions)
+                .map(opt => opt.value);
+        }
+
         try {
-            console.log("call post api users");
             const response = await fetch(data.id ? `/admin/api/users/${data.id}` : '/admin/api/users', {
                 method: data.id ? 'PUT' : 'POST',
                 headers: {
@@ -164,35 +153,53 @@ class UserManagement {
         form.elements['firstName'].value = user.firstName;
         form.elements['lastName'].value = user.lastName;
         form.elements['enabled'].checked = user.enabled;
+        form.elements['password'].value = ''; // Ne pas pré-remplir pour la sécurité
 
-        // Réinitialiser le mot de passe
-        form.elements['password'].value = '';
-
-        // Gérer les rôles
+        // Gestion des rôles
         document.querySelectorAll('input[name="roles"]').forEach(cb => {
             cb.checked = user.roles.includes(cb.value);
         });
 
-        // Gérer la classe
+        // Afficher les sections spécifiques selon les rôles
+        this.toggleRoleFields();
+
+        // Si l'utilisateur a une classe, l'afficher
         if (user.classe) {
             form.elements['classe'].value = user.classe.id;
         }
 
-        this.toggleClasseField();
+        // Pour les professeurs, remplir employmentType et les subjects
+        if (user.roles.includes('ROLE_PROFESSOR') && user.employmentType) {
+            form.elements['employmentType'].value = user.employmentType;
+        }
+        if (user.roles.includes('ROLE_PROFESSOR') && user.subjects) {
+            const subjectsSelect = document.getElementById('subjects');
+            // Réinitialiser la sélection
+            Array.from(subjectsSelect.options).forEach(option => option.selected = false);
+            user.subjects.forEach(subject => {
+                let option = subjectsSelect.querySelector(`option[value="${subject.id}"]`);
+                if (option) {
+                    option.selected = true;
+                }
+            });
+        }
     }
 
-    toggleClasseField() {
-        const isStudent = document.getElementById('roleStudent').checked;
-        const classeField = document.getElementById('classeField');
-        classeField.style.display = isStudent ? 'block' : 'none';
-
-        if (!isStudent) {
-            document.getElementById('classe').value = '';
+    toggleRoleFields() {
+        // Masquer toutes les sections spécifiques
+        document.getElementById('studentFields').style.display = 'none';
+        document.getElementById('professorFields').style.display = 'none';
+        // Afficher la section "studentFields" si le rôle étudiant est sélectionné
+        const selectedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+        if (selectedRoles.includes('ROLE_STUDENT')) {
+            document.getElementById('studentFields').style.display = 'block';
+        }
+        if (selectedRoles.includes('ROLE_PROFESSOR')) {
+            document.getElementById('professorFields').style.display = 'block';
         }
     }
 
     showNotification(message, type) {
-        // Implémenter selon votre système de notification
         alert(message);
     }
 
@@ -200,18 +207,20 @@ class UserManagement {
         this.form.reset();
         document.getElementById('userId').value = '';
 
+        // Réinitialiser les sections spécifiques
+        document.getElementById('studentFields').style.display = 'none';
+        document.getElementById('professorFields').style.display = 'none';
+
         // Sélectionner le rôle approprié
         document.querySelectorAll('input[name="roles"]').forEach(cb => {
             cb.checked = cb.value === `ROLE_${type.toUpperCase()}`;
         });
 
-        this.toggleClasseField();
+        this.toggleRoleFields();
         this.modal.show();
     }
 }
 
-// Initialisation
-let userManagement;
 document.addEventListener('DOMContentLoaded', () => {
-    userManagement = new UserManagement();
+    window.userManagement = new UserManagement();
 });

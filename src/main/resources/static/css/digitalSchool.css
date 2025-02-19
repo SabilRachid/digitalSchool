@@ -9,6 +9,13 @@
     --danger-color: #EF4444;
     --info-color: #4299E1;
 
+    /* Nouvelle couleur personnalisée */
+    --custom-primary: #2a7ec1;
+    /* Une teinte plus claire pour le survol (ajustez si besoin) */
+    --custom-primary-light: #5596c3;
+    --custom-secondary-light: #93e2ef;
+
+
     /* Texte */
     --text-primary: #1F2937;
     --text-secondary: #6B7280;

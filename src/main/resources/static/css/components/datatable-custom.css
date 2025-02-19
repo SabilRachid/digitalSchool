@@ -1,0 +1,66 @@
+/* Wrapper DataTables */
+.dataTables_wrapper {
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-primary);
+}
+
+/* Table principale */
+table.dataTable {
+    background-color: white;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* En-tête de table */
+table.dataTable thead th {
+    background-color: var(--custom-primary);
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 2px solid var(--custom-primary);
+    white-space: nowrap;
+}
+
+/* Ajustement des coins des cellules d'en-tête */
+table.dataTable thead th:first-child {
+    border-top-left-radius: var(--border-radius);
+}
+table.dataTable thead th:last-child {
+    border-top-right-radius: var(--border-radius);
+}
+
+/* Corps de la table */
+table.dataTable tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--bg-secondary);
+    color: var(--text-secondary);
+    transition: background-color var(--transition-speed);
+}
+
+/* Survol des lignes */
+table.dataTable tbody tr:hover td {
+    background-color: var(--custom-secondary-light);
+}
+
+/* Pagination */
+.dataTables_paginate .paginate_button {
+    padding: 0.5rem 1rem;
+    border: 0px solid var(--custom-primary);
+    border-radius: var(--border-radius);
+    background-color: white;
+    color: var(--custom-primary);
+    transition: background-color var(--transition-speed);
+    margin: 0 0.2rem;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background-color: var(--custom-primary-light);
+}
+
+.dataTables_paginate .paginate_button.current {
+    background-color: var(--custom-primary);
+    color: white !important;
+    border: none;
+}

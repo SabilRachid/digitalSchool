@@ -20,7 +20,8 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     public int calculateStudentRank(Long studentId, Long classeId) {
-        return studentGradeRepository.calculateStudentRank(studentId, classeId);
+        Integer rank = studentGradeRepository.calculateStudentRank(studentId, classeId);
+        return rank != null ? rank : 0;
     }
 
     @Override

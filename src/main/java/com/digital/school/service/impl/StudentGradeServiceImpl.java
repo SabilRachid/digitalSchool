@@ -43,30 +43,35 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public List<Map<String, Object>> findGradesBySubject(Student student) {
         List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
-        
-        return grades.stream()
-            .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
-                Collectors.collectingAndThen(
-                    Collectors.toList(),
-                    subjectGrades -> {
-                        Map<String, Object> subjectData = new HashMap<>();
-                        subjectData.put("grades", subjectGrades);
-                        subjectData.put("average", calculateAverage(subjectGrades));
-                        subjectData.put("classAverage", calculateClassAverage(subjectGrades));
-                        return subjectData;
-                    }
-                )
-            ))
-            .entrySet()
-            .stream()
-            .map(entry -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("subject", entry.getKey());
-                map.putAll((Map<String, Object>)entry.getValue());
-                return map;
-            })
-            .collect(Collectors.toList());
+
+        // Filtrer les notes dont la matière est null pour éviter des NullPointerExceptions
+        List<StudentGrade> filteredGrades = grades.stream()
+                .filter(grade -> grade.getSubject() != null)
+                .collect(Collectors.toList());
+
+        return filteredGrades.stream()
+                .collect(Collectors.groupingBy(
+                        grade -> grade.getSubject().getName(),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                subjectGrades -> {
+                                    Map<String, Object> subjectData = new HashMap<>();
+                                    subjectData.put("grades", subjectGrades);
+                                    subjectData.put("average", calculateAverage(subjectGrades));
+                                    subjectData.put("classAverage", calculateClassAverage(subjectGrades));
+                                    return subjectData;
+                                }
+                        )
+                ))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", entry.getKey());
+                    map.putAll(entry.getValue());
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

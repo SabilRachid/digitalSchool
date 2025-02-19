@@ -95,24 +95,24 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
     List<StudentGrade> findByClasseAndPeriod(Long classeId, String period);
 
     @Query(value = "WITH StudentAverages AS (" +
-            "  SELECT g.student_id, AVG(g.grade_value) as avg_grade, " +
+            "  SELECT g.student_id, COALESCE(AVG(g.grade_value), 0.0) as avg_grade, " +
             "         DENSE_RANK() OVER (ORDER BY AVG(g.grade_value) DESC) as rank " +
             "  FROM student_grades g " +
             "  JOIN students s ON g.student_id = s.user_id " +
             "  WHERE s.class_id = :classeId " +
             "  GROUP BY g.student_id" +
             ") " +
-            "SELECT rank FROM StudentAverages WHERE student_id = :studentId",
+            "SELECT COALESCE(rank, 0) FROM StudentAverages WHERE student_id = :studentId",
             nativeQuery = true)
-    int calculateStudentRank(
+    Integer calculateStudentRank(
             @Param("studentId") Long studentId,
             @Param("classeId") Long classeId
     );
 
 
-    @Query("SELECT AVG(g.value) FROM StudentGrade g WHERE g.student = :student")
-    Double calculateAverageGrade(Optional<Student> student);
 
+    @Query("SELECT COALESCE(AVG(g.value), 0.0) FROM StudentGrade g WHERE g.student = :student")
+    Double calculateAverageGrade(@Param("student") Student student);
 
     @Query("SELECT g FROM StudentGrade g WHERE g.student = :student ORDER BY g.date DESC")
     Page<StudentGrade> findRecentGrades(Student student, Pageable pageable);
@@ -145,4 +145,8 @@ public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long
 
     @Query("SELECT AVG(CASE WHEN g.value >= 10 THEN 1 ELSE 0 END) FROM StudentGrade g WHERE g.subject.id = :subjectId AND g.title = :title AND g.student.classe.id = :classId")
     Double calculateSuccessRate(Long subjectId, String title, Long classId);
+
+
+    @Query("SELECT AVG(CASE WHEN g.value >= 10 THEN 1 ELSE 0 END) FROM StudentGrade g WHERE g.student = :student")
+    Double calculateSuccessRate(Student student);
 }

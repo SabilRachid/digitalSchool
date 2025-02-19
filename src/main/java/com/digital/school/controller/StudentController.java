@@ -1,6 +1,7 @@
 package com.digital.school.controller;
 
 import com.digital.school.model.Student;
+import com.digital.school.service.StudentGradeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,10 @@ public class StudentController {
     
     @Autowired
     private StudentDashboardService dashboardService;
-    
-    
+
+    @Autowired
+    private StudentGradeService gradeService;
+
     
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
@@ -73,5 +76,54 @@ public class StudentController {
     }
     
 
+    @GetMapping("/homeworks")
+    public String homeworks(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+            !(authentication instanceof AnonymousAuthenticationToken)) {
+
+            String username = authentication.getName();
+            Optional<User> userOptional = userService.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                LOGGER.debug("Student user present: {}, URI: {}", username, request.getRequestURI());
+                User user = userOptional.get();
+                model.addAttribute("user", user);
+                model.addAttribute("currentURI", request.getRequestURI());
+
+                // Devoirs en attente
+                model.addAttribute("pendingHomework", dashboardService.getPendingHomework(student));
+
+                return "student/homeworks";
+            }
+        }
+        return "redirect:/login";
+    }
+
+
+    @GetMapping("/grades")
+    public String grades(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken)) {
+
+            String username = authentication.getName();
+            Optional<User> userOptional = userService.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                LOGGER.debug("Student user present: {}, URI: {}", username, request.getRequestURI());
+                User user = userOptional.get();
+                model.addAttribute("user", user);
+                model.addAttribute("currentURI", request.getRequestURI());
+
+                // Ajout des données nécessaires à la vue
+                model.addAttribute("gradesBySubject", gradeService.findGradesBySubject(student));
+                model.addAttribute("stats", dashboardService.getStudentStats(student));
+
+                return "student/grades"; // Correspond au template student/grades.html
+            }
+        }
+        return "redirect:/login";
+    }
     
 }

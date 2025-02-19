@@ -19,13 +19,6 @@ public class StudentGradesController {
     @Autowired
     private StudentGradeService gradeService;
 
-    @GetMapping
-    public String showGrades(@AuthenticationPrincipal Student student, Model model) {
-        model.addAttribute("gradesBySubject", gradeService.findGradesBySubject(student));
-        model.addAttribute("stats", gradeService.calculatePerformanceStats(student));
-        return "student/grades";
-    }
-
     @GetMapping("/report")
     public ResponseEntity<?> downloadReport(@AuthenticationPrincipal Student student) {
         try {

@@ -1,4 +1,3 @@
-// Gestion des notes et performances
 document.addEventListener('DOMContentLoaded', function() {
     initializeSubjectCharts();
     initializeProgressionChart();
@@ -6,10 +5,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialisation des graphiques par matière
 function initializeSubjectCharts() {
-    document.querySelectorAll('.grades-chart canvas').forEach(canvas => {
+    const subjectCanvases = document.querySelectorAll('.grades-chart canvas');
+    subjectCanvases.forEach(canvas => {
         const subject = canvas.id.replace('chart-', '');
         const grades = getSubjectGrades(subject);
-        
+        console.log("Données pour la matière", subject, grades);
+
+        if (!grades || grades.length === 0) {
+            console.warn("Aucune donnée pour", subject);
+            return;
+        }
+
         new Chart(canvas, {
             type: 'line',
             data: {
@@ -41,12 +47,17 @@ function initializeSubjectCharts() {
     });
 }
 
-// Initialisation du graphique de progression
+// Initialisation du graphique de progression (utilise un canvas unique avec id "progressionChart")
 function initializeProgressionChart() {
+    const progressionCanvas = document.getElementById('progressionChart');
+    if (!progressionCanvas) {
+        console.warn("Le canvas de progression n'est pas trouvé");
+        return;
+    }
     fetch('/student/grades/progression')
         .then(response => response.json())
         .then(data => {
-            const ctx = document.getElementById('progressionChart').getContext('2d');
+            const ctx = progressionCanvas.getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -73,32 +84,17 @@ function initializeProgressionChart() {
         .catch(error => showNotification(error.message, 'error'));
 }
 
-// Téléchargement du bulletin
-function downloadBulletin() {
-    fetch('/student/grades/report')
-        .then(response => {
-            if (!response.ok) throw new Error('Erreur lors du téléchargement');
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'bulletin.pdf';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        })
-        .catch(error => showNotification(error.message, 'error'));
-}
-
-// Utilitaires
+// Utilitaire : Récupération des notes pour une matière donnée
 function getSubjectGrades(subject) {
+    if (!window.gradesData) {
+        console.warn("gradesData is not defined, returning an empty array");
+        return [];
+    }
     const subjectData = window.gradesData.find(s => s.subject === subject);
     return subjectData ? subjectData.grades : [];
 }
 
+// Utilitaire : Formatage d'une date (ex. "01/Jan")
 function formatDate(date) {
     return new Date(date).toLocaleDateString('fr-FR', {
         day: '2-digit',
@@ -106,6 +102,7 @@ function formatDate(date) {
     });
 }
 
+// Utilitaire : Génération d'étiquettes de date pour le graphique de progression
 function generateDateLabels() {
     const labels = [];
     const now = new Date();
@@ -117,6 +114,7 @@ function generateDateLabels() {
     return labels;
 }
 
+// Utilitaire : Retourne une couleur en fonction de la matière
 function getSubjectColor(subject) {
     const colors = {
         'Mathématiques': '#4F46E5',
@@ -140,15 +138,12 @@ function showNotification(message, type = 'info') {
         </div>
         <button class="notification-close">&times;</button>
     `;
-
     document.body.appendChild(notification);
     setTimeout(() => notification.classList.add('show'), 100);
-
     notification.querySelector('.notification-close').addEventListener('click', () => {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     });
-
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);

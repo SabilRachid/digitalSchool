@@ -29,10 +29,13 @@ public class PerformanceServiceImpl implements PerformanceService {
     @Transactional
     @Override
     public void updateStudentPerformance(Long studentId) {
-        Double newAverage = studentGradeRepository.calculateAverageGrade(studentRepository.findById(studentId));
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
+
+        Double newAverage = studentGradeRepository.calculateAverageGrade(student);
 
         Performance performance = performanceRepository.findByStudentId(studentId)
-                .orElseGet(() -> new Performance(studentRepository.findById(studentId).orElse(null)));
+                .orElseGet(() -> new Performance(student));
 
         performance.setAverageGrade(newAverage != null ? newAverage : 0.0);
         performanceRepository.save(performance);

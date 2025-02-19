@@ -49,7 +49,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         
         // Calculer la moyenne générale
         //gerer optional de student
-        Double averageGrade = gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
+        Double averageGrade = gradeRepository.calculateAverageGrade(student);
         stats.setAverageGrade(averageGrade != null ? averageGrade : 0.0);
         
         // Compter les devoirs en attente
@@ -57,7 +57,16 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         
         // Compter les examens à venir
         stats.setUpcomingExams(eventRepository.countUpcomingExams(student));
-        
+
+        // Calculer le rang de l'élève
+        stats.setRank(gradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId()));
+
+        // Calculer le nombre d'elèves dans la classe
+        stats.setTotalStudents(classeRepository.countStudents(student.getClasse().getId()));
+
+        // calculer le successRate
+        stats.setSuccessRate(gradeRepository.calculateSuccessRate(student));
+
         return stats;
     }
 

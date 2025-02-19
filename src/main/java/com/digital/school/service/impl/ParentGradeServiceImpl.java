@@ -98,7 +98,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     }
 
     private double calculateAverageGrade(Student student) {
-        return gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
+        return gradeRepository.calculateAverageGrade(student);
     }
 
     private int calculateRank(Student student) {

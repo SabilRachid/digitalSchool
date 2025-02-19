@@ -9,6 +9,22 @@ public class StudentDashboardStats {
     private double averageGrade;
     private int pendingHomework;
     private int upcomingExams;
+	private Integer rank;
+	private long totalStudents;
+	private Double successRate;
+
+	public StudentDashboardStats() {
+	}
+
+	public StudentDashboardStats(double attendanceRate, double averageGrade, int pendingHomework, int upcomingExams, Integer rank, long totalStudents, Double successRate) {
+		this.attendanceRate = attendanceRate;
+		this.averageGrade = averageGrade;
+		this.pendingHomework = pendingHomework;
+		this.upcomingExams = upcomingExams;
+		this.rank = rank;
+		this.totalStudents = totalStudents;
+		this.successRate = successRate;
+	}
 	public double getAttendanceRate() {
 		return attendanceRate;
 	}
@@ -33,10 +49,29 @@ public class StudentDashboardStats {
 	public void setUpcomingExams(int upcomingExams) {
 		this.upcomingExams = upcomingExams;
 	}
-    
-    
-    
-    
-    
-    
+
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
+
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setTotalStudents(long totalStudents) {
+		this.totalStudents = totalStudents;
+	}
+
+	public long getTotalStudents() {
+		return totalStudents;
+	}
+
+	public void setSuccessRate(Double successRate) {
+		this.successRate = successRate;
+	}
+
+	public Double getSuccessRate() {
+		return successRate;
+	}
 }

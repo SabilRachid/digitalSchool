@@ -260,7 +260,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     // Méthodes utilitaires
     private double calculateAverageGrade(Student student) {
-        return gradeRepository.calculateAverageGrade(Optional.ofNullable(student));
+        return gradeRepository.calculateAverageGrade(student);
     }
 
     private double calculateAttendanceRate(Student student) {
@@ -276,10 +276,11 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     private int calculateRank(Student student) {
-        return gradeRepository.calculateStudentRank(
-            student.getId(), 
-            student.getClasse().getId()
+        Integer rank = gradeRepository.calculateStudentRank(
+                student.getId(),
+                student.getClasse().getId()
         );
+        return rank != null ? rank : 0;
     }
 
     private Map<String, Double> calculateSubjectAverages(Student student) {

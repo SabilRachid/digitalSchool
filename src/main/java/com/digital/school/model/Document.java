@@ -1,61 +1,78 @@
 package com.digital.school.model;
 
+import com.digital.school.model.enumerated.DocumentType;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "documents")
 public class Document extends AuditableEntity {
-    
 
-    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Titre du document
     @Column(nullable = false)
     private String name;
-    
+
+    // Type de document sous forme d'enum (ex : PDF, Vidéo, Lien, etc.)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
-    
-    @Column(nullable = false)
-    private String category;
-    
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
-    
-    @Column(name = "mime_type")
-    private String mimeType;
-    
-    @Column(name = "file_size")
-    private Long fileSize;
-    
-    @ManyToOne
-    @JoinColumn(name = "uploaded_by_id")
-    private User uploadedBy;
-    
-    @Column(name = "uploaded_at")
-    private LocalDateTime uploadedAt = LocalDateTime.now();
-    
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private User student;
-    
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private User parent;
-    
+    private DocumentType type;
+
+    // Description détaillée du document
     @Column(columnDefinition = "TEXT")
     private String description;
-    
-    @Column(name = "is_validated")
-    private boolean validated;
-    
-    @ManyToOne
-    @JoinColumn(name = "validated_by_id")
-    private User validatedBy;
-    
-    @Column(name = "validated_at")
-    private LocalDateTime validatedAt;
 
-    // Getters and setters
+    // Contenu du fichier, pour les documents stockés dans la base (optionnel)
+    @Lob
+    private byte[] fileContent;
+
+    // URL du fichier, pour les ressources hébergées à l'externe
+    private String fileUrl;
+
+    // Type MIME du fichier (ex : "application/pdf")
+    private String contentType;
+
+    // Association générique pour lier le document à une entité (ex : cours, facture, bulletin, etc.)
+    private Long relatedEntityId;
+    private String relatedEntityType;
+
+    // Propriétaire du document
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    // Utilisateurs avec lesquels le document est partagé
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "document_shared_with",
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> sharedWith = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = true)
+    private Course course;
+
+    private String category;
+
+    private long fileSize;
+
+    // Getters et setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -64,76 +81,12 @@ public class Document extends AuditableEntity {
         this.name = name;
     }
 
-    public String getType() {
+    public DocumentType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(DocumentType type) {
         this.type = type;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public Long getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public User getUploadedBy() {
-        return uploadedBy;
-    }
-
-    public void setUploadedBy(User uploadedBy) {
-        this.uploadedBy = uploadedBy;
-    }
-
-    public LocalDateTime getUploadedAt() {
-        return uploadedAt;
-    }
-
-    public void setUploadedAt(LocalDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
-    }
-
-    public User getStudent() {
-        return student;
-    }
-
-    public void setStudent(User student) {
-        this.student = student;
-    }
-
-    public User getParent() {
-        return parent;
-    }
-
-    public void setParent(User parent) {
-        this.parent = parent;
     }
 
     public String getDescription() {
@@ -144,27 +97,97 @@ public class Document extends AuditableEntity {
         this.description = description;
     }
 
-    public boolean isValidated() {
-        return validated;
+    public byte[] getFileContent() {
+        return fileContent;
     }
 
-    public void setValidated(boolean validated) {
-        this.validated = validated;
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
 
-    public User getValidatedBy() {
-        return validatedBy;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setValidatedBy(User validatedBy) {
-        this.validatedBy = validatedBy;
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
-    public LocalDateTime getValidatedAt() {
-        return validatedAt;
+    public String getContentType() {
+        return contentType;
     }
 
-    public void setValidatedAt(LocalDateTime validatedAt) {
-        this.validatedAt = validatedAt;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public Long getRelatedEntityId() {
+        return relatedEntityId;
+    }
+
+    public void setRelatedEntityId(Long relatedEntityId) {
+        this.relatedEntityId = relatedEntityId;
+    }
+
+    public String getRelatedEntityType() {
+        return relatedEntityType;
+    }
+
+    public void setRelatedEntityType(String relatedEntityType) {
+        this.relatedEntityType = relatedEntityType;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Set<User> getSharedWith() {
+        return sharedWith;
+    }
+
+    public void setSharedWith(Set<User> sharedWith) {
+        this.sharedWith = sharedWith != null ? sharedWith : new HashSet<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Document)) return false;
+        Document document = (Document) o;
+        return id != null && id.equals(document.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public long getFileSize() {
+        return fileSize;
     }
 }

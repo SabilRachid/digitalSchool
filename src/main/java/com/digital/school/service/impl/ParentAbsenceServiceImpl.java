@@ -2,6 +2,7 @@ package com.digital.school.service.impl;
 
 
 import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.enumerated.DocumentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,15 +64,21 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
         // Créer le document
         Document justification = new Document();
         justification.setName(file.getOriginalFilename());
-        justification.setType("ABSENCE_JUSTIFICATION");
+        justification.setType(DocumentType.ABSENCE_JUSTIFICATION);
         justification.setCategory("ADMINISTRATIVE");
-        justification.setFilePath(filePath);
-        justification.setMimeType(file.getContentType());
+        justification.setFileUrl(filePath);
+        justification.setContentType(file.getContentType());
         justification.setFileSize(file.getSize());
-        justification.setUploadedBy(parent);
-        justification.setUploadedAt(LocalDateTime.now());
-        justification.setStudent(absence.getStudent());
-        justification.setParent(parent);
+        justification.setOwner(parent);
+        justification.getAuditable().setCreated(new Date());
+        Set<User> sharedWith = new HashSet<>();
+        if (absence.getStudent() != null) {
+            sharedWith.add(absence.getStudent());
+        }
+        if (absence.getStudent().getParent() != null) {
+            sharedWith.add(absence.getStudent().getParent());
+        }
+        justification.setSharedWith(sharedWith);
         justification.setDescription(reason);
         
         documentRepository.save(justification);

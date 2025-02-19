@@ -14,8 +14,11 @@ import com.digital.school.service.HomeworkService;
 import com.digital.school.service.StorageService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +30,32 @@ public class HomeworkServiceImpl implements HomeworkService {
     @Autowired
     private StorageService storageService;
 
+        @Override
+        public List<Map<String, Object>> findAllAsMap() {
+            List<Homework> homeworks = homeworkRepository.findAll();
+            return homeworks.stream().map(hw -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", hw.getId());
+                map.put("title", hw.getTitle());
+                // On suppose que Homework a une association "course" qui possède un nom et un identifiant
+                if (hw.getCourse() != null) {
+                    Map<String, Object> courseMap = new HashMap<>();
+                    courseMap.put("id", hw.getCourse().getId());
+                    courseMap.put("name", hw.getCourse().getName());
+                    map.put("course", courseMap);
+                } else {
+                    map.put("course", null);
+                }
+                map.put("dueDate", hw.getDueDate());
+                map.put("status", hw.getStatus());
+                // Ajoutez d'autres champs si nécessaire
+                return map;
+            }).collect(Collectors.toList());
+      }
 
-        /* Crée un nouveau devoir */
+
+
+    /* Crée un nouveau devoir */
         @Override
         public void createHomework(Professor professor, Homework homework) {
             homework.setProfessor(professor);

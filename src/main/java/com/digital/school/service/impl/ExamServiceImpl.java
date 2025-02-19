@@ -1,127 +1,87 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.Exam;
+import com.digital.school.model.Professor;
+import com.digital.school.model.enumerated.ExamStatus;
+import com.digital.school.repository.ExamRepository;
+import com.digital.school.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.digital.school.model.*;
-import com.digital.school.repository.ExamRepository;
-import com.digital.school.repository.ExamResultRepository;
-import com.digital.school.service.ExamService;
-import com.digital.school.service.EmailService;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class ExamServiceImpl implements ExamService {
 
     @Autowired
     private ExamRepository examRepository;
-    
-    @Autowired
-    private ExamResultRepository examResultRepository;
-    
-    @Autowired
-    private EmailService emailService;
 
     @Override
     public List<Exam> findByProfessor(Professor professor) {
-        return examRepository.findByCreatedBy(professor);
+        return examRepository.findExamsByProfessor(professor);
     }
 
     @Override
-    public Optional<Exam> findById(Long id) {
-        return examRepository.findById(id);
-    }
-
-    @Override
-    @Transactional
-    public Exam save(Exam exam) {
-        exam.setCreatedAt(LocalDateTime.now());
+    public Exam createExam(Exam exam, Long professorId) {
+        // Vous pouvez associer l'examen au professeur via professorId, par exemple en utilisant un champ "professorId" dans Exam.
+        // Ici, nous supposons que l'examen est initialisé en mode brouillon ("DRAFT")
+        exam.setStatus(ExamStatus.DRAFT);
+        // Si nécessaire, effectuez d'autres initialisations spécifiques
         return examRepository.save(exam);
     }
 
     @Override
-    @Transactional
-    public void deleteById(Long id) {
-        examRepository.deleteById(id);
+    public void publishExam(Long id) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
+        // Mettre à jour le statut pour la publication
+        exam.setStatus(ExamStatus.SCHEDULED);
+        examRepository.save(exam);
     }
 
     @Override
-    @Transactional
-    public Exam publish(Long id) {
-        Exam exam = findById(id)
-            .orElseThrow(() -> new RuntimeException("Examen non trouvé"));
-            
-        exam.setIsPublished(true);
-        exam = examRepository.save(exam);
-        
-        // Notifier les étudiants
-        Exam finalExam = exam;
-        exam.getClasse().getStudents().forEach(student -> {
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("examName", finalExam.getName());
-            variables.put("examDate", finalExam.getExamDate());
-            variables.put("duration", finalExam.getDuration());
-            
-            emailService.sendEmail(
-                student.getEmail(),
-                "Nouvel examen publié",
-                "exam-notification",
-                variables
-            );
-        });
-        
-        return exam;
+    public void endExam(Long id) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
+        // Mettre à jour le statut pour indiquer la fin de l'examen
+        exam.setStatus(ExamStatus.COMPLETED);
+        examRepository.save(exam);
     }
 
     @Override
-    @Transactional
-    public ExamResult publishResults(Long id, ExamResult results) {
-        Exam exam = findById(id)
-            .orElseThrow(() -> new RuntimeException("Examen non trouvé"));
-            
-        results.setExam(exam);
-        results.setPublishedAt(LocalDateTime.now());
-        
-        ExamResult savedResults = examResultRepository.save(results);
-        
-        // Notifier les étudiants
-        exam.getClasse().getStudents().forEach(student -> {
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("examName", exam.getName());
-            variables.put("studentGrade", "Note"); // TODO: Get individual grade
-            variables.put("classAverage", results.getClassAverage());
-            
-            emailService.sendEmail(
-                student.getEmail(),
-                "Résultats d'examen disponibles",
-                "exam-results",
-                variables
-            );
-        });
-        
-        return savedResults;
+    @Transactional(readOnly = true)
+    public Map<String, Object> getExamResults(Long id) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
+        Map<String, Object> results = new HashMap<>();
+        // Exemple de données à retourner
+        results.put("examTitle", exam.getName());
+        // Pour l'exemple, nous utilisons des valeurs fictives :
+        results.put("average", 12.5);
+        results.put("highest", 18.0);
+        results.put("passRate", 75.0);
+        // Distribution des notes (exemple fictif, vous pouvez ajuster selon votre logique)
+        results.put("distribution", new int[]{2, 5, 10, 8, 3, 1, 0});
+        // Si vous avez une collection de résultats, vous pouvez l'ajouter également
+        // results.put("studentGrades", exam.getStudentGrades());
+        return results;
     }
 
     @Override
-    public List<Exam> findUpcomingExams(Professor professor) {
-        return examRepository.findUpcomingExamsByProfessor(professor);
+    public byte[] generateExamReport(Long id) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
+        // Implémentez ici la génération de PDF à l'aide d'une bibliothèque comme iText ou Apache PDFBox.
+        // Pour cet exemple, nous retournons un tableau d'octets vide.
+        return new byte[0];
     }
 
     @Override
-    public Map<String, Object> getExamStatistics(Long examId) {
-        ExamResult results = examResultRepository.findByExamId(examId)
-            .orElseThrow(() -> new RuntimeException("Résultats non trouvés"));
-            
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("average", results.getClassAverage());
-        stats.put("highest", results.getHighestScore());
-        stats.put("lowest", results.getLowestScore());
-        stats.put("passRate", 
-            (double) results.getPassedStudents() / results.getTotalStudents() * 100);
-        
-        return stats;
+    public List<Exam> findExamsByProfessor(Long professorId) {
+        return examRepository.findByProfessor_Id(professorId);
     }
 }

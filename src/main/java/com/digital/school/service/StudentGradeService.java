@@ -14,7 +14,7 @@ public interface StudentGradeService {
     List<Map<String, Object>> findGradesBySubject(Student student);
     Map<String, Object> calculatePerformanceStats(Student student);
     byte[] generateReport(Student student);
-    @NotNull Map<String, List<Float>> getGradesProgression(Student student);
+    @NotNull Map<String, List<Double>> getGradesProgression(Student student);
     int getStudentRank(Student student);
     Map<String, Double> getSubjectAverages(Student student);
 }

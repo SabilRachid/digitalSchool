@@ -142,7 +142,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
             ));
     }
 
-    private @NotNull Map<String, List<Float>> calculateProgression(Student student) {
+    private @NotNull Map<String, List<Double>> calculateProgression(Student student) {
         return gradeRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 grade -> grade.getSubject().getName(),
@@ -162,7 +162,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     }
 
     private String getGradeRange(StudentGrade grade) {
-        float value = grade.getValue();
+        Double value = grade.getValue();
         if (value < 5) return "0-5";
         if (value < 8) return "5-8";
         if (value < 10) return "8-10";

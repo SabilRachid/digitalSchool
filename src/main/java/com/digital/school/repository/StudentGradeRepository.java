@@ -17,32 +17,82 @@ import java.util.Optional;
 
 public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long> {
 
+
+    // Récupère les notes pour une classe et une matière donnés
+    @Query("SELECT sg FROM StudentGrade sg WHERE sg.student.classe.id = :classeId AND sg.subject.id = :subjectId")
+    List<StudentGrade> findByStudent_Classe_IdAndSubject_Id(@Param("classeId") Long classeId,
+                                                            @Param("subjectId") Long subjectId);
+
+    // Récupère toutes les notes associées à une évaluation donnée
+    @Query("SELECT sg FROM StudentGrade sg WHERE sg.id = :evaluationId")
+    List<StudentGrade> findByEvaluationId(@Param("evaluationId") Long evaluationId);
+
+    // Récupère la note d'un étudiant pour une évaluation donnée
+    @Query("SELECT sg FROM StudentGrade sg WHERE sg.id = :evaluationId AND sg.student.id = :studentId")
+    Optional<StudentGrade> findByEvaluationIdAndStudentId(@Param("evaluationId") Long evaluationId,
+                                                          @Param("studentId") Long studentId);
+
+    // Calcule la moyenne des notes pour une classe et une matière donnés
+    @Query("SELECT AVG(sg.value) FROM StudentGrade sg WHERE sg.student.classe.id = :classeId AND sg.subject.id = :subjectId")
+    Double calculateAverageGradeByClasseAndSubject(@Param("classeId") Long classeId,
+                                                   @Param("subjectId") Long subjectId);
+
+    // Récupère la note la plus haute pour une classe et une matière donnés
+    @Query("SELECT MAX(sg.value) FROM StudentGrade sg WHERE sg.student.classe.id = :classeId AND sg.subject.id = :subjectId")
+    Double findHighestGradeByClasseAndSubject(@Param("classeId") Long classeId,
+                                              @Param("subjectId") Long subjectId);
+
+    // Récupère la note la plus basse pour une classe et une matière donnés
+    @Query("SELECT MIN(sg.value) FROM StudentGrade sg WHERE sg.student.classe.id = :classeId AND sg.subject.id = :subjectId")
+    Double findLowestGradeByClasseAndSubject(@Param("classeId") Long classeId,
+                                             @Param("subjectId") Long subjectId);
+
+    // Calcule le taux de réussite pour une classe et une matière donnés (note >= 10)
+    @Query("SELECT (COUNT(CASE WHEN sg.value >= 10 THEN 1 END) * 100.0 / COUNT(sg)) " +
+            "FROM StudentGrade sg WHERE sg.student.classe.id = :classeId AND sg.subject.id = :subjectId")
+    Double calculatePassRateByClasseAndSubject(@Param("classeId") Long classeId,
+                                               @Param("subjectId") Long subjectId);
+
+    // Retourne la distribution des notes par intervalles pour une classe et une matière donnés.
+    // Cette requête native utilise PostgreSQL et retourne un tableau d'entiers.
+    @Query(value = "SELECT array_agg(cnt) FROM (" +
+            "  SELECT count(*) as cnt FROM student_grades sg " +
+            "  WHERE sg.value >= 0 AND sg.value < 5 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 5 AND sg.value < 8 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 8 AND sg.value < 10 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 10 AND sg.value < 12 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 12 AND sg.value < 15 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 15 AND sg.value < 18 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            "  UNION ALL " +
+            "  SELECT count(*) FROM student_grades sg " +
+            "  WHERE sg.value >= 18 AND sg.value <= 20 AND sg.student_id IN (SELECT id FROM students WHERE class_id = :classeId) AND sg.subject_id = :subjectId " +
+            ") sub", nativeQuery = true)
+    int[] getGradeDistributionByClasseAndSubject(@Param("classeId") Long classeId, @Param("subjectId") Long subjectId);
+
+
+
+    // Récupère une note pour un étudiant (dans un contexte donné)
+    @Query("SELECT sg FROM StudentGrade sg WHERE sg.student.id = :studentId")
+    Optional<StudentGrade> findByStudentId(Long studentId);
+
+
+    // grades page Students
+
     @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId AND g.subject.id = :subjectId")
     List<StudentGrade> findByClasse_IdAndSubject_Id(Long classeId, Long subjectId);
 
-    @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId")
-    List<StudentGrade> findByClasse_Id(Long classeId);
-
-    @Query("SELECT g FROM StudentGrade g WHERE g.student.id = :studentId")
-    List<StudentGrade> findByStudent_Id(Long studentId);
-
     @Query("SELECT g FROM StudentGrade g WHERE g.student.classe.id = :classeId AND '1' = :period")
     List<StudentGrade> findByClasseAndPeriod(Long classeId, String period);
-
-    @Query("SELECT g FROM StudentGrade g WHERE g.student.id = :studentId AND g.subject.id = :subjectId")
-    List<StudentGrade> findByStudent_IdAndSubject_Id(Long studentId, Long subjectId);
-
-    @Query("SELECT AVG(g.value) FROM StudentGrade g " +
-           "WHERE g.student.id = :studentId AND g.subject.id = :subjectId")
-    Double calculateStudentAverage(
-        @Param("studentId") Long studentId,
-        @Param("subjectId") Long subjectId
-    );
-    
-    @Query("SELECT g.subject.name as subject, AVG(g.value) as average " +
-           "FROM StudentGrade g WHERE g.student.classe.id = :classeId " +
-           "GROUP BY g.subject.name")
-    Map<String, Double> calculateClassAverages(@Param("classeId") Long classeId);
 
     @Query(value = "WITH StudentAverages AS (" +
             "  SELECT g.student_id, AVG(g.grade_value) as avg_grade, " +

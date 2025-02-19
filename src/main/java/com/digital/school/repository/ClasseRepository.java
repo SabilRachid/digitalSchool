@@ -4,6 +4,8 @@ import com.digital.school.model.Professor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.digital.school.model.Classe;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 public interface ClasseRepository extends JpaRepository<Classe, Long> {
@@ -27,7 +29,6 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
     @Query("SELECT c FROM Classe c JOIN FETCH c.subjects WHERE c.id = ?1")
     Classe findByIdWithSubjects(Long id);
 
-    // A CORRIGER
-    @Query("SELECT c FROM Classe c JOIN FETCH c.students WHERE ?1 MEMBER OF c.students ")
-    List<Classe> findByProfessor(Professor professor);
+    @Query("SELECT c FROM Classe c JOIN c.professors p WHERE p = :professor")
+    List<Classe> findByProfessor(@Param("professor") Professor professor);
 }

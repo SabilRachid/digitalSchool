@@ -76,7 +76,7 @@ function initializeForm() {
                 online: formData.get('online') === 'on'
             };
 
-            const response = await fetch('/professor/meetings', {
+            const response = await fetch('/professor/api/meetings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ async function joinMeeting(meetingLink) {
 
 async function sendReminders(meetingId) {
     try {
-        const response = await fetch(`/professor/meetings/${meetingId}/notify`, {
+        const response = await fetch(`/professor/api/meetings/${meetingId}/notify`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -132,7 +132,7 @@ async function cancelMeeting(meetingId) {
     if (!confirm('Êtes-vous sûr de vouloir annuler cette réunion ?')) return;
 
     try {
-        const response = await fetch(`/professor/meetings/${meetingId}`, {
+        const response = await fetch(`/professor/api/meetings/${meetingId}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content

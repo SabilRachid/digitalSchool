@@ -97,9 +97,9 @@ public class CourseServiceImpl implements CourseService {
                     map.put("id", course.getId());
                     map.put("name", course.getName());
                     map.put("subject", course.getSubject().getName());
-                    map.put("class", course.getClasse().getName());
-                    map.put("startTime", course.getStartTime().toString());
-                    map.put("endTime", course.getEndTime().toString());
+                    map.put("classe", course.getClasse().getName());
+                    map.put("startTime", course.getStartTime());
+                    map.put("endTime", course.getEndTime());
                     map.put("room", course.getRoom());
                     return map;
                 })

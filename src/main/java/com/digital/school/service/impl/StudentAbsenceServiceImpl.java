@@ -2,6 +2,7 @@ package com.digital.school.service.impl;
 
 
 import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.enumerated.DocumentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,14 +54,13 @@ public class StudentAbsenceServiceImpl implements StudentAbsenceService {
         // Créer le document
         Document justification = new Document();
         justification.setName(file.getOriginalFilename());
-        justification.setType("ABSENCE_JUSTIFICATION");
+        justification.setType(DocumentType.ABSENCE_JUSTIFICATION);
         justification.setCategory("ADMINISTRATIVE");
-        justification.setFilePath(filePath);
-        justification.setMimeType(file.getContentType());
+        justification.setFileUrl(filePath);
+        justification.setContentType(file.getContentType());
         justification.setFileSize(file.getSize());
-        justification.setUploadedBy(student);
-        justification.setUploadedAt(LocalDateTime.now());
-        justification.setStudent(student);
+        justification.setOwner(student);
+        justification.getAuditable().setCreated(new Date());
         justification.setDescription(reason);
         
         documentRepository.save(justification);

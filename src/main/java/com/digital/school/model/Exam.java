@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Table(name = "exams")
 public class Exam extends AuditableEntity {
     
-
     @Column(nullable = false)
     private String name;
     
@@ -37,8 +36,8 @@ public class Exam extends AuditableEntity {
     private ExamStatus status = ExamStatus.SCHEDULED;
     
     @ManyToOne
-    @JoinColumn(name = "created_by_id")
-    private User createdBy;
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
     
     private LocalDateTime createdAt = LocalDateTime.now();
     
@@ -119,13 +118,10 @@ public class Exam extends AuditableEntity {
         this.status = status;
     }
 
-    public User getCreatedBy() {
-        return createdBy;
-    }
+    public Professor getProfessor() { return professor;}
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
+    public void setProfessor(Professor professor) { this.professor = professor; }
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

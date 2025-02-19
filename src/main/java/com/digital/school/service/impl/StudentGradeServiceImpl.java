@@ -87,7 +87,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         stats.put("rank", rank);
         
         // Progression
-        Map<String, List<Float>> progression = getGradesProgression(student);
+        Map<String, List<Double>> progression = getGradesProgression(student);
         stats.put("progression", progression);
         
         // Moyennes par matière
@@ -108,7 +108,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     @Override
-    public @NotNull Map<String, List<Float>> getGradesProgression(Student student) {
+    public @NotNull Map<String, List<Double>> getGradesProgression(Student student) {
         List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()

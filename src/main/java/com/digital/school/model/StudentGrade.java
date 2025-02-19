@@ -20,7 +20,7 @@ public class StudentGrade extends AuditableEntity {
     private String title;
     
     @Column(name = "grade_value") // Renommage de la colonne
-    private Float value;
+    private Double value;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "grade_letter", nullable = false)
@@ -61,11 +61,11 @@ public class StudentGrade extends AuditableEntity {
 		this.title = title;
 	}
 
-	public Float getValue() {
+	public Double getValue() {
 		return value;
 	}
 
-	public void setValue(Float value) {
+	public void setValue(Double value) {
 		this.value = value;
 		this.grade = GradeType.fromScore(value);
 	}

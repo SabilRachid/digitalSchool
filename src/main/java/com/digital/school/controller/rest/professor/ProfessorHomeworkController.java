@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/professor/homework")
+@RequestMapping("/professor/api/homeworks")
 public class ProfessorHomeworkController {
 
     @Autowired
@@ -29,8 +29,8 @@ public class ProfessorHomeworkController {
     @GetMapping("/data")
     @ResponseBody
     public List<Map<String, Object>> getHomeworksData() {
-        //return homeworkService.findAllAsMap();
-        return null;
+        return homeworkService.findAllAsMap();
+
     }
 
     /* Affiche les détails d'un devoir */

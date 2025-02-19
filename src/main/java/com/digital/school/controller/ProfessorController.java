@@ -1,6 +1,7 @@
 package com.digital.school.controller;
 
 import com.digital.school.dto.ParticipationDto;
+import com.digital.school.model.Exam;
 import com.digital.school.model.Homework;
 import com.digital.school.model.Professor;
 import com.digital.school.service.*;
@@ -32,13 +33,13 @@ public class ProfessorController {
     private ProfessorDashboardService dashboardService;
 
     @Autowired
-    private UserService userService;
+    private ClasseService classeService;
+
+    @Autowired
+    private SubjectService subjectService;
 
     @Autowired
     private CourseService courseService;
-
-    @Autowired
-    private ClasseService classeService;
 
     @Autowired
     private HomeworkService homeworkService;
@@ -51,6 +52,8 @@ public class ProfessorController {
 
     @Autowired
     private AttendanceService attendanceService;
+    @Autowired
+    private ExamService examService;
 
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
@@ -101,15 +104,68 @@ public class ProfessorController {
     }
 
     @GetMapping("/attendances")
-    public String listAttendances(HttpServletRequest request,  @AuthenticationPrincipal User professor, Model model) {
+    public String listAttendances(HttpServletRequest request,  @AuthenticationPrincipal Professor professor, Model model) {
 
-        model.addAttribute("teacherId", professor);
+        model.addAttribute("teacherId", professor.getId());
         model.addAttribute("classes", classeService.getAll());
         model.addAttribute("currentURI", request.getRequestURI());
         return "professor/attendances";
     }
 
+    @GetMapping("/courses")
+    public String getCoursesForProfessor(HttpServletRequest request,  @AuthenticationPrincipal Professor professor, Model model) {
 
+        LOGGER.debug("📌 Requête reçue : {}", request.getRequestURI());
+        model.addAttribute("teacherId", professor.getId());
+        List<Map<String, Object>> courses = courseService.findByProfessor(professor);
+        return "professor/courses";
+    }
+
+
+    @GetMapping("/exams")
+    public String getExamsForProfessor(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
+        // Récupérer la liste des examens pour le professeur connecté via le service
+        List<Exam> exams = examService.findExamsByProfessor(professor.getId());
+        model.addAttribute("exams", exams);
+        model.addAttribute("teacherId", professor.getId());
+
+        // Vous pouvez ajouter d'autres attributs nécessaires pour le template
+        model.addAttribute("currentURI", request.getRequestURI());
+
+        // Retourner le nom du template (par exemple, "professor/exams")
+        return "professor/exams";
+    }
+
+    @GetMapping("/grades")
+    public String getGradesForProfessor(HttpServletRequest request,
+                                        @AuthenticationPrincipal Professor professor,
+                                        Model model) {
+        // Par exemple, récupérer la liste des classes et matières concernées par le professeur
+        model.addAttribute("teacherId", professor.getId());
+        model.addAttribute("classes", classeService. findByProfessor(professor));
+        model.addAttribute("subjects", subjectService.findByProfessor(professor));
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "professor/grades"; // Correspond au template Thymeleaf (ex: templates/professor/grades.html)
+    }
+
+
+    @GetMapping("/resources")
+    public String getJustificationPage(HttpServletRequest request,
+                                       @AuthenticationPrincipal Professor professor,
+                                       Model model) {
+        model.addAttribute("teacherId", professor.getId());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "professor/resources"; // Renvoie vers la template justification.html
+    }
+
+    @GetMapping("/meetings")
+    public String getMeetingPage(HttpServletRequest request,
+                                       @AuthenticationPrincipal Professor professor,
+                                       Model model) {
+        model.addAttribute("teacherId", professor.getId());
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "professor/meetings"; // Renvoie vers la template justification.html
+    }
 
 
 

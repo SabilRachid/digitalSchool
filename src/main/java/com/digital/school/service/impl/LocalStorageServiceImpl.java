@@ -1,11 +1,8 @@
 package com.digital.school.service.impl;
 
-import com.digital.school.dto.ResourceDto;
-import com.digital.school.model.Course;
 import com.digital.school.service.CourseService;
-import com.digital.school.service.ResourceService;
+import com.digital.school.service.DocumentService;
 import com.digital.school.service.StorageService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -20,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -30,7 +26,7 @@ public class LocalStorageServiceImpl implements StorageService {
 
     private Path rootLocation;
     @Autowired
-    private ResourceService resourceService;
+    private DocumentService documentService;
     @Autowired
     private CourseService courseService;
 
@@ -38,14 +34,14 @@ public class LocalStorageServiceImpl implements StorageService {
     private String resourceStoragePath;
 
 
-    public LocalStorageServiceImpl(@Value("${app.storage.resources}") String storageLocation, ResourceService resourceService) {
+    public LocalStorageServiceImpl(@Value("${app.storage.resources}") String storageLocation, DocumentService documentService) {
         this.rootLocation = Paths.get(storageLocation);
         try {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize storage location", e);
         }
-        this.resourceService = resourceService;
+        this.documentService = documentService;
     }
 
 

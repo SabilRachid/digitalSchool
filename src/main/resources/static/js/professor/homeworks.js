@@ -4,7 +4,7 @@ class HomeworksPage extends AdminPage {
             tableId: 'homeworksTable',
             modalId: 'homeworkModal',
             formId: 'homeworkForm',
-            apiEndpoint: '/professor/homeworks',
+            apiEndpoint: '/professor/api/homeworks',
             columns: [
                 { data: 'title' },
                 { data: 'course.name' },

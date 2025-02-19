@@ -5,7 +5,7 @@ class ParticipationsPage extends AdminPage {
             tableId: 'participationsTable',
             modalId: 'participationModal',
             formId: 'participationForm',
-            apiEndpoint: '/admin/participations',
+            apiEndpoint: '/admin/api/participations',
             columns: [
                 {
                     data: 'student',
@@ -60,7 +60,7 @@ class ParticipationsPage extends AdminPage {
     // Charger les classes
     async loadClasses() {
         try {
-            const response = await fetch('/admin/classes/list');
+            const response = await fetch('/admin/api/classes/list');
             if (!response.ok) throw new Error('Erreur lors du chargement des classes');
 
             const classes = await response.json();
@@ -82,7 +82,7 @@ class ParticipationsPage extends AdminPage {
     // Charger les matières
     async loadSubjects() {
         try {
-            const response = await fetch('/admin/subjects/list');
+            const response = await fetch('/admin/api/subjects/list');
             if (!response.ok) throw new Error('Erreur lors du chargement des matières');
 
             const subjects = await response.json();
@@ -105,7 +105,7 @@ class ParticipationsPage extends AdminPage {
     async loadStudents(classId) {
         if (!classId) return;
         try {
-            const response = await fetch(`/admin/students/by-class/${classId}`);
+            const response = await fetch(`/admin/api/students/by-class/${classId}`);
             if (!response.ok) throw new Error('Erreur lors du chargement des élèves');
 
             const students = await response.json();

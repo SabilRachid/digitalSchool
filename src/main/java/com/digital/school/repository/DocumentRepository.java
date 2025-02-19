@@ -1,70 +1,42 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Document;
+import com.digital.school.model.enumerated.DocumentType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import com.digital.school.model.Document;
-import com.digital.school.model.User;
+
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
-    List<Document> findByStudent(User student);
-    List<Document> findByParent(User parent);
-    List<Document> findByCategory(String category);
-    List<Document> findByType(String type);
-    List<Document> findByUploadedBy(User uploadedBy);
-    List<Document> findByValidatedBy(User validatedBy);
-    
-    @Query("SELECT d FROM Document d WHERE d.student = :student AND d.type = :type")
-    List<Document> findByStudentAndType(@Param("student") User student, @Param("type") String type);
-    
-    @Query("SELECT d FROM Document d WHERE d.parent = :parent AND d.type = :type")
-    List<Document> findByParentAndType(@Param("parent") User parent, @Param("type") String type);
-    
-    boolean existsByStudentAndType(User student, String type);
-    boolean existsByParentAndType(User parent, String type);
 
-    @Query("SELECT NEW map(" +
-           "d.id as id, " +
-           "d.name as name, " +
-           "d.type as type, " +
-           "d.category as category, " +
-           "d.uploadedAt as uploadedAt, " +
-           "d.validated as validated, " +
-           "d.uploadedBy as uploadedBy, " +
-           "d.student as student, " +
-           "d.parent as parent) " +
-           "FROM Document d")
-    List<Map<String, Object>> findAllAsMap();
+    // Récupère les documents liés à une entité (par exemple, Student ou Parent)
+    List<Document> findByRelatedEntityIdAndRelatedEntityType(Long relatedEntityId, String relatedEntityType);
 
-    @Query("SELECT COUNT(d) > 0 FROM Document d " +
-           "WHERE d.student = :student " +
-           "AND d.type = :type " +
-           "AND d.validated = true")
-    boolean hasValidatedDocument(@Param("student") User student, @Param("type") String type);
+    // Récupère les documents d'un type spécifique
+    List<Document> findByType(DocumentType type);
 
-  
-    @Query("SELECT d FROM Document d " +
-           "WHERE d.validated = false " +
-           "ORDER BY d.uploadedAt DESC")
-    List<Document> findPendingValidation();
+    // Récupère le premier document associé à une entité et d'un type donné
+    Optional<Document> findFirstByRelatedEntityIdAndRelatedEntityTypeAndType(Long relatedEntityId,
+                                                                             String relatedEntityType,
+                                                                             DocumentType type);
 
-    @Query("SELECT COUNT(d) FROM Document d " +
-           "WHERE d.validated = false")
-    long countPendingValidation();
+    // Vérifie l'existence d'un document pour une entité donnée et un type spécifique
+    boolean existsByRelatedEntityIdAndRelatedEntityTypeAndType(Long relatedEntityId,
+                                                               String relatedEntityType,
+                                                               DocumentType type);
 
-    @Query("SELECT NEW map(" +
-           "d.type as type, " +
-           "COUNT(d) as count) " +
-           "FROM Document d " +
-           "GROUP BY d.type")
-    List<Map<String, Object>> getDocumentTypeStats();
+    // Récupère les documents associés à un cours (pour les ressources de cours)
+    @Query("SELECT d FROM Document d WHERE d.relatedEntityType = 'Course' AND d.relatedEntityId = :courseId")
+    List<Document> findByCourseId(@Param("courseId") Long courseId);
 
-    @Query("SELECT NEW map(" +
-           "d.category as category, " +
-           "COUNT(d) as count) " +
-           "FROM Document d " +
-           "GROUP BY d.category")
-    List<Map<String, Object>> getDocumentCategoryStats();
+    // Vérifie si un document est possédé par un professeur donné
+    @Query("SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END FROM Document d WHERE d.id = :documentId AND d.owner.id = :professorId")
+    boolean isOwner(@Param("documentId") Long documentId, @Param("professorId") Long professorId);
+
+    // Recherche les documents dont la description contient une chaîne spécifique (par exemple, pour filtrer par catégorie)
+    List<Document> findByDescriptionContaining(String keyword);
+
+    List<Document> findByRelatedEntityIdAndRelatedEntityTypeAndType(Long id, String parent, DocumentType documentType);
 }

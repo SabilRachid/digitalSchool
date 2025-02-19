@@ -24,7 +24,7 @@ function initializeForm() {
                 maxScore: parseFloat(formData.get('maxScore'))
             };
 
-            const response = await fetch('/professor/exams', {
+            const response = await fetch('/professor/api/exams', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ function closeExamModal() {
 // Actions sur les examens
 async function publishExam(examId) {
     try {
-        const response = await fetch(`/professor/exams/${examId}/publish`, {
+        const response = await fetch(`/professor/api/exams/${examId}/publish`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -77,7 +77,7 @@ async function endExam(examId) {
     if (!confirm('Êtes-vous sûr de vouloir terminer cet examen ?')) return;
 
     try {
-        const response = await fetch(`/professor/exams/${examId}/end`, {
+        const response = await fetch(`/professor/api/exams/${examId}/end`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -95,7 +95,7 @@ async function endExam(examId) {
 
 async function viewResults(examId) {
     try {
-        const response = await fetch(`/professor/exams/${examId}/results`);
+        const response = await fetch(`/professor/api/exams/${examId}/results`);
         if (!response.ok) throw new Error('Erreur lors du chargement des résultats');
 
         const results = await response.json();
@@ -164,7 +164,7 @@ function updateDistributionChart(distribution) {
 
 async function downloadReport(examId) {
     try {
-        const response = await fetch(`/professor/exams/${examId}/report`);
+        const response = await fetch(`/professor/api/exams/${examId}/report`);
         if (!response.ok) throw new Error('Erreur lors du téléchargement du rapport');
 
         const blob = await response.blob();

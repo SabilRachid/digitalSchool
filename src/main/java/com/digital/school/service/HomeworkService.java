@@ -7,10 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import com.digital.school.model.User;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /* Service de gestion des devoirs */
 public interface HomeworkService {
+
+    List<Map<String, Object>> findAllAsMap();
 
     void createHomework(Professor professor, Homework homework);
 
@@ -19,7 +22,6 @@ public interface HomeworkService {
     List<Homework> findHomeworksByProfessor(Professor professor);
 
     void updateHomework(Homework homework, Homework updatedHomework);
-
 
     /* Récupère la liste des devoirs en attente d'un étudiant. */
     List<Homework> findPendingHomework(Student student);

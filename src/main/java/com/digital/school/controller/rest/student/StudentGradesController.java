@@ -42,7 +42,7 @@ public class StudentGradesController {
 
     @GetMapping("/progression")
     @ResponseBody
-    public ResponseEntity<Map<String, List<Float>>> getProgression(@AuthenticationPrincipal Student student) {
+    public ResponseEntity<Map<String, List<Double>>> getProgression(@AuthenticationPrincipal Student student) {
         return ResponseEntity.ok(gradeService.getGradesProgression(student));
     }
 

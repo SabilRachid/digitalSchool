@@ -27,7 +27,7 @@ public class StudentHomeworkController {
 
     @GetMapping
     public String showHomework(@AuthenticationPrincipal Student student, Model model) {
-        model.addAttribute("pendingHomework", homeworkService.findPendingHomework(student));
+        model.addAttribute("pendingHomework", homeworkService.findUpcomingHomeworks(student));
         model.addAttribute("submittedHomework", homeworkService.findSubmittedHomework(student));
         model.addAttribute("gradedHomework", homeworkService.findGradedHomework(student));
         model.addAttribute("subjects", subjectService.findByStudent(student));

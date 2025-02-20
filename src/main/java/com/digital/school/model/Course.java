@@ -1,6 +1,8 @@
 package com.digital.school.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +23,11 @@ public class Course extends AuditableEntity {
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
     private Classe classe;
-    
+
+    // Nouvelle propriété pour la date du cours
+    @Column(nullable = true)
+    private LocalDate date;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     
@@ -64,6 +70,10 @@ public class Course extends AuditableEntity {
     public void setClasse(Classe classe) {
         this.classe = classe;
     }
+
+    public LocalDate getDate() {return date;}
+
+    public void setDate(LocalDate date) {this.date = date;}
 
     public LocalDateTime getStartTime() {
         return startTime;

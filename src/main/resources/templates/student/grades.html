@@ -22,7 +22,7 @@
 <!-- Injection des données pour les graphiques -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    window.gradesData = [[${gradesBySubjects}]];
+    window.gradesData = /*[[${gradesBySubjectsJsons}]]*/ [];
     /*]]>*/
 </script>
 
@@ -47,37 +47,33 @@
             </div>
             <div class="stat-content">
                 <h3>Moyenne Générale</h3>
-                <div class="stat-value" th:text="${stats.averageGrade + '/20'}">14.5/20</div>
+                <div class="stat-value" th:text="${stats.averageGrade != null ? stats.averageGrade + '/20' : '0/20'}">14.5/20</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
                     <span>+0.5 pts vs trimestre dernier</span>
                 </div>
             </div>
         </div>
-
         <div class="stat-card">
             <div class="stat-icon rank">
                 <i class="fas fa-trophy"></i>
             </div>
             <div class="stat-content">
                 <h3>Classement</h3>
-                <div class="stat-value" th:text="${stats.rank + '/' + stats.totalStudents}">
-                    3/28
-                </div>
+                <div class="stat-value" th:text="${stats.rank != null && stats.totalStudents != null ? stats.rank + '/' + stats.totalStudents : '0/0'}">3/28</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
                     <span>+2 places</span>
                 </div>
             </div>
         </div>
-
         <div class="stat-card">
             <div class="stat-icon success">
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-content">
                 <h3>Taux de Réussite</h3>
-                <div class="stat-value" th:text="${stats.successRate + '%'}">85%</div>
+                <div class="stat-value" th:text="${stats.successRate != null ? stats.successRate + '%' : '0%'}">85%</div>
                 <div class="stat-label">des évaluations</div>
             </div>
         </div>
@@ -85,49 +81,34 @@
 
     <!-- Grades by Subject -->
     <div class="grades-grid">
-        <div th:each="subject : ${gradesBySubject}" class="subject-card">
+        <div th:each="subject : ${gradesBySubjects}" class="subject-card">
             <div class="subject-header">
                 <h3 th:text="${subject.subject}">Matière</h3>
                 <div class="subject-average">
-                        <span class="average-value"
-                              th:text="${subject.average + '/20'}"
-                              th:classappend="${
-                                  subject.average >= 16 ? 'excellent' :
-                                  subject.average >= 14 ? 'good' :
-                                  subject.average >= 10 ? 'average' :
-                                  'poor'
-                              }">
-                            15/20
-                        </span>
+            <span class="average-value"
+                  th:text="${subject.average != null ? subject.average + '/20' : '0/20'}"
+                  th:classappend="${subject.average != null ? (subject.average >= 16 ? 'excellent' : subject.average >= 14 ? 'good' : subject.average >= 10 ? 'average' : 'poor') : 'poor'}">
+              0/20
+            </span>
                     <span class="class-average">
-                            Moyenne classe:
-                            <span th:text="${subject.classAverage + '/20'}">13/20</span>
-                        </span>
+              Moyenne classe:
+              <span th:text="${subject.classAverage != null ? subject.classAverage + '/20' : '0/20'}">13/20</span>
+            </span>
                 </div>
             </div>
             <div class="grades-chart">
-                <!-- Assurez-vous que subject.subject ne contient pas d'espaces ou normalisez-le -->
+                <!-- Assurez-vous que subject.subject est formaté sans espaces -->
                 <canvas th:id="${'chart-' + subject.subject}"></canvas>
             </div>
             <div class="grades-list">
                 <div th:each="grade : ${subject.grades}" class="grade-item">
                     <div class="grade-info">
-                            <span class="grade-title" th:text="${grade.title}">
-                                Contrôle continu
-                            </span>
-                        <span class="grade-date"
-                              th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">
-                                01/01/2024
-                            </span>
+                        <span class="grade-title" th:text="${grade.title}">Contrôle continu</span>
+                        <span class="grade-date" th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">01/01/2024</span>
                     </div>
                     <div class="grade-value"
-                         th:text="${grade.value + '/20'}"
-                         th:classappend="${
-                                 grade.value >= 16 ? 'excellent' :
-                                 grade.value >= 14 ? 'good' :
-                                 grade.value >= 10 ? 'average' :
-                                 'poor'
-                             }">
+                         th:text="${grade.value != null ? grade.value + '/20' : '0/20'}"
+                         th:classappend="${grade.value != null ? (grade.value >= 16 ? 'excellent' : grade.value >= 14 ? 'good' : grade.value >= 10 ? 'average' : 'poor') : 'poor'}">
                         15/20
                     </div>
                 </div>

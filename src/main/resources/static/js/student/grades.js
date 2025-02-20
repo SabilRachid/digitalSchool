@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialisation des graphiques par matière
 function initializeSubjectCharts() {
-    const subjectCanvases = document.querySelectorAll('.grades-chart canvas');
-    subjectCanvases.forEach(canvas => {
+    document.querySelectorAll('.grades-chart canvas').forEach(canvas => {
+        // Ici, on suppose que l'id du canvas est au format "chart-Matière" (sans espaces)
         const subject = canvas.id.replace('chart-', '');
         const grades = getSubjectGrades(subject);
         console.log("Données pour la matière", subject, grades);
@@ -47,11 +47,11 @@ function initializeSubjectCharts() {
     });
 }
 
-// Initialisation du graphique de progression (utilise un canvas unique avec id "progressionChart")
+// Initialisation du graphique de progression
 function initializeProgressionChart() {
     const progressionCanvas = document.getElementById('progressionChart');
     if (!progressionCanvas) {
-        console.warn("Le canvas de progression n'est pas trouvé");
+        console.warn("Canvas de progression introuvable");
         return;
     }
     fetch('/student/grades/progression')
@@ -84,17 +84,23 @@ function initializeProgressionChart() {
         .catch(error => showNotification(error.message, 'error'));
 }
 
-// Utilitaire : Récupération des notes pour une matière donnée
+// Récupère les notes d'une matière depuis window.gradesData
+function normalize(str) {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function getSubjectGrades(subject) {
     if (!window.gradesData) {
         console.warn("gradesData is not defined, returning an empty array");
         return [];
     }
-    const subjectData = window.gradesData.find(s => s.subject === subject);
+    // Normalisez les valeurs pour comparer
+    const normalizedSubject = normalize(subject);
+    const subjectData = window.gradesData.find(s => normalize(s.subject) === normalizedSubject);
     return subjectData ? subjectData.grades : [];
 }
 
-// Utilitaire : Formatage d'une date (ex. "01/Jan")
+// Formate une date en "dd MMM"
 function formatDate(date) {
     return new Date(date).toLocaleDateString('fr-FR', {
         day: '2-digit',
@@ -102,7 +108,7 @@ function formatDate(date) {
     });
 }
 
-// Utilitaire : Génération d'étiquettes de date pour le graphique de progression
+// Génère des étiquettes de date pour le graphique de progression
 function generateDateLabels() {
     const labels = [];
     const now = new Date();
@@ -114,7 +120,7 @@ function generateDateLabels() {
     return labels;
 }
 
-// Utilitaire : Retourne une couleur en fonction de la matière
+// Retourne une couleur selon la matière
 function getSubjectColor(subject) {
     const colors = {
         'Mathématiques': '#4F46E5',
@@ -127,7 +133,27 @@ function getSubjectColor(subject) {
     return colors[subject] || '#6B7280';
 }
 
-// Notifications
+// Téléchargement du bulletin
+function downloadBulletin() {
+    fetch('/student/grades/report')
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur lors du téléchargement');
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bulletin.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => showNotification(error.message, 'error'));
+}
+
+// Affichage des notifications
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;

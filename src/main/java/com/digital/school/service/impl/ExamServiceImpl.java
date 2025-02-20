@@ -2,6 +2,7 @@ package com.digital.school.service.impl;
 
 import com.digital.school.model.Exam;
 import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
 import com.digital.school.model.enumerated.ExamStatus;
 import com.digital.school.repository.ExamRepository;
 import com.digital.school.service.ExamService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,12 @@ public class ExamServiceImpl implements ExamService {
 
     @Autowired
     private ExamRepository examRepository;
+
+
+    @Override
+    public List<Exam> findUpcomingExams(Student student) {
+        return examRepository.findUpcomingExamsByStudent(student.getId(), LocalDate.now());
+    }
 
     @Override
     public List<Exam> findByProfessor(Professor professor) {

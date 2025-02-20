@@ -29,6 +29,10 @@ public class Attendance extends AuditableEntity {
     
     @Column(columnDefinition = "TEXT")
     private String justification;
+
+    // Chemin ou nom de fichier du justificatif téléchargé
+    @Column(name = "justification_file")
+    private String justificationFile;
     
     @ManyToOne
     @JoinColumn(name = "recorded_by_id")
@@ -83,6 +87,13 @@ public class Attendance extends AuditableEntity {
 
     public void setJustification(String justification) {
         this.justification = justification;
+    }
+
+    public String getJustificationFile() {
+        return justificationFile;
+    }
+    public void setJustificationFile(String justificationFile) {
+        this.justificationFile = justificationFile;
     }
 
     public User getRecordedBy() {

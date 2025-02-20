@@ -147,11 +147,10 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     private double calculateAverage(List<StudentGrade> grades) {
         if (grades.isEmpty()) return 0.0;
-        
         return grades.stream()
-            .mapToDouble(StudentGrade::getValue)
-            .average()
-            .orElse(0.0);
+                .mapToDouble(StudentGrade::getValue)
+                .average()
+                .orElse(0.0);
     }
 
     private double calculateClassAverage(List<StudentGrade> grades) {

@@ -1,16 +1,18 @@
 
 package com.digital.school.service;
 
-import com.digital.school.model.Exam;
-import com.digital.school.model.ExamResult;
-import com.digital.school.model.Professor;
-import com.digital.school.model.User;
+import com.digital.school.model.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface ExamService {
+
+       List<Exam> findUpcomingExams(Student student);
+
        List<Exam> findByProfessor(Professor professor);
+
      /* Crée un nouvel examen et l'associe au professeur identifié par professorId.*/
         Exam createExam(Exam exam, Long professorId);
 
@@ -24,12 +26,10 @@ public interface ExamService {
          * La Map peut contenir des clés telles que "examTitle", "average", "highest", "passRate", "distribution", etc.*/
         Map<String, Object> getExamResults(Long id);
 
-        /**
-         * Génère le rapport de l'examen au format PDF et retourne son contenu sous forme de tableau d'octets.
-         */
+        /* Génère le rapport de l'examen au format PDF et retourne son contenu sous forme de tableau d'octets.*/
         byte[] generateExamReport(Long id);
 
-    List<Exam> findExamsByProfessor(Long id);
+        List<Exam> findExamsByProfessor(Long id);
 }
 
 

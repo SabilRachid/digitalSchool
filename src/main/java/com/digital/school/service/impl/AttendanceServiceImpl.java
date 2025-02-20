@@ -21,7 +21,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +36,9 @@ import java.util.stream.Collectors;
 public class AttendanceServiceImpl implements AttendanceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttendanceServiceImpl.class);
+
+    // Répertoire où les fichiers justificatifs seront stockés
+    private final String justificationDir = "uploads/justifications/";
 
 	@Autowired 
 	AttendanceRepository attendanceRepository;
@@ -60,6 +67,49 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Optional<Attendance> findById(Long id) {
         return attendanceRepository.findById(id);
+    }
+
+
+    @Override
+    public List<Map<String, Object>> findAllAsMap(Long classId, LocalDate startDate, LocalDate endDate) {
+        List<Attendance> attendances = attendanceRepository.findByClassIdAndDateRange(classId, startDate, endDate);
+        return attendances.stream().map(att -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", att.getId());
+            map.put("date", att.getDateEvent());
+            map.put("studentName", att.getStudent().getFirstName() + " " + att.getStudent().getLastName());
+            map.put("className", att.getStudent().getClasse().getName());
+            map.put("status", att.getStatus().name());
+            map.put("justification", att.getJustification());
+            map.put("justificationFile", att.getJustificationFile());
+            map.put("recordedAt", att.getRecordedAt());
+            return map;
+        }).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public Attendance justifyAttendance(Long attendanceId, String justificationText, MultipartFile justificationFile) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new RuntimeException("Attendance non trouvé"));
+        // Mise à jour du justificatif textuel
+        attendance.setJustification(justificationText);
+
+        // En cas de fichier justificatif envoyé, on le sauvegarde
+        if (justificationFile != null && !justificationFile.isEmpty()) {
+            try {
+                File dir = new File(justificationDir);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                String filename = System.currentTimeMillis() + "_" + justificationFile.getOriginalFilename();
+                Files.copy(justificationFile.getInputStream(), Paths.get(justificationDir, filename));
+                attendance.setJustificationFile(filename);
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur lors de la sauvegarde du fichier justificatif: " + e.getMessage(), e);
+            }
+        }
+        return attendanceRepository.save(attendance);
     }
 
     @Override
@@ -98,25 +148,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.findByStudent(student);
     }
 
-    @Override
-    public List<Attendance> findByCourse(Course course) {
-        return attendanceRepository.findByCourse(course);
-    }
-
-    @Override
-    public double getAttendanceRate(Student student, Course course) {
-        long totalSessions = attendanceRepository.countByStudentAndCourse(student, course);
-        if (totalSessions == 0) {
-            return 0.0;
-        }
-
-        long presentSessions = attendanceRepository.countByStudentAndStatusAndCourse(
-            student, AttendanceStatus.PRESENT, course);
-        long lateSessions = attendanceRepository.countByStudentAndStatusAndCourse(
-            student, AttendanceStatus.RETARD, course);
-
-        return ((double) (presentSessions + lateSessions) / totalSessions) * 100;
-    }
 
     
     public Map<String, Double> getClassAttendanceStats(Course course) {
@@ -169,17 +200,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         return stats;
     }
 
-    @Override
-    public List<Attendance> getAttendancesByCourseAndDate(Course course, LocalDate date) {
-        return attendanceRepository.findByCourseAndDate(course, date);
-    }
-
-    @Override
-    public void updateAttendance(Long id, AttendanceStatus status) {
-        Attendance attendance = attendanceRepository.findById(id).orElseThrow(() -> new RuntimeException("Présence non trouvée"));
-        attendance.setStatus(status);
-        attendanceRepository.save(attendance);
-    }
 
     @GetMapping("/data")
     @ResponseBody
@@ -226,10 +246,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.existsById(id);
     }
 
-    @Override
-    public List<Map<String, Object>> getAbsenceStatistics(Student student) {
-        return attendanceRepository.findAbsenceDetails(student);
-    }
 
     @Override
     public List<Attendance> getAbsenceStatistics() {

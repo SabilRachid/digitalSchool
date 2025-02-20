@@ -9,7 +9,7 @@ function initializeSubjectCharts() {
     document.querySelectorAll('.grades-chart canvas').forEach(canvas => {
         const [childId, subject] = canvas.id.replace('chart-', '').split('-');
         const grades = getSubjectGrades(childId, subject);
-
+        console.log("Données pour la matière", subject, grades);
         new Chart(canvas, {
             type: 'line',
             data: {

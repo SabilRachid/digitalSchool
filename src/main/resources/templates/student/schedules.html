@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace - Digital School</title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/topbar.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+    <link rel="stylesheet" th:href="@{/css/components/badges.css}">
+    <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
+    <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
+    <link rel="stylesheet" th:href="@{/css/student/grades.css}">
+    <link rel="stylesheet" th:href="@{/css/student/schedules.css}">
+
+
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h3 class="dashboard-title">
+                    <span class="page-title-icon bg-theme text-black mr-2">
+                      <i class="fas fa-book-open"></i>
+                    </span> Mes Schedules
+        </h3>
+    </div>
+    <div class="content-card">
+        <div class="container mt-4">
+            <!-- Section Prochains DS / Examens -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-calendar-check"></i> Examens à venir</h5>
+                    <div class="list-group">
+                        <!-- Exemple de boucle Thymeleaf : upcomingExams -->
+                        <div th:each="exam : ${upcomingExams}" class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" th:text="${exam.subjectName}">Matière</div>
+                                <small th:text="${exam.description}">Description de l'examen</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill" th:text="${#temporals.format(exam.date, 'dd MMM HH:mm')}">
+                    24 déc. 16:00
+                  </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="fas fa-clipboard-list"></i> Devoirs à rendre</h5>
+                    <div class="list-group">
+                        <!-- Exemple de boucle Thymeleaf : upcomingHomeworks -->
+                        <div th:each="hw : ${upcomingHomeworks}" class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold" th:text="${hw.subjectName}">Matière</div>
+                                <small th:text="${hw.title}">Titre du devoir</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill" th:text="${#temporals.format(hw.dueDate, 'dd MMM')}">
+                    30 déc.
+                  </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Emploi du temps -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5><i class="fas fa-clock"></i> Emploi du temps d'aujourd'hui</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Heure</th>
+                                    <th scope="col">Matière</th>
+                                    <th scope="col">Professeur</th>
+                                    <th scope="col">Salle</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Exemple de boucle Thymeleaf : dailySchedule -->
+                                <tr th:each="course : ${todaySchedule}">
+                                    <td th:text="${#temporals.format(course.startTime, 'HH:mm')} + ' - ' + #temporals.format(course.endTime, 'HH:mm')}">
+                                        08:00 - 09:00
+                                    </td>
+                                    <td th:text="${course.subject.name}">Anglais</td>
+                                    <td th:text="${course.professor.firstName + ' ' + course.professor.lastName}">
+                                        NAJI A.
+                                    </td>
+                                    <td th:text="${course.room != null ? course.room : 'Salle ?'}">Salle Lecture</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Travail à faire pour les prochains jours (détails) -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5><i class="fas fa-book"></i> Travail à faire</h5>
+                    <div class="list-group">
+                        <!-- Boucle sur les devoirs détaillés, par exemple -->
+                        <div th:each="hw : ${nextDaysHomeworks}" class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" th:text="${hw.subjectName}">Arabe</h6>
+                                <small th:text="${#temporals.format(hw.dueDate, 'dd MMM HH:mm')}">Demain 16h</small>
+                            </div>
+                            <p class="mb-1" th:text="${hw.instructions}">Consignes du devoir...</p>
+                            <small>
+                                Statut:
+                                <span th:text="${hw.status}">Non fait</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+<script th:src="@{/js/admin/common.js}"></script>
+<script th:src="@{/js/sidebar.js}"></script>
+<script th:src="@{/js/topbar.js}"></script>
+<script th:src="@{/js/student/schedules.js}"></script>
+</body>
+</html>

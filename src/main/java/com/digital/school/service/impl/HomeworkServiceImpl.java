@@ -13,6 +13,7 @@ import com.digital.school.repository.HomeworkRepository;
 import com.digital.school.service.HomeworkService;
 import com.digital.school.service.StorageService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -85,10 +86,16 @@ public class HomeworkServiceImpl implements HomeworkService {
         }
 
 
-    /* Récupère les devoirs en attente d'un étudiant. */
     @Override
-    public List<Homework> findPendingHomework(Student student) {
-        return homeworkRepository.findByStudentAndStatusOrderByDueDateAsc(student, "PENDING");
+    public List<Homework> findUpcomingHomeworks(Student student) {
+        return homeworkRepository.findUpcomingHomeworksByStudent(student.getId(), LocalDate.now());
+    }
+
+    @Override
+    public List<Homework> findHomeworksForNextDays(Student student) {
+        LocalDate today = LocalDate.now();
+        LocalDate nextWeek = today.plusDays(7);
+        return homeworkRepository.findHomeworksByStudentBetweenDates(student.getId(), today, nextWeek);
     }
 
     /* Récupère les devoirs soumis par un étudiant. */
@@ -120,7 +127,7 @@ public class HomeworkServiceImpl implements HomeworkService {
             throw new RuntimeException("Vous n'êtes pas autorisé à soumettre ce devoir");
         }
 
-        if (homework.getDueDate().isBefore(LocalDateTime.now())) {
+        if (homework.getDueDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("La date limite est dépassée");
         }
 

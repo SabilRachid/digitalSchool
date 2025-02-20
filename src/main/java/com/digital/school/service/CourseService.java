@@ -16,12 +16,9 @@ public interface CourseService {
     Course save(Course course);
     void deleteById(Long id);
     boolean existsById(Long id);
+    List<Course> findTodaySchedule(Student student);
     List<Course> findByClasse(Classe classe);
     List<Map<String, Object>> findByProfessor(Professor professor);
-    List<Course> findBySubject(Subject subject);
-    List<Course> findByDateRange(LocalDateTime start, LocalDateTime end);
-    List<Course> findUpcomingCourses(Professor professor);
-    Map<String, Object> getCourseStatistics(Course course);
     List<Map<String, Object>> findAllAsMap();
     List<Map<String, Object>> findAllBasicInfo();
     Object findByStudent(Student student);

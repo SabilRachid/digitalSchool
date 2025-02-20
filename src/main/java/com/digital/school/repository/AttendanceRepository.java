@@ -13,13 +13,21 @@ import java.util.List;
 import java.util.Map;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+
     List<Attendance> findByStudent(User student);
 
-    @Query("SELECT a FROM Attendance a WHERE a.course = :course")
-    List<Attendance> findByCourse(Course course);
+    @Query("SELECT a FROM Attendance a WHERE a.student = :student AND a.recordedAt BETWEEN :start AND :end")
+    List<Attendance> findByStudentAndRecordedAtBetween(@Param("student") Student student,
+                                                       @Param("start") LocalDateTime start,
+                                                       @Param("end") LocalDateTime end);
 
-    List<Attendance> findByStudentAndRecordedAtBetween(Student student, LocalDateTime start, LocalDateTime end);
-    List<Attendance> findByCourseAndRecordedAtBetween(Course course, LocalDateTime start, LocalDateTime end);
+    @Query("SELECT a FROM Attendance a " +
+            "WHERE (:classId IS NULL OR a.student.classe.id = :classId) " +
+            "AND (:startDate IS NULL OR a.dateEvent >= :startDate) " +
+            "AND (:endDate IS NULL OR a.dateEvent <= :endDate)")
+    List<Attendance> findByClassIdAndDateRange(@Param("classId") Long classId,
+                                               @Param("startDate") LocalDate startDate,
+                                               @Param("endDate") LocalDate endDate);
 
     @Query("SELECT a FROM Attendance a WHERE a.course = :course AND a.dateEvent = :date")
     List<Attendance> findByCourseAndDate(Course course, LocalDate date);
@@ -33,14 +41,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT (SUM(CASE WHEN a.status = 'ABSENT' THEN 1 ELSE 0 END) * 100.0 / COUNT(a)) FROM Attendance a")
     Double getUnjustifiedAbsencesRate();
 
-    long countByStudentAndCourse(Student student, Course course);
-    
-    long countByStudentAndStatusAndCourse(
-        @Param("student") Student student,
-        @Param("status") AttendanceStatus status, 
-        @Param("course") Course course
-    );
-    
+
+
     @Query("SELECT a.status, COUNT(a) FROM Attendance a WHERE a.course = :course GROUP BY a.status")
     List<Object[]> getAttendanceStatsByCourse(@Param("course") Course course);
     

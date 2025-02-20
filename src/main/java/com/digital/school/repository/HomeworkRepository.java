@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.digital.school.model.User;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface HomeworkRepository extends JpaRepository<Homework, Long> {
@@ -16,8 +17,25 @@ public interface HomeworkRepository extends JpaRepository<Homework, Long> {
     @Query("SELECT COUNT(h) FROM Homework h WHERE h.student = ?1 AND h.status = 'PENDING' AND h.dueDate > CURRENT_TIMESTAMP")
     int countPendingHomework(Student student);
 
-    @Query("SELECT h FROM Homework h WHERE h.student = ?1 AND h.dueDate > CURRENT_TIMESTAMP ORDER BY h.dueDate ASC")
-    List<Homework> findUpcomingHomework(Student student);
+
+    @Query("SELECT h FROM Homework h " +
+            "JOIN h.course c " +
+            "JOIN c.classe.students s " +
+            "WHERE s.id = :studentId " +
+            "  AND h.dueDate >= :currentDate " +
+            "ORDER BY h.dueDate ASC")
+    List<Homework> findUpcomingHomeworksByStudent(@Param("studentId") Long studentId,
+                                                  @Param("currentDate") LocalDate currentDate);
+
+    @Query("SELECT h FROM Homework h " +
+            "JOIN h.course c " +
+            "JOIN c.classe.students s " +
+            "WHERE s.id = :studentId " +
+            "  AND h.dueDate BETWEEN :startDate AND :endDate " +
+            "ORDER BY h.dueDate ASC")
+    List<Homework> findHomeworksByStudentBetweenDates(@Param("studentId") Long studentId,
+                                                      @Param("startDate") LocalDate startDate,
+                                                      @Param("endDate") LocalDate endDate);
 
 
     @Query("SELECT COUNT(h) FROM Homework h WHERE h.professor = :professor AND h.status = 'SUBMITTED'")

@@ -10,6 +10,7 @@ import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Optional<Course> findById(Long id) {
         return courseRepository.findById(id);
+    }
+
+    @Override
+    public List<Course> findTodaySchedule(Student student) {
+        return courseRepository.findTodayScheduleByStudent(student.getId(), LocalDate.now());
     }
 
     @Override
@@ -106,33 +112,6 @@ public class CourseServiceImpl implements CourseService {
                 .collect(Collectors.toList());
 
 
-    }
-
-    @Override
-    public List<Course> findBySubject(Subject subject) {
-        return courseRepository.findBySubject(subject);
-    }
-
-    @Override
-    public List<Course> findByDateRange(LocalDateTime start, LocalDateTime end) {
-        return courseRepository.findByStartTimeBetween(start, end);
-    }
-
-    @Override
-    public List<Course> findUpcomingCourses(Professor professor) {
-        LocalDateTime now = LocalDateTime.now();
-        if (professor.getRoles().stream().anyMatch(r -> r.getName().toString().equals("ROLE_PROFESSOR"))) {
-            return courseRepository.findByProfessorAndStartTimeAfter(professor, now);
-        } else {
-            return courseRepository.findByClasseAndStartTimeAfter(professor.getClasses().iterator().next(), now);
-        }
-    }
-
-    @Override
-    public Map<String, Object> getCourseStatistics(Course course) {
-        Map<String, Object> stats = new HashMap<>();
-        // TODO: Implement course statistics
-        return stats;
     }
 
     @Override

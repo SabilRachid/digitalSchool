@@ -1,0 +1,188 @@
+/* ----- Emploi du temps et devoirs (schedule.css) ----- */
+
+
+/* Listes groupées (Examens à venir, Devoirs à rendre) */
+.list-group {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid var(--bg-secondary);
+    margin-bottom: -1px; /* pour éviter double-bordure */
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.list-group-item .badge {
+    font-size: 0.8rem;
+}
+
+/* Stat-cards */
+.performance-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.stat-card {
+    flex: 1 1 300px;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--bg-secondary);
+}
+.stat-icon i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+.stat-content h3 {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.stat-change {
+    font-size: 0.875rem;
+}
+.stat-change.positive {
+    color: var(--success-color);
+}
+.stat-change.negative {
+    color: var(--danger-color);
+}
+
+/* Tableau emploi du temps */
+table.table {
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+table thead th {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+/* Grades-grid (affichage des devoirs par jour, par exemple) */
+.grades-grid,
+.progress-section {
+    margin-top: 2rem;
+}
+.grades-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.subject-card {
+    flex: 1 1 300px;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    padding: 1rem;
+}
+.subject-header {
+    margin-bottom: 1rem;
+}
+.subject-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+.subject-average .average-value {
+    font-weight: 700;
+    margin-right: 1rem;
+}
+.average-value.excellent {
+    color: var(--success-color);
+}
+.average-value.good {
+    color: var(--info-color);
+}
+.average-value.average {
+    color: var(--warning-color);
+}
+.average-value.poor {
+    color: var(--danger-color);
+}
+
+/* Grades-list */
+.grades-list .grade-item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--bg-secondary);
+    padding: 0.5rem 0;
+}
+.grade-item .grade-info {
+    display: flex;
+    flex-direction: column;
+}
+.grade-value.excellent {
+    color: var(--success-color);
+}
+.grade-value.good {
+    color: var(--info-color);
+}
+.grade-value.average {
+    color: var(--warning-color);
+}
+.grade-value.poor {
+    color: var(--danger-color);
+}
+
+/* Progression chart */
+.progress-section .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.progress-chart {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Petits ajustements responsive */
+@media (max-width: 768px) {
+    .performance-overview {
+        flex-direction: column;
+    }
+    .grades-grid {
+        flex-direction: column;
+    }
+    .stat-card {
+        flex: 1 1 auto;
+    }
+    .subject-card {
+        flex: 1 1 auto;
+    }
+}

@@ -1,7 +1,7 @@
 package com.digital.school.controller;
 
 import com.digital.school.model.Student;
-import com.digital.school.service.StudentGradeService;
+import com.digital.school.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.digital.school.model.User;
-import com.digital.school.service.StudentDashboardService;
-import com.digital.school.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -35,6 +35,16 @@ public class StudentController {
 
     @Autowired
     private StudentGradeService gradeService;
+
+    @Autowired
+    private ExamService examService;
+
+    @Autowired
+    private HomeworkService homeworkService;
+
+    @Autowired
+    private CourseService courseService;
+
 
     
     @GetMapping("/dashboard")
@@ -116,14 +126,29 @@ public class StudentController {
                 model.addAttribute("user", user);
                 model.addAttribute("currentURI", request.getRequestURI());
 
+                List<Map<String, Object>> gradesBySubjects = gradeService.findGradesBySubject(student);
+                // Convertir l'objet en JSON (si nécessaire) et l'ajouter au modèle
+                model.addAttribute("gradesBySubjectsJson", gradesBySubjects);
+
                 // Ajout des données nécessaires à la vue
-                model.addAttribute("gradesBySubject", gradeService.findGradesBySubject(student));
+                model.addAttribute("gradesBySubjects", gradeService.findGradesBySubject(student));
+                LOGGER.debug("Grades by subject: {}", gradeService.findGradesBySubject(student));
+
                 model.addAttribute("stats", dashboardService.getStudentStats(student));
 
                 return "student/grades"; // Correspond au template student/grades.html
             }
         }
         return "redirect:/login";
+    }
+
+    @GetMapping("/schedules")
+    public String studentDashboard(@AuthenticationPrincipal Student student, Model model) {
+        model.addAttribute("upcomingExams", examService.findUpcomingExams(student));
+        model.addAttribute("upcomingHomeworks", homeworkService.findUpcomingHomeworks(student));
+        model.addAttribute("todaySchedule", courseService.findTodaySchedule(student));
+        model.addAttribute("nextDaysHomeworks", homeworkService.findHomeworksForNextDays(student));
+        return "student/schedules"; // ou "student/grades", selon votre structure
     }
     
 }

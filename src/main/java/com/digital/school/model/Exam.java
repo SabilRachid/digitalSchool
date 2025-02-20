@@ -2,6 +2,8 @@ package com.digital.school.model;
 
 import jakarta.persistence.*;
 import com.digital.school.model.enumerated.ExamStatus;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,9 +15,13 @@ public class Exam extends AuditableEntity {
     
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
+    // Nouvelle propriété pour la date du cours
     @Column(nullable = false)
-    private LocalDateTime examDate;
+    private LocalDate date;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     
     @Column(nullable = false)
     private Integer duration;
@@ -70,12 +76,24 @@ public class Exam extends AuditableEntity {
         this.description = description;
     }
 
-    public LocalDateTime getExamDate() {
-        return examDate;
+    public LocalDate getDate() {return date;}
+
+    public void setDate(LocalDate date) {this.date = date;}
+
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setExamDate(LocalDateTime examDate) {
-        this.examDate = examDate;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public Integer getDuration() {

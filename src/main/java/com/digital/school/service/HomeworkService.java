@@ -19,12 +19,13 @@ public interface HomeworkService {
 
     void deleteHomework(Long id);
 
+    List<Homework> findUpcomingHomeworks(Student student);
+
+    List<Homework> findHomeworksForNextDays(Student student);
+
     List<Homework> findHomeworksByProfessor(Professor professor);
 
     void updateHomework(Homework homework, Homework updatedHomework);
-
-    /* Récupère la liste des devoirs en attente d'un étudiant. */
-    List<Homework> findPendingHomework(Student student);
 
     /* Récupère la liste des devoirs soumis par un étudiant. */
     List<Homework> findSubmittedHomework(Student student);

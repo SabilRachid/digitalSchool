@@ -36,4 +36,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT c FROM Course c WHERE c.classe = :classe AND c.startTime BETWEEN :start AND :end")
     List<Course> findByClasseAndStartTimeBetween(Classe classe, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT c FROM Course c " +
+            "JOIN c.classe.students s " +
+            "WHERE s.id = :studentId " +
+            "AND c.date = :today " +
+            "ORDER BY c.startTime ASC")
+    List<Course> findTodayScheduleByStudent(@Param("studentId") Long studentId, @Param("today") LocalDate today);
 }

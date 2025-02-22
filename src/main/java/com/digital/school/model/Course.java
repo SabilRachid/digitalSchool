@@ -1,7 +1,7 @@
 package com.digital.school.model;
 
 import jakarta.persistence.*;
-
+import com.digital.school.model.enumerated.CourseStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -29,9 +29,20 @@ public class Course extends AuditableEntity {
     private LocalDate date;
 
     private LocalDateTime startTime;
+
     private LocalDateTime endTime;
-    
+
+    // Champ status utilisant l'Enum CourseStatus
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CourseStatus status;
+
     private String room;
+
+    @Column(name = "resource_count", nullable = true)
+    private int resourceCount=0;
+
+    private String onlineLink;
     
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -95,9 +106,19 @@ public class Course extends AuditableEntity {
         return room;
     }
 
-    public void setRoom(String room) {
-        this.room = room;
-    }
+    public CourseStatus getStatus() {return status;}
+
+    public void setStatus(CourseStatus status) {this.status = status;}
+
+    public void setRoom(String room) {this.room = room;}
+
+    public int getResourceCount() {return resourceCount;}
+
+    public void setResourceCount(int resourceCount) {this.resourceCount = resourceCount;}
+
+    public String getOnlineLink() {return onlineLink; }
+
+    public void setOnlineLink(String onlineLink) { this.onlineLink = onlineLink;}
 
     public String getDescription() {
         return description;

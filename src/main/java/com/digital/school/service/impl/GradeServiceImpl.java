@@ -1,10 +1,12 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.*;
+import com.digital.school.repository.StudentRepository;
+import com.digital.school.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.digital.school.model.StudentGrade;
-import com.digital.school.repository.StudentGradeRepository;
+import com.digital.school.repository.StudentSubmissionRepository;
 import com.digital.school.service.GradeService;
 
 import java.util.*;
@@ -16,11 +18,17 @@ public class GradeServiceImpl implements GradeService {
 
 
         @Autowired
-        private StudentGradeRepository studentGradeRepository;
+        private StudentSubmissionRepository studentSubmissionRepository;
+
+        @Autowired
+        private EvaluationService evaluationService;
+
+        @Autowired
+        private StudentRepository studentRepository;
 
     @Override
     public int calculateStudentRank(Long studentId, Long classeId) {
-        Integer rank = studentGradeRepository.calculateStudentRank(studentId, classeId);
+        Integer rank = studentSubmissionRepository.calculateStudentRank(studentId, classeId);
         return rank != null ? rank : 0;
     }
 
@@ -38,7 +46,7 @@ public class GradeServiceImpl implements GradeService {
     public List<Map<String, Object>> findGradesForEvaluation(Long evaluationId) {
         // On suppose que votre repository dispose d'une méthode pour récupérer toutes les notes
         // associées à une évaluation donnée.
-        List<StudentGrade> grades = studentGradeRepository.findByEvaluationId(evaluationId);
+        List<StudentSubmission> grades = studentSubmissionRepository.findByEvaluationId(evaluationId);
         return grades.stream().map(grade -> {
             Map<String, Object> map = new HashMap<>();
             map.put("studentId", grade.getStudent().getId());
@@ -49,30 +57,46 @@ public class GradeServiceImpl implements GradeService {
         }).collect(Collectors.toList());
     }
 
+
     @Override
     public void saveGrades(Long evaluationId, List<Map<String, Object>> updates) {
-        // Pour chaque mise à jour, récupérer la note existante ou en créer une nouvelle.
+        // Récupérer l'évaluation
+        Evaluation evaluation = evaluationService.findById(evaluationId)
+                .orElseThrow(() -> new RuntimeException("Évaluation non trouvée"));
+
         for (Map<String, Object> update : updates) {
             Long studentId = Long.parseLong(update.get("studentId").toString());
             Double value = Double.parseDouble(update.get("value").toString());
             String comments = update.get("comments") != null ? update.get("comments").toString() : null;
 
-            // On suppose que vous disposez d'une méthode pour récupérer la note d'un étudiant pour une évaluation
-            Optional<StudentGrade> optionalGrade = studentGradeRepository.findByEvaluationIdAndStudentId(evaluationId, studentId);
-            StudentGrade grade;
+            // Récupérer la soumission existante, si elle existe
+            Optional<StudentSubmission> optionalGrade = studentSubmissionRepository
+                    .findByEvaluationIdAndStudentId(evaluationId, studentId);
+            StudentSubmission grade;
             if (optionalGrade.isPresent()) {
                 grade = optionalGrade.get();
             } else {
-                grade = new StudentGrade();
-                // Vous devez définir ici les associations nécessaires :
-                // grade.setEvaluation(evaluationService.findById(evaluationId));
-                // grade.setStudent(studentRepository.findById(studentId).orElseThrow(() -> new RuntimeException("Étudiant non trouvé")));
+                // Instancier la soumission selon le type de l'évaluation
+                if (evaluation instanceof Homework) {
+                    grade = new StudentHomework();
+                } else if (evaluation instanceof Exam) {
+                    grade = new StudentExam();
+                } else {
+                    throw new RuntimeException("Type d'évaluation non supporté");
+                }
+                // Associer l'évaluation
+                grade.setEvaluation(evaluation);
+                // Récupérer l'étudiant
+                Student student = studentRepository.findById(studentId)
+                        .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
+                grade.setStudent(student);
             }
             grade.setValue(value);
             grade.setComments(comments);
-            studentGradeRepository.save(grade);
+            studentSubmissionRepository.save(grade);
         }
     }
+
 
     @Override
     public byte[] generateGradeReport(Long evaluationId, Long subjectId) {

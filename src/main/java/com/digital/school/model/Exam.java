@@ -1,84 +1,30 @@
 package com.digital.school.model;
 
-import jakarta.persistence.*;
-import com.digital.school.model.enumerated.ExamStatus;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "exams")
-public class Exam extends AuditableEntity {
-    
-    @Column(nullable = false)
-    private String name;
-    
-    @Column(columnDefinition = "TEXT")
-    private String description;
+@DiscriminatorValue("exams")
+public class Exam extends Evaluation {
 
-    // Nouvelle propriété pour la date du cours
-    @Column(nullable = false)
-    private LocalDate date;
-
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
+
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
-    
-    @Column(nullable = false)
-    private Integer duration;
-    
-    @ManyToOne
-    @JoinColumn(name = "class_id", nullable = false)
-    private Classe classe;
-    
-    @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = false)
-    private Subject subject;
-    
-    @Column(nullable = false)
-    private Double maxScore;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ExamStatus status = ExamStatus.SCHEDULED;
-    
-    @ManyToOne
-    @JoinColumn(name = "professor_id", nullable = false)
-    private Professor professor;
-    
-    private LocalDateTime createdAt = LocalDateTime.now();
-    
-    @Column(nullable = false)
-    private Boolean isPublished = false;
 
+    // Durée de l'examen en minutes
+    @Column(name = "duration", nullable = false)
+    private int duration;
 
-   private LocalDateTime publishedAt = LocalDateTime.now();
+    // Salle ou emplacement de l'examen
+    @Column(name = "room")
+    private String room;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-   private Room room;
-
-    public Exam() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDate getDate() {return date;}
-
-    public void setDate(LocalDate date) {this.date = date;}
+    // Getters et setters existants...
 
     public LocalDateTime getStartTime() {
         return startTime;
@@ -96,72 +42,24 @@ public class Exam extends AuditableEntity {
         this.endTime = endTime;
     }
 
-    public Integer getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(Integer duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
-    public Classe getClasse() {
-        return classe;
-    }
-
-    public void setClasse(Classe classe) {
-        this.classe = classe;
-    }
-
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
-    public Double getMaxScore() {
-        return maxScore;
-    }
-
-    public void setMaxScore(Double maxScore) {
-        this.maxScore = maxScore;
-    }
-
-    public ExamStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ExamStatus status) {
-        this.status = status;
-    }
-
-    public Professor getProfessor() { return professor;}
-
-    public void setProfessor(Professor professor) { this.professor = professor; }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Boolean getIsPublished() {
-        return isPublished;
-    }
-
-    public void setIsPublished(Boolean isPublished) {
-        this.isPublished = isPublished;
-    }
-
-    public Room getRoom() {
+    public String getRoom() {
         return room;
     }
 
-    public void setRoom(Room room) {
+    public void setRoom(String room) {
         this.room = room;
+    }
+
+    // Méthode dérivée pour obtenir la date de l'examen (basée sur startTime)
+    public LocalDate getDate() {
+        return startTime.toLocalDate();
     }
 }

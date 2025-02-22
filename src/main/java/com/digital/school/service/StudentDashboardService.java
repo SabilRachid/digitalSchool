@@ -13,8 +13,7 @@ import java.util.Optional;
 
 public interface StudentDashboardService {
     StudentDashboardStats getStudentStats(Student student);
-    List<StudentGrade> getRecentGrades(Student student);
-    List<Homework> getPendingHomework(Student student);
+    List<StudentSubmission> getRecentGrades(Student student);
     List<Map<String, Object>> getSubjectsWithResources(Student student);
     List<Event> getUpcomingEvents(Student student);
     public Map<String, Object> getStudentStats();

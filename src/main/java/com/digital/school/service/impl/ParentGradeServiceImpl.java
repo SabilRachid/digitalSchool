@@ -20,7 +20,7 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     private ParentStudentRepository parentStudentRepository;
     
     @Autowired
-    private StudentGradeRepository gradeRepository;
+    private StudentSubmissionRepository studentSubmissionRepository;
     
     @Autowired
     private PDFService pdfService;
@@ -98,20 +98,20 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     }
 
     private double calculateAverageGrade(Student student) {
-        return gradeRepository.calculateAverageGrade(student);
+        return studentSubmissionRepository.calculateAverageGrade(student);
     }
 
     private int calculateRank(Student student) {
-        return gradeRepository.calculateStudentRank(
+        return studentSubmissionRepository.calculateStudentRank(
             student.getId(), 
             student.getClasse().getId()
         );
     }
 
     private List<Map<String, Object>> getSubjectGrades(Student student) {
-        return gradeRepository.findByStudentOrderByDateDesc(student).stream()
+        return studentSubmissionRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
+                grade -> grade.getEvaluation().getSubject().getName(),
                 Collectors.collectingAndThen(
                     Collectors.toList(),
                     grades -> {
@@ -135,33 +135,33 @@ public class ParentGradeServiceImpl implements ParentGradeService {
     }
 
     private Map<String, Double> calculateSubjectAverages(Student student) {
-        return gradeRepository.findByStudentOrderByDateDesc(student).stream()
+        return studentSubmissionRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
-                Collectors.averagingDouble(StudentGrade::getValue)
+                grade -> grade.getEvaluation().getSubject().getName(),
+                Collectors.averagingDouble(StudentSubmission::getValue)
             ));
     }
 
     private @NotNull Map<String, List<Double>> calculateProgression(Student student) {
-        return gradeRepository.findByStudentOrderByDateDesc(student).stream()
+        return studentSubmissionRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
+                grade -> grade.getEvaluation().getSubject().getName(),
                 Collectors.mapping(
-                    StudentGrade::getValue,
+                        StudentSubmission::getValue,
                     Collectors.toList()
                 )
             ));
     }
 
     private Map<String, Long> calculateGradeDistribution(Student student) {
-        return gradeRepository.findByStudentOrderByDateDesc(student).stream()
+        return studentSubmissionRepository.findByStudentOrderByDateDesc(student).stream()
             .collect(Collectors.groupingBy(
                 this::getGradeRange,
                 Collectors.counting()
             ));
     }
 
-    private String getGradeRange(StudentGrade grade) {
+    private String getGradeRange(StudentSubmission grade) {
         Double value = grade.getValue();
         if (value < 5) return "0-5";
         if (value < 8) return "5-8";
@@ -172,16 +172,17 @@ public class ParentGradeServiceImpl implements ParentGradeService {
         return "18-20";
     }
 
-    private double calculateAverage(List<StudentGrade> grades) {
+    private double calculateAverage(List<StudentSubmission> grades) {
         return grades.stream()
-            .mapToDouble(StudentGrade::getValue)
+            .mapToDouble(StudentSubmission::getValue)
             .average()
             .orElse(0.0);
     }
 
-    private double calculateClassAverage(List<StudentGrade> grades) {
+    //A implementer
+    private double calculateClassAverage(List<StudentSubmission> grades) {
         return grades.stream()
-            .mapToDouble(StudentGrade::getClassAverage)
+            .mapToDouble(StudentSubmission::getValue)
             .average()
             .orElse(0.0);
     }

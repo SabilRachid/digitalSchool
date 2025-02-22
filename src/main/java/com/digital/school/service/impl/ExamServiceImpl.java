@@ -3,6 +3,7 @@ package com.digital.school.service.impl;
 import com.digital.school.model.Exam;
 import com.digital.school.model.Professor;
 import com.digital.school.model.Student;
+import com.digital.school.model.enumerated.EvaluationStatus;
 import com.digital.school.model.enumerated.ExamStatus;
 import com.digital.school.repository.ExamRepository;
 import com.digital.school.service.ExamService;
@@ -37,7 +38,7 @@ public class ExamServiceImpl implements ExamService {
     public Exam createExam(Exam exam, Long professorId) {
         // Vous pouvez associer l'examen au professeur via professorId, par exemple en utilisant un champ "professorId" dans Exam.
         // Ici, nous supposons que l'examen est initialisé en mode brouillon ("DRAFT")
-        exam.setStatus(ExamStatus.DRAFT);
+        exam.setStatus(EvaluationStatus.DRAFT);
         // Si nécessaire, effectuez d'autres initialisations spécifiques
         return examRepository.save(exam);
     }
@@ -47,7 +48,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
         // Mettre à jour le statut pour la publication
-        exam.setStatus(ExamStatus.SCHEDULED);
+        exam.setStatus(EvaluationStatus.SCHEDULED);
         examRepository.save(exam);
     }
 
@@ -56,7 +57,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Examen non trouvé pour l'ID : " + id));
         // Mettre à jour le statut pour indiquer la fin de l'examen
-        exam.setStatus(ExamStatus.COMPLETED);
+        exam.setStatus(EvaluationStatus.PUBLISHED);
         examRepository.save(exam);
     }
 

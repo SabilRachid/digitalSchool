@@ -39,7 +39,7 @@ function updateChildStats(childId, stats) {
 
     // Mettre à jour les graphiques
     updateSubjectBreakdown(childId, stats.subjectBreakdown);
-    updateMonthlyTrend(childId, stats.monthlyTrend);
+    //updateMonthlyTrend(childId, stats.monthlyTrend);
 }
 
 // Mise à jour de la répartition par matière

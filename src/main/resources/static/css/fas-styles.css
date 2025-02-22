@@ -1,0 +1,62 @@
+/* fas-styles.css */
+
+
+
+/* Style général pour toutes les icônes Font Awesome */
+.fas {
+    transition: color 0.3s ease;
+}
+
+/* Icônes dans le sidebar */
+.sidebar .nav-item .fas {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    color: var(--bg-primary);
+}
+
+/* Icônes spécifiques avec des couleurs associées */
+.fas.fa-chart-line { color: var(--primary-color); }
+.fas.fa-graduation-cap { color: #4F46E5; }
+.fas.fa-chevron-down { color: var(--text-muted); }
+.fas.fa-layer-group { color: #E9D8FD; }
+.fas.fa-book { color: #059669; }
+.fas.fa-school { color: #D97706; }
+.fas.fa-chalkboard-teacher { color: #DC2626; }
+.fas.fa-users { color: #4299E1; }
+.fas.fa-user-cog { color: #8B5CF6; }
+.fas.fa-cogs { color: var(--text-muted); }
+.fas.fa-door-open { color: var(--primary-color); }
+.fas.fa-file-alt { color: #4F46E5; }
+.fas.fa-calendar-alt { color: #D97706; }
+.fas.fa-home { color: var(--primary-color); }
+.fas.fa-comments { color: #4299E1; }
+.fas.fa-download { color: var(--primary-color); }
+.fas.fa-star { color: #F59E0B; }
+.fas.fa-trophy { color: #F59E0B; }
+.fas.fa-check-circle { color: var(--success-color); }
+.fas.fa-exclamation-circle { color: var(--danger-color); }
+
+/* Hover : change la couleur sur les liens de navigation */
+.nav-item:hover .fas {
+    color: var(--primary-light);
+}
+
+/* Notifications et boutons */
+.notification .notification-content .fas {
+    margin-right: 0.5rem;
+}
+.btn .fas {
+    margin-right: 0.3rem;
+}
+
+/* Icônes dans les cartes de statistiques */
+.stat-icon .fas {
+    font-size: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar .nav-item .fas {
+        font-size: 1rem;
+    }
+}

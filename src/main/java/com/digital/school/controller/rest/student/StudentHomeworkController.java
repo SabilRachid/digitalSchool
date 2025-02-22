@@ -2,6 +2,8 @@ package com.digital.school.controller.rest.student;
 
 import com.digital.school.model.Homework;
 import com.digital.school.model.Student;
+import com.digital.school.model.StudentHomework;
+import com.digital.school.service.StudentHomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,57 +16,47 @@ import com.digital.school.service.HomeworkService;
 import com.digital.school.service.SubjectService;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/student/homework")
 public class StudentHomeworkController {
 
     @Autowired
-    private HomeworkService homeworkService;
+    private StudentHomeworkService studentHomeworkService;
 
     @Autowired
     private SubjectService subjectService;
 
-    @GetMapping
-    public String showHomework(@AuthenticationPrincipal Student student, Model model) {
-        model.addAttribute("pendingHomework", homeworkService.findUpcomingHomeworks(student));
-        model.addAttribute("submittedHomework", homeworkService.findSubmittedHomework(student));
-        model.addAttribute("gradedHomework", homeworkService.findGradedHomework(student));
-        model.addAttribute("subjects", subjectService.findByStudent(student));
-        return "homeworks";
-    }
 
-    @GetMapping("/{id}")
-    public String viewHomework(@PathVariable Long id, Model model) {
-        Homework homework = homeworkService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
-        model.addAttribute("homework", homework);
-        return "student/homework-details";
-    }
-
-    @PostMapping("/{id}/submit")
-    @ResponseBody
-    public ResponseEntity<?> submitHomework(
-            @PathVariable Long id,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(required = false) String comment,
-            @AuthenticationPrincipal Student student) {
-        try {
-            Homework homework = homeworkService.submitHomework(id, student, file, comment);
-            return ResponseEntity.ok(homework);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", e.getMessage()));
+         /* Endpoint pour la soumission d'un devoir.
+         * Le fichier et un commentaire optionnel sont envoyés en multipart */
+        @PostMapping("/{id}/submit")
+        public ResponseEntity<?> submitHomework(
+                @PathVariable Long id,
+                @RequestParam("file") MultipartFile file,
+                @RequestParam(value = "comment", required = false) String comment,
+                @AuthenticationPrincipal Student student) {
+            try {
+                StudentHomework updatedHomework = studentHomeworkService.submitHomework(id, file, comment, student);
+                return ResponseEntity.ok(updatedHomework);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            }
         }
-    }
 
-    @GetMapping("/{id}/view")
-    public ResponseEntity<?> viewSubmission(@PathVariable Long id) {
-        try {
-            return homeworkService.getSubmissionFile(id);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", e.getMessage()));
+        /**
+         * Endpoint pour consulter la soumission d'un devoir.
+         */
+        @GetMapping("/{id}/view")
+        public ResponseEntity<?> viewHomework(
+                @PathVariable Long id,
+                @AuthenticationPrincipal Student student) {
+            try {
+                Optional<StudentHomework> studentHomework = studentHomeworkService.findByIdAndStudent(id, student);
+                return ResponseEntity.ok(studentHomework);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            }
         }
-    }
 }

@@ -24,7 +24,7 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     padding: 1.5rem;
     display: flex;
@@ -72,7 +72,7 @@
 }
 
 .subject-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     padding: 1.5rem;
     box-shadow: var(--card-shadow);
@@ -160,7 +160,7 @@
 
 /* Progress Section */
 .progress-section {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     padding: 1.5rem;
     box-shadow: var(--card-shadow);

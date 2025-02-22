@@ -12,12 +12,12 @@
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/topbar.css}">
-    <link rel="stylesheet" th:href="@{/css/cards.css}">
     <link rel="stylesheet" th:href="@{/css/components/cards.css}">
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
     <link rel="stylesheet" th:href="@{/css/components/badges.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
     <link rel="stylesheet" th:href="@{/css/components/stats.css}">
+    <link rel="stylesheet" th:href="@{/css/fas-styles.css}">
     <link rel="stylesheet" th:href="@{/css/student/dashboard.css}">
 
 
@@ -30,11 +30,6 @@
 
 <div class="dashboard-container">
     <!-- Section Bienvenue -->
-
-    <a href="/student/dashboardd">
-        <span>Ancien Dashboard</span>
-    </a>
-
     <div class="welcome-section">
         <div class="welcome-header">
             <h1>Bienvenue, <span th:text="${user.firstName}">Étudiant</span></h1>
@@ -103,7 +98,7 @@
         <!-- Cours en Cours -->
         <div class="dashboard-card current-courses">
             <div class="card-header">
-                <h2><i class="fas fa-book"></i> Cours en Cours</h2>
+                <h2><i class="fas fa-book"></i> Cours à venir</h2>
                 <a href="/student/courses" class="btn-link">Voir tout</a>
             </div>
             <div class="card-content">
@@ -123,7 +118,7 @@
                                class="btn btn-primary">
                                 <i class="fas fa-video"></i> Rejoindre
                             </a>
-                            <a th:href="@{'/student/courses/' + ${course.id}}"
+                            <a th:href="@{'/student/api/courses/' + ${course.id}}"
                                class="btn btn-secondary">
                                 <i class="fas fa-info-circle"></i> Détails
                             </a>
@@ -137,7 +132,7 @@
         <div class="dashboard-card pending-homework">
             <div class="card-header">
                 <h2><i class="fas fa-tasks"></i> Devoirs à Rendre</h2>
-                <a href="/student/homework" class="btn-link">Voir tout</a>
+                <a href="/student/homeworks" class="btn-link">Voir tout</a>
             </div>
             <div class="card-content">
                 <div class="homework-list">
@@ -195,17 +190,17 @@
             </div>
         </div>
 
-        <!-- Graphique de Progression -->
-        <div class="dashboard-card progress-chart">
-            <div class="card-header">
-                <h2><i class="fas fa-chart-line"></i> Progression</h2>
+        <!-- Progress Chart -->
+        <div class="progress-section">
+            <div class="section-header">
+                <h2>Progression</h2>
                 <div class="period-selector">
                     <button class="btn-outline active">Trimestre</button>
                     <button class="btn-outline">Année</button>
                 </div>
             </div>
-            <div class="card-content">
-                <canvas id="progressChart"></canvas>
+            <div class="progress-chart">
+                <canvas id="progressionChart"></canvas>
             </div>
         </div>
 
@@ -253,11 +248,14 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script th:src="@{/js/student/dashboard.js}"></script>
+
 <script th:src="@{/js/dashboard.js}"></script>
 <script th:src="@{/js/sidebar.js}"></script>
 <script th:src="@{/js/topbar.js}"></script>>
 <script th:src="@{/js/chart.js}"></script>
+
+<script th:src="@{/js/student/grades.js}"></script>
+<script th:src="@{/js/student/dashboard.js}"></script>
 
 
 </body>

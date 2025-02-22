@@ -45,8 +45,11 @@ public class StudentController {
     @Autowired
     private CourseService courseService;
 
+    @Autowired
+    private SubjectService subjectService;
+    @Autowired
+    private StudentHomeworkService studentHomeworkService;
 
-    
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,9 +70,13 @@ public class StudentController {
                 
                 // Notes récentes
                 model.addAttribute("recentGrades", dashboardService.getRecentGrades(student));
-                
+
+                // Current Courses
+                model.addAttribute("currentCourses", courseService.findTodaySchedule(student));
+                //model.addAttribute("currentCourses", null);
+
                 // Devoirs en attente
-                model.addAttribute("pendingHomework", dashboardService.getPendingHomework(student));
+                model.addAttribute("pendingHomework", studentHomeworkService.findUpcomingHomeworks(student));
                 
                 // Matières et ressources
                 model.addAttribute("subjects", dashboardService.getSubjectsWithResources(student));
@@ -102,7 +109,7 @@ public class StudentController {
                 model.addAttribute("currentURI", request.getRequestURI());
 
                 // Devoirs en attente
-                model.addAttribute("pendingHomework", dashboardService.getPendingHomework(student));
+                model.addAttribute("pendingHomework", studentHomeworkService.findUpcomingHomeworks(student));
 
                 return "student/homeworks";
             }
@@ -145,10 +152,28 @@ public class StudentController {
     @GetMapping("/schedules")
     public String studentDashboard(@AuthenticationPrincipal Student student, Model model) {
         model.addAttribute("upcomingExams", examService.findUpcomingExams(student));
-        model.addAttribute("upcomingHomeworks", homeworkService.findUpcomingHomeworks(student));
+        model.addAttribute("upcomingHomeworks", studentHomeworkService.findUpcomingHomeworks(student));
         model.addAttribute("todaySchedule", courseService.findTodaySchedule(student));
-        model.addAttribute("nextDaysHomeworks", homeworkService.findHomeworksForNextDays(student));
+        model.addAttribute("nextDaysHomeworks", studentHomeworkService.findHomeworksForNextDays(student));
         return "student/schedules"; // ou "student/grades", selon votre structure
+    }
+
+
+    @GetMapping("/courses")
+    public String getStudentCourses(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
+        Optional<User> userOptional = userService.findByUsername(student.getUsername());
+        if (userOptional.isPresent()) {
+            LOGGER.debug("Student user present: {}, URI: {}", student.getUsername(), request.getRequestURI());
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("currentURI", request.getRequestURI());
+            // Liste des cours pour l'étudiant
+            model.addAttribute("courses", courseService.findByStudent(student));
+            // Liste de toutes les matières pour alimenter le filtre
+            model.addAttribute("subjects", subjectService.findByStudent(student) );
+            return "student/courses"; // Ce template correspond à student/courses.html
+        }
+        return "redirect:/login";
     }
     
 }

@@ -1,14 +1,13 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.model.Professor;
+import com.digital.school.model.enumerated.EvaluationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.digital.school.model.User;
 import com.digital.school.repository.*;
 import com.digital.school.service.ProfessorDashboardService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +21,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     private CourseRepository courseRepository;
 
     @Autowired
-    private HomeworkRepository homeworkRepository;
+    private ParentHomeworkRepository homeworkRepository;
 
     @Autowired
     private ExamRepository examRepository;
@@ -52,7 +51,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
         stats.put("totalClasses", totalClasses);
 
         // Count pending homework
-        int pendingHomework = homeworkRepository.countPendingGradingByProfessor(professor);
+        int pendingHomework = homeworkRepository.countPendingGradingByProfessor(professor, EvaluationStatus.PUBLISHED);
         stats.put("pendingHomework", pendingHomework);
 
         // Count submissions today

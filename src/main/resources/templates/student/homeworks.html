@@ -49,10 +49,10 @@
             <div class="homework-list">
                 <div th:each="homework : ${pendingHomework}"
                      class="homework-card"
-                     th:data-subject="${homework.course.subject.id}"
+                     th:data-subject="${homework.subject.id}"
                      th:data-status="PENDING">
                     <div class="homework-header">
-                        <div class="subject-badge" th:text="${homework.course.subject.name}">
+                        <div class="subject-badge" th:text="${homework.subject.name}">
                             Matière
                         </div>
                         <div class="due-date">
@@ -69,7 +69,7 @@
                     <div class="homework-footer">
                         <div class="assigned-by">
                             <i class="fas fa-user"></i>
-                            <span th:text="${homework.assignedBy.firstName + ' ' + homework.assignedBy.lastName}">
+                            <span th:text="${homework.professor.firstName + ' ' + homework.professor.lastName}">
                                     Professeur
                                 </span>
                         </div>
@@ -88,10 +88,10 @@
             <div class="homework-list">
                 <div th:each="homework : ${submittedHomework}"
                      class="homework-card"
-                     th:data-subject="${homework.course.subject.id}"
+                     th:data-subject="${homework.subject.id}"
                      th:data-status="SUBMITTED">
                     <div class="homework-header">
-                        <div class="subject-badge" th:text="${homework.course.subject.name}">
+                        <div class="subject-badge" th:text="${homework.subject.name}">
                             Matière
                         </div>
                         <div class="submission-date">
@@ -128,7 +128,7 @@
                      th:data-subject="${homework.course.subject.id}"
                      th:data-status="GRADED">
                     <div class="homework-header">
-                        <div class="subject-badge" th:text="${homework.course.subject.name}">
+                        <div class="subject-badge" th:text="${homework.subject.name}">
                             Matière
                         </div>
                         <div class="grade">

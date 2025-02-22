@@ -6,6 +6,7 @@ import com.digital.school.model.User;
 import com.digital.school.service.HomeworkService;
 import com.digital.school.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,50 +27,46 @@ public class ProfessorHomeworkController {
     private CourseService courseService;
 
 
+
     @GetMapping("/data")
-    @ResponseBody
-    public List<Map<String, Object>> getHomeworksData() {
-        return homeworkService.findAllAsMap();
-
+    public ResponseEntity<List<Map<String, Object>>> getHomeworks(
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        List<Map<String, Object>> homeworks = homeworkService.findAllAsMap(classId, year, month);
+        return ResponseEntity.ok(homeworks);
     }
 
-    /* Affiche les détails d'un devoir */
     @GetMapping("/{id}")
-    public String viewHomework(@PathVariable Long id, Model model) {
-        Homework homework = homeworkService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
-        model.addAttribute("homework", homework);
-        return "professor/homework-details";
+    public ResponseEntity<Homework> getHomework(@PathVariable Long id,
+                                                @AuthenticationPrincipal Professor professor) {
+        Homework homework = homeworkService.findByIdAndProfessor(id, professor);
+        return ResponseEntity.ok(homework);
     }
 
-    /* Ajoute un nouveau devoir */
-    @PostMapping("/add")
-    public String addHomework(@AuthenticationPrincipal Professor professor, @ModelAttribute Homework homework, RedirectAttributes redirectAttributes) {
-        homeworkService.createHomework(professor, homework);
-        redirectAttributes.addFlashAttribute("successMessage", "Devoir ajouté avec succès !");
-        return "redirect:/professor/homework";
+    @PostMapping
+    public ResponseEntity<Homework> createHomework(@RequestBody Homework homework,
+                                                   @AuthenticationPrincipal Professor professor) {
+        Homework savedHomework = homeworkService.createHomework(homework, professor);
+        return ResponseEntity.ok(savedHomework);
     }
 
-    /* Supprime un devoir */
-    @PostMapping("/{id}/delete")
-    public String deleteHomework(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        homeworkService.deleteHomework(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Devoir supprimé avec succès !");
-        return "redirect:/professor/homework";
+    @PutMapping("/{id}")
+    public ResponseEntity<Homework> updateHomework(@PathVariable Long id,
+                                                   @RequestBody Homework homework,
+                                                   @AuthenticationPrincipal Professor professor) {
+        Homework updatedHomework = homeworkService.updateHomework(id, homework, professor);
+        return ResponseEntity.ok(updatedHomework);
     }
 
-    /* Modifie un devoir */
-    @PostMapping("/{id}/edit")
-    public String editHomework(@PathVariable Long id, @ModelAttribute Homework updatedHomework, RedirectAttributes redirectAttributes) {
-        Optional<Homework> existingHomework = homeworkService.findById(id);
-
-        if (existingHomework.isPresent()) {
-            homeworkService.updateHomework(existingHomework.get(), updatedHomework);
-            redirectAttributes.addFlashAttribute("successMessage", "Devoir mis à jour !");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Le devoir n'existe pas.");
-        }
-
-        return "redirect:/professor/homework";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteHomework(@PathVariable Long id,
+                                            @AuthenticationPrincipal Professor professor) {
+        homeworkService.deleteHomework(id, professor);
+        return ResponseEntity.ok().build();
     }
+
+
+
+
 }

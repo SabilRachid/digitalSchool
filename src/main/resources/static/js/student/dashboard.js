@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!homeworkId) return;
 
             try {
-                const response = await fetch(`/student/homework/${homeworkId}/submit`, {
+                const response = await fetch(`/student/api/homework/${homeworkId}/submit`, {
                     method: 'GET',
                     headers: {
                         Accept: 'application/json',
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!resourceId) return;
 
             try {
-                const response = await fetch(`/student/resources/${resourceId}`, {
+                const response = await fetch(`/student/api/resources/${resourceId}`, {
                     headers: {
                         Accept: 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content,

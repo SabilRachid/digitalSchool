@@ -29,9 +29,6 @@ public class CourseServiceImpl implements CourseService {
     SubjectRepository subjectRepository;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
     ProfessorRepository professorRepository;
 
     @Autowired
@@ -157,8 +154,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object findByStudent(Student student) {
-        return null;
+    public List<Course> findByStudent(Student student) {
+        return courseRepository.findByClasse(student.getClasse());
     }
 
     @Override

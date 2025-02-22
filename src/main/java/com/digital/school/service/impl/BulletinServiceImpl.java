@@ -25,7 +25,7 @@ public class BulletinServiceImpl implements BulletinService {
     private ClasseRepository classeRepository;
 
     @Autowired
-    private StudentGradeRepository gradeRepository;
+    private StudentSubmissionRepository studentSubmissionRepository;
 
     @Autowired
     private PDFService pdfService;
@@ -46,7 +46,7 @@ public class BulletinServiceImpl implements BulletinService {
 
         period="1";
         // Récupérer les notes de la période
-        List<StudentGrade> grades = gradeRepository.findByClasseAndPeriod(classe.getId(), period);
+        List<StudentSubmission> grades = studentSubmissionRepository.findByClasseAndPeriod(classe.getId(), period);
 
         // Calculer les moyennes
         Map<String, Object> data = calculateAverages(grades);
@@ -101,7 +101,7 @@ public class BulletinServiceImpl implements BulletinService {
         }
     }
 
-    private Map<String, Object> calculateAverages(List<StudentGrade> grades) {
+    private Map<String, Object> calculateAverages(List<StudentSubmission> grades) {
         Map<String, Object> data = new HashMap<>();
 
         // Calcul des moyennes par élève et par matière
@@ -109,7 +109,7 @@ public class BulletinServiceImpl implements BulletinService {
         grades.forEach(grade -> {
             gradesByStudent
                     .computeIfAbsent(grade.getStudent().getId(), k -> new HashMap<>())
-                    .computeIfAbsent(grade.getSubject().getName(), k -> new ArrayList<>())
+                    .computeIfAbsent(grade.getEvaluation().getSubject().getName(), k -> new ArrayList<>())
                     .add(grade.getValue().doubleValue());
         });
 
@@ -133,7 +133,7 @@ public class BulletinServiceImpl implements BulletinService {
         Map<String, Double> classAverages = new HashMap<>();
         grades.stream()
                 .collect(Collectors.groupingBy(
-                        grade -> grade.getSubject().getName(),
+                        grade -> grade.getEvaluation().getSubject().getName(),
                         Collectors.averagingDouble(grade -> grade.getValue().doubleValue())
                 ))
                 .forEach(classAverages::put);

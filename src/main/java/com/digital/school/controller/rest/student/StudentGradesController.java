@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/student/grades")
+@RequestMapping("/student/api/grades")
 public class StudentGradesController {
 
     @Autowired

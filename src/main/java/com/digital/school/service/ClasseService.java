@@ -18,5 +18,5 @@ public interface ClasseService {
     long countStudents(Long classeId);
     List<Classe>  getAll();
 
-    Object findByProfessor(Professor professor);
+    List<Classe> findByProfessor(Professor professor);
 }

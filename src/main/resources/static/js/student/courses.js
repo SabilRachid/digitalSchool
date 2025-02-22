@@ -1,45 +1,5 @@
 // Initialisation des graphiques et fonctionnalités du tableau de bord étudiant
 document.addEventListener('DOMContentLoaded', function() {
-    // Graphique de progression
-    const progressCtx = document.getElementById('progressChart').getContext('2d');
-    new Chart(progressCtx, {
-        type: 'line',
-        data: {
-            labels: ['Sept', 'Oct', 'Nov', 'Déc', 'Jan', 'Fév'],
-            datasets: [{
-                label: 'Moyenne Générale',
-                data: [12, 13, 13.5, 14, 14.5, 15],
-                borderColor: '#4F46E5',
-                tension: 0.4,
-                fill: false
-            }, {
-                label: 'Moyenne Classe',
-                data: [11.5, 12, 12.5, 13, 13.5, 14],
-                borderColor: '#9CA3AF',
-                tension: 0.4,
-                fill: false,
-                borderDash: [5, 5]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 20,
-                    ticks: {
-                        stepSize: 5
-                    }
-                }
-            }
-        }
-    });
 
     // Animation des cartes statistiques
     const statCards = document.querySelectorAll('.stat-card');

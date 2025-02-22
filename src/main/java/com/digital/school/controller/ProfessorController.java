@@ -1,11 +1,8 @@
 package com.digital.school.controller;
 
 import com.digital.school.dto.ParticipationDto;
-import com.digital.school.model.Exam;
-import com.digital.school.model.Homework;
-import com.digital.school.model.Professor;
+import com.digital.school.model.*;
 import com.digital.school.service.*;
-import com.digital.school.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +51,8 @@ public class ProfessorController {
     private AttendanceService attendanceService;
     @Autowired
     private ExamService examService;
+    @Autowired
+    private MeetingService meetingService;
 
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
@@ -88,8 +87,11 @@ public class ProfessorController {
     @GetMapping("/homeworks")
     public String listHomeworks(@AuthenticationPrincipal Professor professor, Model model) {
         List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor);
+        List<Subject> subjects = subjectService.findByProfessor(professor);
+        List<Classe> classes = classeService.findByProfessor(professor);
+        model.addAttribute("subjects", subjects);
+        model.addAttribute("classes", classes);
         model.addAttribute("homeworks", homeworks);
-        model.addAttribute("courses", courseService.findByProfessor(professor));
         return "professor/homeworks";
     }
 
@@ -162,6 +164,7 @@ public class ProfessorController {
     public String getMeetingPage(HttpServletRequest request,
                                        @AuthenticationPrincipal Professor professor,
                                        Model model) {
+        model.addAttribute("meetings", meetingService.findByProfessor(professor));
         model.addAttribute("teacherId", professor.getId());
         model.addAttribute("currentURI", request.getRequestURI());
         return "professor/meetings"; // Renvoie vers la template justification.html

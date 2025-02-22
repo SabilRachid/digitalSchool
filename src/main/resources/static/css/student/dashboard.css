@@ -48,7 +48,7 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     padding: 1.5rem;
     display: flex;
@@ -118,7 +118,7 @@
     background: white;
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 .card-header {
@@ -177,11 +177,6 @@
 .course-info h3 {
     font-weight: 600;
     margin-bottom: 0.25rem;
-}
-
-.course-actions {
-    display: flex;
-    gap: 0.5rem;
 }
 
 /* Liste des Devoirs */

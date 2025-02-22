@@ -1,7 +1,7 @@
 package com.digital.school.service;
 
 
-import com.digital.school.model.StudentGrade;
+import com.digital.school.model.StudentSubmission;
 import java.util.List;
 import java.util.Map;
 

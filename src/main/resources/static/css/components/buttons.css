@@ -123,7 +123,6 @@
 }
 
 .btn-group .btn:last-child {
-    border-top-right ```css
     border-top-right-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
 }

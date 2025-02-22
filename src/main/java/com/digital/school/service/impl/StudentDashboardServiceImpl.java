@@ -12,7 +12,6 @@ import com.digital.school.model.*;
 import com.digital.school.repository.*;
 import com.digital.school.service.StudentDashboardService;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,10 +23,10 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     private static final Logger LOGGER  = LoggerFactory.getLogger(StudentDashboardServiceImpl.class);
 
     @Autowired
-    private StudentGradeRepository gradeRepository;
+    private StudentSubmissionRepository studentSubmissionRepository;
     
     @Autowired
-    private HomeworkRepository homeworkRepository;
+    private ParentHomeworkRepository homeworkRepository;
     
     @Autowired
     private LearningResourceRepository resourceRepository;
@@ -40,6 +39,8 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
 
     @Autowired
     private ClasseRepository classeRepository;
+    @Autowired
+    private StudentHomeworkRepository studentHomeworkRepository;
 
     public StudentDashboardStats getStudentStats(Student student) {
         StudentDashboardStats stats = new StudentDashboardStats();
@@ -49,39 +50,35 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         
         // Calculer la moyenne générale
         //gerer optional de student
-        Double averageGrade = gradeRepository.calculateAverageGrade(student);
+        Double averageGrade = studentSubmissionRepository.calculateAverageGrade(student);
         stats.setAverageGrade(averageGrade != null ? averageGrade : 0.0);
         
         // Compter les devoirs en attente
-        stats.setPendingHomework(homeworkRepository.countPendingHomework(student));
+        stats.setPendingHomework(studentHomeworkRepository.countPendingHomework(student));
         
         // Compter les examens à venir
         stats.setUpcomingExams(eventRepository.countUpcomingExams(student));
 
         // Calculer le rang de l'élève
-        stats.setRank(gradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId()));
+        stats.setRank(studentSubmissionRepository.calculateStudentRank(student.getId(), student.getClasse().getId()));
 
         // Calculer le nombre d'elèves dans la classe
         stats.setTotalStudents(classeRepository.countStudents(student.getClasse().getId()));
 
         // calculer le successRate
-        stats.setSuccessRate(gradeRepository.calculateSuccessRate(student));
+        stats.setSuccessRate(studentSubmissionRepository.calculateSuccessRate(student));
 
         return stats;
     }
 
 
     @Override
-    public List<StudentGrade> getRecentGrades(Student student) {
-        Pageable pageable = (Pageable) PageRequest.of(0, 5, Sort.by("date").descending());
-        Page<StudentGrade> pagedGrades = gradeRepository.findRecentGrades(student, pageable);
+    public List<StudentSubmission> getRecentGrades(Student student) {
+        Pageable pageable = (Pageable) PageRequest.of(0, 5, Sort.by("gradedAt").descending());
+        Page<StudentSubmission> pagedGrades = studentSubmissionRepository.findRecentGrades(student, pageable);
         return pagedGrades.getContent();
     }
 
-    @Override
-    public List<Homework> getPendingHomework(Student student) {
-        return homeworkRepository.findByStudentAndStatusOrderByDueDateAsc(student, "PENDING");
-    }
 
     @Override
     @Transactional
@@ -93,7 +90,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
             return classeWithSubjects.getSubjects().stream()
                     .map(subject -> {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("subject", subject);
+                        map.put("name", subject.getName());
                         map.put("recentResources", resourceRepository.findRecentResources(subject));
                         map.put("resourceCount", resourceRepository.countBySubject(subject));
                         return map;

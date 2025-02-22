@@ -54,7 +54,7 @@ function initializeProgressionChart() {
         console.warn("Canvas de progression introuvable");
         return;
     }
-    fetch('/student/grades/progression')
+    fetch('/student/api/grades/progression')
         .then(response => response.json())
         .then(data => {
             const ctx = progressionCanvas.getContext('2d');
@@ -135,7 +135,7 @@ function getSubjectColor(subject) {
 
 // Téléchargement du bulletin
 function downloadBulletin() {
-    fetch('/student/grades/report')
+    fetch('/student/api/grades/report')
         .then(response => {
             if (!response.ok) throw new Error('Erreur lors du téléchargement');
             return response.blob();

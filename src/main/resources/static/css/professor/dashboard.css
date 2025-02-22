@@ -35,7 +35,7 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     padding: 1.5rem;
     display: flex;
@@ -96,10 +96,11 @@
 
 /* Dashboard Cards */
 .dashboard-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .card-header {

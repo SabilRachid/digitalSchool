@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface HomeworkRepository extends JpaRepository<Homework, Long> {
+public interface ParentHomeworkRepository extends JpaRepository<Homework, Long> {
 
     Optional<Homework> findByIdAndProfessor(Long id, Professor professor);
 
@@ -26,8 +26,8 @@ public interface HomeworkRepository extends JpaRepository<Homework, Long> {
             "JOIN h.subject s " +
             "JOIN h.classe c " +
             "WHERE (:classId IS NULL OR c.id = :classId) " +
-            "AND (:year IS NULL OR FUNCTION('YEAR', h.dueDate) = :year) " +
-            "AND (:month IS NULL OR FUNCTION('MONTH', h.dueDate) = :month)")
+            "AND (:year IS NULL OR EXTRACT(YEAR FROM h.dueDate) = :year) " +
+            "AND (:month IS NULL OR EXTRACT(MONTH FROM h.dueDate) = :month)")
     List<Map<String, Object>> findAllAsMap(@Param("classId") Long classId,
                                            @Param("year") Integer year,
                                            @Param("month") Integer month);

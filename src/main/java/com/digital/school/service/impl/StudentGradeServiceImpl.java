@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.digital.school.model.StudentGrade;
+import com.digital.school.model.StudentSubmission;
 import com.digital.school.model.User;
-import com.digital.school.repository.StudentGradeRepository;
+import com.digital.school.repository.StudentSubmissionRepository;
 import com.digital.school.service.StudentGradeService;
 import com.digital.school.service.PDFService;
 
@@ -25,33 +25,33 @@ import java.util.stream.Collectors;
 public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Autowired
-    private StudentGradeRepository gradeRepository;
+    private StudentSubmissionRepository studentSubmissionRepository;
     
     @Autowired
     private PDFService pdfService;
 
     @Override
-    public List<StudentGrade> findRecentGrades(Student student) {
+    public List<StudentSubmission> findRecentGrades(Student student) {
         //add pageable parameter to the method findRecentGrades(student);
         Pageable pageable = PageRequest.of(0, 5, Sort.by("date").descending());
 
-        Page<StudentGrade> pagedGrades =gradeRepository.findRecentGrades(student, pageable);
+        Page<StudentSubmission> pagedGrades =studentSubmissionRepository.findRecentGrades(student, pageable);
 
         return pagedGrades.getContent();
     }
 
     @Override
     public List<Map<String, Object>> findGradesBySubject(Student student) {
-        List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
+        List<StudentSubmission> grades = studentSubmissionRepository.findByStudentOrderByDateDesc(student);
 
         // Filtrer les notes dont la matière est null pour éviter des NullPointerExceptions
-        List<StudentGrade> filteredGrades = grades.stream()
-                .filter(grade -> grade.getSubject() != null)
+        List<StudentSubmission> filteredGrades = grades.stream()
+                .filter(grade -> grade.getEvaluation().getSubject() != null)
                 .collect(Collectors.toList());
 
         return filteredGrades.stream()
                 .collect(Collectors.groupingBy(
-                        grade -> grade.getSubject().getName(),
+                        grade -> grade.getEvaluation().getSubject().getName(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 subjectGrades -> {
@@ -78,14 +78,14 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     public Map<String, Object> calculatePerformanceStats(Student student) {
         Map<String, Object> stats = new HashMap<>();
         
-        List<StudentGrade> allGrades = gradeRepository.findByStudentOrderByDateDesc(student);
+        List<StudentSubmission> allGrades = studentSubmissionRepository.findByStudentOrderByDateDesc(student);
         
         // Moyenne générale
         double average = calculateAverage(allGrades);
         stats.put("average", average);
         
         // Rang dans la classe
-        int rank = gradeRepository.calculateStudentRank(
+        int rank = studentSubmissionRepository.calculateStudentRank(
             student.getId(), 
             student.getClasse().getId()
         );
@@ -114,13 +114,13 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public @NotNull Map<String, List<Double>> getGradesProgression(Student student) {
-        List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
+        List<StudentSubmission> grades = studentSubmissionRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()
             .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
+                grade -> grade.getEvaluation().getSubject().getName(),
                 Collectors.mapping(
-                    StudentGrade::getValue,
+                    StudentSubmission::getValue,
                     Collectors.toList()
                 )
             ));
@@ -128,7 +128,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public int getStudentRank(Student student) {
-        return gradeRepository.calculateStudentRank(
+        return studentSubmissionRepository.calculateStudentRank(
             student.getId(), 
             student.getClasse().getId()
         );
@@ -136,28 +136,29 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public Map<String, Double> getSubjectAverages(Student student) {
-        List<StudentGrade> grades = gradeRepository.findByStudentOrderByDateDesc(student);
+        List<StudentSubmission> grades = studentSubmissionRepository.findByStudentOrderByDateDesc(student);
         
         return grades.stream()
             .collect(Collectors.groupingBy(
-                grade -> grade.getSubject().getName(),
-                Collectors.averagingDouble(StudentGrade::getValue)
+                grade -> grade.getEvaluation().getSubject().getName(),
+                Collectors.averagingDouble(StudentSubmission::getValue)
             ));
     }
 
-    private double calculateAverage(List<StudentGrade> grades) {
+    private double calculateAverage(List<StudentSubmission> grades) {
         if (grades.isEmpty()) return 0.0;
         return grades.stream()
-                .mapToDouble(StudentGrade::getValue)
+                .mapToDouble(StudentSubmission::getValue)
                 .average()
                 .orElse(0.0);
     }
 
-    private double calculateClassAverage(List<StudentGrade> grades) {
+    private double calculateClassAverage(List<StudentSubmission> grades) {
         if (grades.isEmpty()) return 0.0;
-        
+
+        //A implementer
         return grades.stream()
-            .mapToDouble(StudentGrade::getClassAverage)
+            .mapToDouble(StudentSubmission::getValue)
             .average()
             .orElse(0.0);
     }

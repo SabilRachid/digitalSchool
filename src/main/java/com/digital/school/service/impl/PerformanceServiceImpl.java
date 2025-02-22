@@ -3,7 +3,7 @@ package com.digital.school.service.impl;
 import com.digital.school.model.Performance;
 import com.digital.school.model.Student;
 import com.digital.school.repository.PerformanceRepository;
-import com.digital.school.repository.StudentGradeRepository;
+import com.digital.school.repository.StudentSubmissionRepository;
 import com.digital.school.repository.StudentRepository;
 import com.digital.school.service.PerformanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class PerformanceServiceImpl implements PerformanceService {
     private PerformanceRepository performanceRepository;
 
     @Autowired
-    private StudentGradeRepository studentGradeRepository;
+    private StudentSubmissionRepository studentSubmissionRepository;
 
     @Autowired
     private StudentRepository studentRepository;
@@ -32,7 +32,7 @@ public class PerformanceServiceImpl implements PerformanceService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
 
-        Double newAverage = studentGradeRepository.calculateAverageGrade(student);
+        Double newAverage = studentSubmissionRepository.calculateAverageGrade(student);
 
         Performance performance = performanceRepository.findByStudentId(studentId)
                 .orElseGet(() -> new Performance(student));
@@ -45,8 +45,8 @@ public class PerformanceServiceImpl implements PerformanceService {
     @Override
     public void finalizeClassPerformance(Long subjectId, String title, Long classId) {
 
-        Long totalStudents = studentGradeRepository.countStudentsInClass(classId);
-        Long gradedStudents = studentGradeRepository.countGradesForClass(subjectId, title, classId);
+        Long totalStudents = studentSubmissionRepository.countStudentsInClass(classId);
+        Long gradedStudents = studentSubmissionRepository.countGradesForClass(subjectId, title, classId);
 
         //commentaire
         if (gradedStudents.equals(totalStudents)) { // Vérifier si toutes les notes ont été saisies
@@ -54,8 +54,8 @@ public class PerformanceServiceImpl implements PerformanceService {
 
 
 
-            Double classAverage = studentGradeRepository.calculateClassAverage(subjectId, title, classId);
-            Double successRate = studentGradeRepository.calculateSuccessRate(subjectId, title, classId);
+            Double classAverage = studentSubmissionRepository.calculateClassAverage(subjectId, title, classId);
+            Double successRate = studentSubmissionRepository.calculateSuccessRate(subjectId, title, classId);
 
             List<Performance> performances = performanceRepository.findAllByClasseOrderByAverageDesc(classId);
             int rank = 1;

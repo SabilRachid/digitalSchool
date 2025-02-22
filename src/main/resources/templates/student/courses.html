@@ -45,7 +45,7 @@
     <div th:each="course : ${courses}" class="course-card">
       <div class="course-header">
         <div class="course-subject" th:text="${course.subject.name}">Matière</div>
-        <div class="course-status" th:classappend="${course.status.toLowerCase()}"
+        <div class="course-status" th:classappend="${course.status}"
              th:text="${course.status}">Status</div>
       </div>
       <div class="course-content">

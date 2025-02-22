@@ -1,13 +1,16 @@
 package com.digital.school.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@DiscriminatorValue("exams")
+@Table(name = "exams")
+@PrimaryKeyJoinColumn(name = "id") // La clé primaire est partagée avec Evaluation
 public class Exam extends Evaluation {
 
     @Column(name = "start_time", nullable = false)
@@ -24,7 +27,7 @@ public class Exam extends Evaluation {
     @Column(name = "room")
     private String room;
 
-    // Getters et setters existants...
+    // Getters et setters
 
     public LocalDateTime getStartTime() {
         return startTime;

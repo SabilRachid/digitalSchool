@@ -22,9 +22,6 @@ public class Assignment extends AuditableEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course; // Cours associé
 
-    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL)
-    private Set<Submission> submissions = new HashSet<>();
-
     public Assignment() {}
 
     public String getTitle() {
@@ -59,11 +56,4 @@ public class Assignment extends AuditableEntity {
         this.course = course;
     }
 
-    public Set<Submission> getSubmissions() {
-        return submissions;
-    }
-
-    public void setSubmissions(Set<Submission> submissions) {
-        this.submissions = submissions;
-    }
 }

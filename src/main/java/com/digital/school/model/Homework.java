@@ -1,11 +1,13 @@
 package com.digital.school.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 
 @Entity
-@DiscriminatorValue("HOMEWORK")
+@Table(name = "homeworks")
+@PrimaryKeyJoinColumn(name = "id")
 public class Homework extends Evaluation {
 
     @Column(columnDefinition = "TEXT")

@@ -18,6 +18,19 @@ public class StudentExam extends StudentSubmission {
     @Column(nullable = false)
     private Boolean isPresent = false;
 
+    // Redéfinition pour renvoyer l'examen associé comme évaluation
+    @Override
+    public Evaluation getEvaluation() {
+        return exam;
+    }
+
+    @Override
+    public void setEvaluation(Evaluation evaluation) {
+        this.exam = (Exam) evaluation;
+    }
+
+    // Getters et setters spécifiques
+
     public Exam getExam() {
         return exam;
     }

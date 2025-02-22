@@ -18,7 +18,7 @@ public abstract class StudentSubmission extends AuditableEntity {
     @JoinColumn(name = "evaluation_id")
     private Evaluation evaluation;
 
-
+    public StudentSubmission() {}
 
     public Evaluation getEvaluation() {
         return evaluation;
@@ -27,10 +27,6 @@ public abstract class StudentSubmission extends AuditableEntity {
     public void setEvaluation(Evaluation evaluation) {
         this.evaluation = evaluation;
     }
-
-
-    public StudentSubmission() {}
-
 
     // Date de soumission (pour examen ou devoir)
     @Column(name = "submitted_at")
@@ -54,7 +50,7 @@ public abstract class StudentSubmission extends AuditableEntity {
     @Column(name = "grade_letter", nullable = false)
     private GradeType gradeType;
 
-    // Champ status déplacé dans la classe de base
+    // Champ status pour la soumission (par exemple, PENDING, COMPLETED, LATE, etc.)
     @Enumerated(EnumType.STRING)
     @Column(name = "submission_status", nullable = false)
     private StudentSubmissionStatus status;
@@ -125,7 +121,7 @@ public abstract class StudentSubmission extends AuditableEntity {
         this.status = status;
     }
 
-    // Méthode utilitaire pour la moyenne de classe si besoin (peut être calculée ailleurs)
+    // Méthode utilitaire (optionnelle) pour la moyenne de classe
     public Object getClassAverage() {
         return null;
     }

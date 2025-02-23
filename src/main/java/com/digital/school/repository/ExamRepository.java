@@ -16,7 +16,7 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
             "JOIN e.classe c " +
             "JOIN c.students s " +
             "WHERE s.id = :studentId " +
-            "  AND e.startTime >= :currentDate " +
+            "AND FUNCTION('DATE', e.startTime) >= :currentDate " +
             "ORDER BY e.startTime ASC")
     List<Exam> findUpcomingExamsByStudent(@Param("studentId") Long studentId,
                                           @Param("currentDate") LocalDate currentDate);
@@ -42,6 +42,7 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 
     @Query("SELECT COUNT(e) FROM Exam e WHERE e.startTime > CURRENT_TIMESTAMP AND e.status = 'PENDING' AND e.classe = :classe")
     int countUpcomingExams(Classe classe);
+
 
     List<Exam> findByProfessor_Id(Long professorId);
 }

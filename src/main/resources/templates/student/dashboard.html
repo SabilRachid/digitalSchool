@@ -61,7 +61,7 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stat-content">
-                <h3>Moyenne Générale</h3>
+                <h3>Moyenne des notes</h3>
                 <div class="stat-value" th:text="${stats.averageGrade + '/20'}">14.5/20</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
@@ -170,13 +170,13 @@
                     <div th:each="grade : ${recentGrades}" class="grade-item">
                         <div class="grade-subject">
                             <i class="fas fa-book"></i>
-                            <span th:text="${grade.subject.name}">Matière</span>
+                            <span th:text="${grade.evaluation.subject.name}">Matière</span>
                         </div>
                         <div class="grade-info">
                             <div class="grade-value" th:text="${grade.value + '/20'}">Note</div>
                             <div class="grade-details">
-                                <span th:text="${grade.title}">Type d'évaluation</span>
-                                <span class="grade-date" th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">Date</span>
+                                <span th:text="${grade.evaluation.title}">Type d'évaluation</span>
+                                <span class="grade-date" th:text="${#temporals.format(grade.evaluation.dueDate, 'dd/MM/yyyy')}">Date</span>
                             </div>
                         </div>
                         <div class="grade-comparison">

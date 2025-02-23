@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "Student_Submissions")
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "submission_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class StudentSubmission extends AuditableEntity {
 
@@ -121,7 +122,7 @@ public abstract class StudentSubmission extends AuditableEntity {
         this.status = status;
     }
 
-    // Méthode utilitaire (optionnelle) pour la moyenne de classe
+    // Méthode utilitaire (optionnelle)
     public Object getClassAverage() {
         return null;
     }

@@ -5,8 +5,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "evaluations")
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "evaluations")
+@DiscriminatorColumn(name="evaluation_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Evaluation extends AuditableEntity {
 
     @Column(nullable = false)
@@ -34,7 +35,7 @@ public abstract class Evaluation extends AuditableEntity {
     @Column(name = "status", nullable = false)
     private EvaluationStatus status;
 
-    // Getters et setters
+    // Getters and setters
 
     public String getName() {
         return name;

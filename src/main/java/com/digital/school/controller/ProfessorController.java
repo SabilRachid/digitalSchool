@@ -128,6 +128,7 @@ public class ProfessorController {
     public String getExamsForProfessor(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
         // Récupérer la liste des examens pour le professeur connecté via le service
         List<Exam> exams = examService.findExamsByProfessor(professor.getId());
+        LOGGER.debug("professor exams size()="+exams.size());
         model.addAttribute("exams", exams);
         model.addAttribute("teacherId", professor.getId());
 

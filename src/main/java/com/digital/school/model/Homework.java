@@ -1,11 +1,9 @@
 package com.digital.school.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
+@DiscriminatorValue("homework")
 @Table(name = "homeworks")
 @PrimaryKeyJoinColumn(name = "id")
 public class Homework extends Evaluation {
@@ -13,9 +11,8 @@ public class Homework extends Evaluation {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Autres champs spécifiques au devoir si nécessaire
+    // Getters and setters
 
-    // Getters et setters
     public String getDescription() {
         return description;
     }

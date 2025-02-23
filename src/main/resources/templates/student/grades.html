@@ -103,8 +103,8 @@
             <div class="grades-list">
                 <div th:each="grade : ${subject.grades}" class="grade-item">
                     <div class="grade-info">
-                        <span class="grade-title" th:text="${grade.title}">Contrôle continu</span>
-                        <span class="grade-date" th:text="${#temporals.format(grade.date, 'dd/MM/yyyy')}">01/01/2024</span>
+                        <span class="grade-title" th:text="${grade.evaluation.title}">Contrôle continu</span>
+                        <span class="grade-date" th:text="${#temporals.format(grade.evaluation.dueDate, 'dd/MM/yyyy')}">01/01/2024</span>
                     </div>
                     <div class="grade-value"
                          th:text="${grade.value != null ? grade.value + '/20' : '0/20'}"

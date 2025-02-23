@@ -1,12 +1,11 @@
 package com.digital.school.model;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue("homework")
+@DiscriminatorValue("homeworks")
+@Table(name = "Student_Homeworks")
+@PrimaryKeyJoinColumn(name = "id")
 public class StudentHomework extends StudentSubmission {
 
 	@ManyToOne(optional = false)
@@ -18,7 +17,6 @@ public class StudentHomework extends StudentSubmission {
 	@JoinColumn(name = "document_id")
 	private Document document;
 
-	// Redéfinition pour renvoyer le devoir associé comme évaluation
 	@Override
 	public Evaluation getEvaluation() {
 		return homework;
@@ -29,7 +27,7 @@ public class StudentHomework extends StudentSubmission {
 		this.homework = (Homework) evaluation;
 	}
 
-	// Getters et setters spécifiques
+	// Getters & setters spécifiques
 
 	public Homework getHomework() {
 		return homework;

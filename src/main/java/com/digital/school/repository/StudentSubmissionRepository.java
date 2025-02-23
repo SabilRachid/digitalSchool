@@ -19,7 +19,7 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
             "  SELECT ss.student_id, " +
             "         COALESCE(AVG(ss.grade_value), 0.0) AS avg_grade, " +
             "         DENSE_RANK() OVER (ORDER BY AVG(ss.grade_value) DESC) AS rank " +
-            "  FROM student_submission ss " +
+            "  FROM student_submissions ss " +
             "  JOIN students s ON ss.student_id = s.user_id " +
             "  WHERE s.class_id = :classId " +
             "  GROUP BY ss.student_id " +

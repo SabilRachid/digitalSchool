@@ -1,14 +1,13 @@
 package com.digital.school.model;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @DiscriminatorValue("exams")
+@Table(name="student_exams")
+@PrimaryKeyJoinColumn(name = "id")
 public class StudentExam extends StudentSubmission {
 
     @ManyToOne(optional = false)
@@ -18,7 +17,6 @@ public class StudentExam extends StudentSubmission {
     @Column(nullable = false)
     private Boolean isPresent = false;
 
-    // Redéfinition pour renvoyer l'examen associé comme évaluation
     @Override
     public Evaluation getEvaluation() {
         return exam;
@@ -29,7 +27,7 @@ public class StudentExam extends StudentSubmission {
         this.exam = (Exam) evaluation;
     }
 
-    // Getters et setters spécifiques
+    // Getters et setters
 
     public Exam getExam() {
         return exam;

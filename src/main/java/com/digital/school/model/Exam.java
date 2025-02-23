@@ -1,16 +1,13 @@
 package com.digital.school.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
-
-import java.time.LocalDate;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
+@DiscriminatorValue("exams")
 @Table(name = "exams")
-@PrimaryKeyJoinColumn(name = "id") // La clé primaire est partagée avec Evaluation
+@PrimaryKeyJoinColumn(name = "id")
 public class Exam extends Evaluation {
 
     @Column(name = "start_time", nullable = false)
@@ -23,9 +20,10 @@ public class Exam extends Evaluation {
     @Column(name = "duration", nullable = false)
     private int duration;
 
-    // Salle ou emplacement de l'examen
-    @Column(name = "room")
-    private String room;
+    // Au lieu d'une chaîne, on utilise une relation vers la classe Room
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     // Getters et setters
 
@@ -53,11 +51,11 @@ public class Exam extends Evaluation {
         this.duration = duration;
     }
 
-    public String getRoom() {
+    public Room getRoom() {
         return room;
     }
 
-    public void setRoom(String room) {
+    public void setRoom(Room room) {
         this.room = room;
     }
 

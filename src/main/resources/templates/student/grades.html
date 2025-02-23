@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Notes - Digital School</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -16,13 +15,14 @@
     <link rel="stylesheet" th:href="@{/css/components/badges.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
-    <link rel="stylesheet" th:href="@{/css/student/grades.css}">
+    <link rel="stylesheet" href="/css/student/grades.css">
 </head>
 <body>
-<!-- Injection des données pour les graphiques -->
+<!-- Injection des données JSON pour les graphiques -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    window.gradesData = /*[[${gradesBySubjectsJsons}]]*/ [];
+    window.homeworkGradesData = /*[[${homeworkGradesJson}]]*/ [];
+    window.examGradesData = /*[[${examGradesJson}]]*/ [];
     /*]]>*/
 </script>
 
@@ -79,44 +79,65 @@
         </div>
     </div>
 
-    <!-- Grades by Subject -->
-    <div class="grades-grid">
-        <div th:each="subject : ${gradesBySubjects}" class="subject-card">
+    <!-- Section de notes de devoirs -->
+    <div class="grades-section" id="homework-grades">
+        <h2>Notes de Devoirs</h2>
+        <div th:each="subjectGroup : ${homeworkGrades}" class="subject-card">
             <div class="subject-header">
-                <h3 th:text="${subject.subject}">Matière</h3>
+                <h3 th:text="${subjectGroup.subject}">Matière</h3>
                 <div class="subject-average">
             <span class="average-value"
-                  th:text="${subject.average != null ? subject.average + '/20' : '0/20'}"
-                  th:classappend="${subject.average != null ? (subject.average >= 16 ? 'excellent' : subject.average >= 14 ? 'good' : subject.average >= 10 ? 'average' : 'poor') : 'poor'}">
-              0/20
-            </span>
+                  th:text="${subjectGroup.average != null ? subjectGroup.average + '/20' : '0/20'}">0/20</span>
                     <span class="class-average">
-              Moyenne classe:
-              <span th:text="${subject.classAverage != null ? subject.classAverage + '/20' : '0/20'}">13/20</span>
+              Moyenne classe: <span th:text="${subjectGroup.classAverage != null ? subjectGroup.classAverage + '/20' : '0/20'}">13/20</span>
             </span>
                 </div>
-            </div>
-            <div class="grades-chart">
-                <!-- Assurez-vous que subject.subject est formaté sans espaces -->
-                <canvas th:id="${'chart-' + subject.subject}"></canvas>
             </div>
             <div class="grades-list">
-                <div th:each="grade : ${subject.grades}" class="grade-item">
+                <div th:each="grade : ${subjectGroup.grades}" class="grade-item">
                     <div class="grade-info">
-                        <span class="grade-title" th:text="${grade.evaluation.title}">Contrôle continu</span>
-                        <span class="grade-date" th:text="${#temporals.format(grade.evaluation.dueDate, 'dd/MM/yyyy')}">01/01/2024</span>
+                        <span class="grade-title" th:text="${grade.evaluationTitle}">Titre devoir</span>
+                        <span class="grade-date" th:text="${#temporals.format(grade.dueDate, 'dd/MM/yyyy')}">01/01/2024</span>
                     </div>
-                    <div class="grade-value"
-                         th:text="${grade.value != null ? grade.value + '/20' : '0/20'}"
-                         th:classappend="${grade.value != null ? (grade.value >= 16 ? 'excellent' : grade.value >= 14 ? 'good' : grade.value >= 10 ? 'average' : 'poor') : 'poor'}">
-                        15/20
-                    </div>
+                    <div class="grade-value" th:text="${grade.value != null ? grade.value + '/20' : '0/20'}">15/20</div>
                 </div>
             </div>
+            <!--div class="grades-chart">
+                <canvas th:id="${'chart-' + subjectGroup.subject.replaceAll(' ', '')}"></canvas>
+            </div-->
         </div>
     </div>
 
-    <!-- Progress Chart -->
+    <!-- Section de notes d'examens -->
+    <div class="grades-section" id="exam-grades">
+        <h2>Notes d'Examens</h2>
+        <div th:each="subjectGroup : ${examGrades}" class="subject-card">
+            <div class="subject-header">
+                <h3 th:text="${subjectGroup.subject}">Matière</h3>
+                <div class="subject-average">
+            <span class="average-value"
+                  th:text="${subjectGroup.average != null ? subjectGroup.average + '/20' : '0/20'}">0/20</span>
+                    <span class="class-average">
+              Moyenne classe: <span th:text="${subjectGroup.classAverage != null ? subjectGroup.classAverage + '/20' : '0/20'}">13/20</span>
+            </span>
+                </div>
+            </div>
+            <div class="grades-list">
+                <div th:each="grade : ${subjectGroup.grades}" class="grade-item">
+                    <div class="grade-info">
+                        <span class="grade-title" th:text="${grade.evaluationTitle}">Titre examen</span>
+                        <span class="grade-date" th:text="${#temporals.format(grade.dueDate, 'dd/MM/yyyy')}">01/01/2024</span>
+                    </div>
+                    <div class="grade-value" th:text="${grade.value != null ? grade.value + '/20' : '0/20'}">14/20</div>
+                </div>
+            </div>
+            <!--div class="grades-chart">
+                <canvas th:id="${'chart-' + subjectGroup.subject.replaceAll(' ', '') + '-exam'}"></canvas>
+            </div-->
+        </div>
+    </div>
+
+    <!-- Graphique de progression -->
     <div class="progress-section">
         <div class="section-header">
             <h2>Progression</h2>

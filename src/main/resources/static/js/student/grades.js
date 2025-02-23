@@ -3,19 +3,18 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProgressionChart();
 });
 
-// Initialisation des graphiques par matière
+// Initialisation des graphiques par matière pour devoirs et examens
 function initializeSubjectCharts() {
-    document.querySelectorAll('.grades-chart canvas').forEach(canvas => {
-        // Ici, on suppose que l'id du canvas est au format "chart-Matière" (sans espaces)
+    // Graphiques pour les devoirs
+    document.querySelectorAll('#homework-grades .grades-chart canvas').forEach(canvas => {
+        // L'ID du canvas est au format "chart-Matière" (sans espaces)
         const subject = canvas.id.replace('chart-', '');
-        const grades = getSubjectGrades(subject);
-        console.log("Données pour la matière", subject, grades);
-
+        const grades = getSubjectGrades(subject, 'homework');
+        console.log("Données pour devoirs - Matière:", subject, grades);
         if (!grades || grades.length === 0) {
             console.warn("Aucune donnée pour", subject);
             return;
         }
-
         new Chart(canvas, {
             type: 'line',
             data: {
@@ -24,13 +23,57 @@ function initializeSubjectCharts() {
                     label: 'Mes notes',
                     data: grades.map(g => g.value),
                     borderColor: '#4F46E5',
-                    tension: 0.4
+                    tension: 0.4,
+                    fill: false
                 }, {
                     label: 'Moyenne classe',
                     data: grades.map(g => g.classAverage),
                     borderColor: '#9CA3AF',
                     borderDash: [5, 5],
-                    tension: 0.4
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 20
+                    }
+                }
+            }
+        });
+    });
+
+    // Graphiques pour les examens
+    document.querySelectorAll('#exam-grades .grades-chart canvas').forEach(canvas => {
+        // L'ID du canvas est au format "chart-Matière-exam"
+        const subject = canvas.id.replace('chart-', '').replace('-exam', '');
+        const grades = getSubjectGrades(subject, 'exam');
+        console.log("Données pour examens - Matière:", subject, grades);
+        if (!grades || grades.length === 0) {
+            console.warn("Aucune donnée pour", subject);
+            return;
+        }
+        new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: grades.map(g => formatDate(g.date)),
+                datasets: [{
+                    label: 'Mes notes',
+                    data: grades.map(g => g.value),
+                    borderColor: '#DC2626',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: 'Moyenne classe',
+                    data: grades.map(g => g.classAverage),
+                    borderColor: '#9CA3AF',
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: false
                 }]
             },
             options: {
@@ -66,7 +109,8 @@ function initializeProgressionChart() {
                         label: subject,
                         data: grades,
                         borderColor: getSubjectColor(subject),
-                        tension: 0.4
+                        tension: 0.4,
+                        fill: false
                     }))
                 },
                 options: {
@@ -84,23 +128,25 @@ function initializeProgressionChart() {
         .catch(error => showNotification(error.message, 'error'));
 }
 
-// Récupère les notes d'une matière depuis window.gradesData
-function normalize(str) {
-    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-function getSubjectGrades(subject) {
+// Récupère les notes d'une matière depuis window.gradesData selon le type ('homework' ou 'exam')
+function getSubjectGrades(subject, type) {
     if (!window.gradesData) {
         console.warn("gradesData is not defined, returning an empty array");
         return [];
     }
-    // Normalisez les valeurs pour comparer
+    // On suppose que window.gradesData contient deux propriétés : homework et exam
+    let dataGroup = [];
+    if (type === 'homework' && window.gradesData.homework) {
+        dataGroup = window.gradesData.homework;
+    } else if (type === 'exam' && window.gradesData.exam) {
+        dataGroup = window.gradesData.exam;
+    }
     const normalizedSubject = normalize(subject);
-    const subjectData = window.gradesData.find(s => normalize(s.subject) === normalizedSubject);
+    const subjectData = dataGroup.find(s => normalize(s.subject) === normalizedSubject);
     return subjectData ? subjectData.grades : [];
 }
 
-// Formate une date en "dd MMM"
+// Formate une date en "dd MMM" (exemple: "01 janv.")
 function formatDate(date) {
     return new Date(date).toLocaleDateString('fr-FR', {
         day: '2-digit',
@@ -120,7 +166,7 @@ function generateDateLabels() {
     return labels;
 }
 
-// Retourne une couleur selon la matière
+// Retourne une couleur en fonction du nom de la matière
 function getSubjectColor(subject) {
     const colors = {
         'Mathématiques': '#4F46E5',
@@ -133,7 +179,7 @@ function getSubjectColor(subject) {
     return colors[subject] || '#6B7280';
 }
 
-// Téléchargement du bulletin
+// Fonction de téléchargement du bulletin PDF
 function downloadBulletin() {
     fetch('/student/api/grades/report')
         .then(response => {
@@ -153,7 +199,7 @@ function downloadBulletin() {
         .catch(error => showNotification(error.message, 'error'));
 }
 
-// Affichage des notifications
+// Affiche une notification à l'écran
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -174,4 +220,9 @@ function showNotification(message, type = 'info') {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     }, 5000);
+}
+
+// Normalise une chaîne (suppression d'accents, minuscules)
+function normalize(str) {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }

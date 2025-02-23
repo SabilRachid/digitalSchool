@@ -76,6 +76,7 @@
     border-radius: var(--card-radius);
     padding: 1.5rem;
     box-shadow: var(--card-shadow);
+    margin-bottom: 2rem; /* espace entre les sections (devoirs et examens) */
 }
 
 .subject-header {
@@ -110,6 +111,12 @@
 .class-average {
     font-size: 0.875rem;
     color: var(--text-secondary);
+}
+
+
+/* Ajoute une marge entre chaque section de notes */
+.grades-section {
+    margin-bottom: 2rem; /* espace entre les sections (devoirs et examens) */
 }
 
 /* Grades Chart */

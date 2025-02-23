@@ -196,4 +196,8 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
             "      OR TREAT(ss AS StudentExam).exam.startTime >= CURRENT_DATE)))")
     List<StudentSubmission> findByClasseAndPeriod(@Param("classId") Long classId,
                                                   @Param("period") String period);
+
+    @Query("SELECT ss FROM StudentSubmission ss WHERE ss.student = :student ORDER BY ss.gradedAt DESC")
+    List<StudentSubmission> findByStudentOrderByGradedAtDesc(@Param("student") Student student);
+
 }

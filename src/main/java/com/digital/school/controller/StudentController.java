@@ -2,6 +2,10 @@ package com.digital.school.controller;
 
 import com.digital.school.model.Student;
 import com.digital.school.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +28,12 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/student")
 public class StudentController {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private StudentDashboardService dashboardService;
 
@@ -40,7 +44,7 @@ public class StudentController {
     private ExamService examService;
 
     @Autowired
-    private HomeworkService homeworkService;
+    private ObjectMapper objectMapper;
 
     @Autowired
     private CourseService courseService;
@@ -53,21 +57,21 @@ public class StudentController {
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && 
+        if (authentication != null && authentication.isAuthenticated() &&
             !(authentication instanceof AnonymousAuthenticationToken)) {
-            
+
             String username = authentication.getName();
             Optional<User> userOptional = userService.findByUsername(username);
-            
+
             if (userOptional.isPresent()) {
                 LOGGER.debug("Student user present: {}, URI: {}", username, request.getRequestURI());
                 User user = userOptional.get();
                 model.addAttribute("user", user);
                 model.addAttribute("currentURI", request.getRequestURI());
-                
+
                 // Statistiques générales
                 model.addAttribute("stats", dashboardService.getStudentStats(student));
-                
+
                 // Notes récentes
                 model.addAttribute("recentGrades", dashboardService.getRecentGrades(student));
 
@@ -77,21 +81,21 @@ public class StudentController {
 
                 // Devoirs en attente
                 model.addAttribute("pendingHomework", studentHomeworkService.findUpcomingHomeworks(student));
-                
+
                 // Matières et ressources
                 model.addAttribute("subjects", dashboardService.getSubjectsWithResources(student));
-                
+
                 // Événements à venir
                 model.addAttribute("upcomingEvents", dashboardService.getUpcomingEvents(student));
 
                 model.addAttribute("currentURI", request.getRequestURI());
-                
+
                 return "student/dashboard";
             }
         }
         return "redirect:/login";
     }
-    
+
 
     @GetMapping("/homeworks")
     public String homeworks(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
@@ -119,7 +123,9 @@ public class StudentController {
 
 
     @GetMapping("/grades")
-    public String grades(HttpServletRequest request, @AuthenticationPrincipal Student student, Model model) {
+    public String grades(HttpServletRequest request,
+                         @AuthenticationPrincipal Student student,
+                         Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() &&
                 !(authentication instanceof AnonymousAuthenticationToken)) {
@@ -133,13 +139,28 @@ public class StudentController {
                 model.addAttribute("user", user);
                 model.addAttribute("currentURI", request.getRequestURI());
 
-                List<Map<String, Object>> gradesBySubjects = gradeService.findGradesBySubject(student);
-                // Convertir l'objet en JSON (si nécessaire) et l'ajouter au modèle
-                model.addAttribute("gradesBySubjectsJson", gradesBySubjects);
+                // Récupération séparée des notes de devoirs et d'examens via le service
+                List<Map<String, Object>> homeworkGrades = gradeService.findHomeworkGrades(student);
+                List<Map<String, Object>> examGrades = gradeService.findExamGrades(student);
 
-                // Ajout des données nécessaires à la vue
-                model.addAttribute("gradesBySubjects", gradeService.findGradesBySubject(student));
-                LOGGER.debug("Grades by subject: {}", gradeService.findGradesBySubject(student));
+                // Ajout au modèle pour utilisation dans le template Thymeleaf
+                model.addAttribute("homeworkGrades", homeworkGrades);
+                model.addAttribute("examGrades", examGrades);
+
+                // Conversion en JSON pour les graphiques côté client
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.registerModule(new JavaTimeModule());
+                    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                    String homeworkGradesJson = mapper.writeValueAsString(homeworkGrades);
+                    String examGradesJson = mapper.writeValueAsString(examGrades);
+                    model.addAttribute("homeworkGradesJson", homeworkGradesJson);
+                    model.addAttribute("examGradesJson", examGradesJson);
+                } catch (JsonProcessingException e) {
+                    LOGGER.error("Erreur lors de la conversion en JSON", e);
+                    model.addAttribute("homeworkGradesJson", "[]");
+                    model.addAttribute("examGradesJson", "[]");
+                }
 
                 model.addAttribute("stats", dashboardService.getStudentStats(student));
 
@@ -148,6 +169,7 @@ public class StudentController {
         }
         return "redirect:/login";
     }
+
 
     @GetMapping("/schedules")
     public String studentDashboard(@AuthenticationPrincipal Student student, Model model) {
@@ -175,5 +197,5 @@ public class StudentController {
         }
         return "redirect:/login";
     }
-    
+
 }

@@ -2,6 +2,7 @@ package com.digital.school.service.impl;
 
 import com.digital.school.model.Professor;
 import com.digital.school.model.enumerated.EvaluationStatus;
+import com.digital.school.service.ClasseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,19 +32,23 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
 
     @Autowired
     private ProfessorDashboardRepository professorDashboardRepository;
+    @Autowired
+    private ClasseService classeService;
+    @Autowired
+    private ClasseRepository classeRepository;
 
     @Override
     public Map<String, Object> getProfessorStats(Professor professor) {
         Map<String, Object> stats = new HashMap<>();
 
         // Calculate total students
-        int totalStudents = courseRepository.findByProfessor(professor).stream()
-                .mapToInt(course -> course.getClasse().getStudents().size())
-                .sum();
+        int totalStudents = (int) classeRepository.findByProfessor(professor).stream()
+                .flatMap(classe -> classe.getStudents().stream())
+                .distinct()
+                .count();
         stats.put("totalStudents", totalStudents);
 
         // Calculate total classes
-
         long totalClasses = courseRepository.findByProfessor(professor).stream()
                 .map(course -> course.getClasse())
                 .distinct()

@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface ExamRepository extends JpaRepository<Exam, Long> {
 
+    List<Exam> findByProfessorId(Long professorId);
+
     @Query("SELECT e FROM Exam e " +
             "JOIN e.classe c " +
             "JOIN c.students s " +
@@ -43,6 +45,4 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     @Query("SELECT COUNT(e) FROM Exam e WHERE e.startTime > CURRENT_TIMESTAMP AND e.status = 'PENDING' AND e.classe = :classe")
     int countUpcomingExams(Classe classe);
 
-
-    List<Exam> findByProfessor_Id(Long professorId);
 }

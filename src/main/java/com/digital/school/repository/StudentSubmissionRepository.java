@@ -184,8 +184,9 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
     Double calculateAverageGrade(@Param("student") Student student);
 
     // Pagination des soumissions récentes pour un étudiant.
-    @Query("SELECT ss FROM StudentSubmission ss WHERE ss.student = :student")
+    @Query(value = "SELECT ss FROM StudentSubmission ss WHERE ss.student = :student ORDER BY ss.gradedAt DESC")
     Page<StudentSubmission> findRecentGrades(@Param("student") Student student, Pageable pageable);
+
 
     // Récupère les soumissions d'une classe pour une période donnée (past/upcoming).
     @Query("SELECT ss FROM StudentSubmission ss " +
@@ -199,5 +200,7 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
 
     @Query("SELECT ss FROM StudentSubmission ss WHERE ss.student = :student ORDER BY ss.gradedAt DESC")
     List<StudentSubmission> findByStudentOrderByGradedAtDesc(@Param("student") Student student);
+
+
 
 }

@@ -12,6 +12,14 @@ import java.util.Optional;
  */
 public interface HomeworkService {
 
+    Homework createHomework(Homework homework, Long professorId);
+    void publishHomework(Long homeworkId);
+    void endHomework(Long homeworkId);
+    void enterGrade(Long submissionId, Double gradeValue, String comment, Long professorId);
+    List<Homework> findHomeworksByProfessor(Long professorId);
+    List<Homework> findHomeworksByProfessor(Long professorId, String month, Long classe, Long subject);
+    byte[] generateHomeworkReport(Long homeworkId);
+
     List<Map<String, Object>> findAllAsMap(Long classId, Integer year, Integer month);
 
     Homework findByIdAndProfessor(Long id, Professor professor);
@@ -30,4 +38,7 @@ public interface HomeworkService {
      * Récupère la liste des devoirs en attente de correction pour le professeur.
      */
     List<Homework> findPendingGradingByProfessor(Professor professor);
+
+
+
 }

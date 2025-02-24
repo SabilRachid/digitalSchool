@@ -148,21 +148,10 @@
     font-weight: 600;
 }
 
-.grade-value.excellent {
-    color: var(--grade-excellent);
-}
-
-.grade-value.good {
-    color: var(--grade-good);
-}
-
-.grade-value.average {
-    color: var(--grade-average);
-}
-
-.grade-value.poor {
-    color: var(--grade-poor);
-}
+.grade-value.excellent { color: var(--grade-excellent); }
+.grade-value.good { color: var(--grade-good); }
+.grade-value.average { color: var(--grade-average); }
+.grade-value.poor { color: var(--grade-poor); }
 
 /* Modal Styles */
 .modal {
@@ -200,11 +189,9 @@
     .table-actions {
         flex-direction: column;
     }
-
     .table-actions .btn {
         width: 100%;
     }
-
     .stats-grid {
         grid-template-columns: 1fr;
     }

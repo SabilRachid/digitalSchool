@@ -10,6 +10,7 @@ public enum EvaluationStatus {
     /*** Le devoir est publié et accessible aux étudiants.*/
     PUBLISHED,
 
+    COMPLETED,
     /*** Le devoir est clôturé (la date d'échéance est passée).*/
     CLOSED,
 

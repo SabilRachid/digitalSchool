@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,19 +84,7 @@ public class ProfessorController {
     }
 
 
-    /* Affiche la liste des devoirs du professeur */
-    @GetMapping("/homeworks")
-    public String listHomeworks(@AuthenticationPrincipal Professor professor, Model model) {
-        List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor);
-        List<Subject> subjects = subjectService.findByProfessor(professor);
-        List<Classe> classes = classeService.findByProfessor(professor);
-        model.addAttribute("subjects", subjects);
-        model.addAttribute("classes", classes);
-        model.addAttribute("homeworks", homeworks);
-        return "professor/homeworks";
-    }
-
-     // Récupérer toutes les participations
+    // Récupérer toutes les participations
     @GetMapping("/participations")
     public String showParticipations(HttpServletRequest request, Model model) {
         List<ParticipationDto> participations = participationService.getAllParticipations().stream()
@@ -124,18 +113,55 @@ public class ProfessorController {
     }
 
 
-    @GetMapping("/exams")
-    public String getExamsForProfessor(HttpServletRequest request, @AuthenticationPrincipal Professor professor, Model model) {
-        // Récupérer la liste des examens pour le professeur connecté via le service
-        List<Exam> exams = examService.findExamsByProfessor(professor.getId());
-        LOGGER.debug("professor exams size()="+exams.size());
-        model.addAttribute("exams", exams);
-        model.addAttribute("teacherId", professor.getId());
+    /* Affiche la liste des devoirs du professeur */
+    @GetMapping("/homeworks")
+    public String getHomeworksForProfessor(HttpServletRequest request,
+                                       @AuthenticationPrincipal Professor professor,
+                                       @RequestParam(required = false) String month,
+                                       @RequestParam(required = false) Long classe,
+                                       @RequestParam(required = false) Long subject,
+                                       Model model) {
+        List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor.getId(), month, classe, subject);
 
-        // Vous pouvez ajouter d'autres attributs nécessaires pour le template
+        model.addAttribute("classes", classeService.findByProfessor(professor));
+        model.addAttribute("subjects", subjectService.findByProfessor(professor));
+        model.addAttribute("teacherId", professor.getId());
         model.addAttribute("currentURI", request.getRequestURI());
 
-        // Retourner le nom du template (par exemple, "professor/exams")
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("selectedClasse", classe);
+        model.addAttribute("selectedSubject", subject);
+
+        model.addAttribute("homeworks", homeworks);
+        return "professor/homeworks";
+    }
+
+    @GetMapping("/exams")
+    public String getExamsForProfessor(HttpServletRequest request,
+                                       @AuthenticationPrincipal Professor professor,
+                                       @RequestParam(required = false) String month,
+                                       @RequestParam(required = false) Long classe,
+                                       @RequestParam(required = false) Long subject,
+                                       Model model) {
+        // Récupérer la liste filtrée des examens pour le professeur connecté
+        List<Exam> exams = examService.findExamsByProfessor(professor.getId(), month, classe, subject);
+        LOGGER.debug("Exams found: {}", exams.size());
+
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("selectedClasse", classe);
+        model.addAttribute("selectedSubject", subject);
+
+        model.addAttribute("classes", classeService.findByProfessor(professor));
+        model.addAttribute("subjects", subjectService.findByProfessor(professor));
+        model.addAttribute("exams", exams);
+        model.addAttribute("teacherId", professor.getId());
+        model.addAttribute("currentURI", request.getRequestURI());
+
+        // Pour pré-remplir le formulaire de filtre si besoin
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("selectedClasse", classe);
+        model.addAttribute("selectedSubject", subject);
+
         return "professor/exams";
     }
 

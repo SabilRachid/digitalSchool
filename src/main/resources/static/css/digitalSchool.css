@@ -23,8 +23,9 @@
 
     /* Arrière-plans */
     --bg-primary: #F9FAFB;
-    --bg-secondary: #F3F4F6;
-   /* --bg-secondary: #ebe4e452; */
+    --bg-secondary: #eceff194;
+    /* --bg-secondary: #F3F4F6; */
+    /* --bg-secondary: #ebe4e452; */
     --bg-tertiary: #E5E7EB;
 
     /* Layout */
@@ -220,11 +221,11 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.3rem;
 }
 
 .dashboard-title {
-    font-size: 1.625rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -240,7 +241,7 @@ a:hover {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .table-responsive {

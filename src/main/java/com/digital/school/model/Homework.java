@@ -3,7 +3,7 @@ package com.digital.school.model;
 import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue("homework")
+@DiscriminatorValue("homeworks")
 @Table(name = "homeworks")
 @PrimaryKeyJoinColumn(name = "id")
 public class Homework extends Evaluation {

@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public interface HomeworkRepository extends JpaRepository<Homework, Long> {
 
+    List<Homework> findByProfessorId(Long professorId);
+
     Optional<Homework> findByIdAndProfessor(Long id, Professor professor);
 
     @Query("SELECT new map(" +

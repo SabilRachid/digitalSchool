@@ -31,6 +31,14 @@ public class Professor extends User {
     private Set<Classe> classes = new HashSet<>();
 
 
+    // Constructeur par défaut requis par JPA
+    public Professor() { }
+
+    // Constructeur avec identifiant
+    public Professor(Long id) {
+        this.id = id;
+    }
+
     public Set<Subject> getSubjects() {
         return subjects;
     }

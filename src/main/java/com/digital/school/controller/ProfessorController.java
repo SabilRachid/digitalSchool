@@ -103,24 +103,24 @@ public class ProfessorController {
         return "professor/attendances";
     }
 
-    @GetMapping("/courses")
+    @GetMapping("/calendar")
     public String getCoursesForProfessor(HttpServletRequest request,  @AuthenticationPrincipal Professor professor, Model model) {
 
         LOGGER.debug("📌 Requête reçue : {}", request.getRequestURI());
         model.addAttribute("teacherId", professor.getId());
         List<Map<String, Object>> courses = courseService.findByProfessor(professor);
-        return "professor/courses";
+        return "professor/calendar";
     }
 
 
     /* Affiche la liste des devoirs du professeur */
     @GetMapping("/homeworks")
     public String getHomeworksForProfessor(HttpServletRequest request,
-                                       @AuthenticationPrincipal Professor professor,
-                                       @RequestParam(required = false) String month,
-                                       @RequestParam(required = false) Long classe,
-                                       @RequestParam(required = false) Long subject,
-                                       Model model) {
+                                           @AuthenticationPrincipal Professor professor,
+                                           @RequestParam(required = false) String month,
+                                           @RequestParam(required = false) Long classe,
+                                           @RequestParam(required = false) Long subject,
+                                           Model model) {
         List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor.getId(), month, classe, subject);
 
         model.addAttribute("classes", classeService.findByProfessor(professor));
@@ -189,8 +189,8 @@ public class ProfessorController {
 
     @GetMapping("/meetings")
     public String getMeetingPage(HttpServletRequest request,
-                                       @AuthenticationPrincipal Professor professor,
-                                       Model model) {
+                                 @AuthenticationPrincipal Professor professor,
+                                 Model model) {
         model.addAttribute("meetings", meetingService.findByProfessor(professor));
         model.addAttribute("teacherId", professor.getId());
         model.addAttribute("currentURI", request.getRequestURI());
@@ -200,4 +200,3 @@ public class ProfessorController {
 
 
 }
-

@@ -9,47 +9,64 @@ import java.time.LocalDateTime;
 @Table(name = "courses")
 public class Course extends AuditableEntity {
 
-    //ajoute propriété name
+    // Nom du cours (obligatoire)
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
-    
+
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
-    private User professor;
-    
+    private Professor professor;
+
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
     private Classe classe;
 
-    // Nouvelle propriété pour la date du cours
-    @Column(nullable = true)
+    // Date du cours (facultatif)
     private LocalDate date;
 
+    // Horaires du cours
     private LocalDateTime startTime;
-
     private LocalDateTime endTime;
 
-    // Champ status utilisant l'Enum CourseStatus
+    // Statut du cours (par exemple : SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CourseStatus status;
 
+    // Salle physique du cours
     private String room;
 
+    // Nombre de ressources associées (ex. documents, liens, etc.)
     @Column(name = "resource_count", nullable = true)
-    private int resourceCount=0;
+    private int resourceCount = 0;
 
+    // Lien en ligne pour les cours virtuels (si applicable)
     private String onlineLink;
-    
+
+    // Description détaillée du cours
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    // Raison d'annulation (si le cours est annulé)
+    @Column(columnDefinition = "TEXT")
+    private String cancellationReason;
+
+    // Notes de l'instructeur
+    @Column(columnDefinition = "TEXT")
+    private String instructorNotes;
+
+    // Nouvelle propriété online avec valeur par défaut à false
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean online = false;
 
     public Course() {
     }
 
+    // Getters et setters
 
     public String getName() {
         return name;
@@ -58,6 +75,7 @@ public class Course extends AuditableEntity {
     public void setName(String name) {
         this.name = name;
     }
+
     public Subject getSubject() {
         return subject;
     }
@@ -66,11 +84,11 @@ public class Course extends AuditableEntity {
         this.subject = subject;
     }
 
-    public User getProfessor() {
+    public Professor getProfessor() {
         return professor;
     }
 
-    public void setProfessor(User professor) {
+    public void setProfessor(Professor professor) {
         this.professor = professor;
     }
 
@@ -82,9 +100,13 @@ public class Course extends AuditableEntity {
         this.classe = classe;
     }
 
-    public LocalDate getDate() {return date;}
+    public LocalDate getDate() {
+        return date;
+    }
 
-    public void setDate(LocalDate date) {this.date = date;}
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
     public LocalDateTime getStartTime() {
         return startTime;
@@ -102,23 +124,37 @@ public class Course extends AuditableEntity {
         this.endTime = endTime;
     }
 
+    public CourseStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CourseStatus status) {
+        this.status = status;
+    }
+
     public String getRoom() {
         return room;
     }
 
-    public CourseStatus getStatus() {return status;}
+    public void setRoom(String room) {
+        this.room = room;
+    }
 
-    public void setStatus(CourseStatus status) {this.status = status;}
+    public int getResourceCount() {
+        return resourceCount;
+    }
 
-    public void setRoom(String room) {this.room = room;}
+    public void setResourceCount(int resourceCount) {
+        this.resourceCount = resourceCount;
+    }
 
-    public int getResourceCount() {return resourceCount;}
+    public String getOnlineLink() {
+        return onlineLink;
+    }
 
-    public void setResourceCount(int resourceCount) {this.resourceCount = resourceCount;}
-
-    public String getOnlineLink() {return onlineLink; }
-
-    public void setOnlineLink(String onlineLink) { this.onlineLink = onlineLink;}
+    public void setOnlineLink(String onlineLink) {
+        this.onlineLink = onlineLink;
+    }
 
     public String getDescription() {
         return description;
@@ -126,5 +162,29 @@ public class Course extends AuditableEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public String getInstructorNotes() {
+        return instructorNotes;
+    }
+
+    public void setInstructorNotes(String instructorNotes) {
+        this.instructorNotes = instructorNotes;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

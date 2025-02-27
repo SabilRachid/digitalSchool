@@ -56,9 +56,8 @@ public class ClasseServiceImpl implements ClasseService {
     }
 
     @Override
-    public Classe findById(Long id) {
-        return classeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Classe non trouvée : " + id));
+    public Optional<Classe> findById(Long id) {
+        return classeRepository.findById(id);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class ClasseServiceImpl implements ClasseService {
     }
 
     @Override
-    public List<Classe> getAll() {
+    public List<Classe> findAll() {
         return classeRepository.findAll();
     }
 

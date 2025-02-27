@@ -104,7 +104,8 @@ public class AdminUserRestController {
 
         if (roles.contains(RoleName.ROLE_STUDENT)) {
             Student student = new Student();
-            student.setClasse(classeService.findById(userDTO.getClasseId()));
+            student.setClasse(classeService.findById(userDTO.getId())
+                    .orElseThrow(() -> new RuntimeException("Classe non trouvée")));
             user = student;
         } else if (roles.contains(RoleName.ROLE_PARENT)) {
             user = new Parent();
@@ -142,7 +143,8 @@ public class AdminUserRestController {
         if (user instanceof Student) {
             Student student = (Student) user;
             if (userDTO.getClasseId() != null) {
-                student.setClasse(classeService.findById(userDTO.getClasseId()));
+                student.setClasse(classeService.findById(userDTO.getId())
+                        .orElseThrow(() -> new RuntimeException("Classe non trouvée")));
             }
         }
 

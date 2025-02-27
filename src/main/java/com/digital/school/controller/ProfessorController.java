@@ -98,19 +98,19 @@ public class ProfessorController {
     public String listAttendances(HttpServletRequest request,  @AuthenticationPrincipal Professor professor, Model model) {
 
         model.addAttribute("teacherId", professor.getId());
-        model.addAttribute("classes", classeService.getAll());
+        model.addAttribute("classes", classeService.findAll());
         model.addAttribute("currentURI", request.getRequestURI());
         return "professor/attendances";
     }
 
-    @GetMapping("/calendar")
+   /* @GetMapping("/calendar")
     public String getCoursesForProfessor(HttpServletRequest request,  @AuthenticationPrincipal Professor professor, Model model) {
 
         LOGGER.debug("📌 Requête reçue : {}", request.getRequestURI());
         model.addAttribute("teacherId", professor.getId());
         List<Map<String, Object>> courses = courseService.findByProfessor(professor);
         return "professor/calendar";
-    }
+    }*/
 
 
     /* Affiche la liste des devoirs du professeur */

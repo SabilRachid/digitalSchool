@@ -8,9 +8,13 @@ import java.util.Set;
 
 public interface RoomService {
     List<Map<String, Object>> findAllAsMap(String building, Integer floor, String equipment, String status);
+
     Optional<Room> findById(Long id);
     Room save(Room room);
     void deleteById(Long id);
+
+    List<Map<String, Object>> findAllBasicInfo();
+
     boolean existsById(Long id);
     Room updateStatus(Long id, String status);
     Room updateEquipment(Long id, Set<String> equipment);

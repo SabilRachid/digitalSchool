@@ -9,45 +9,61 @@ import java.util.Set;
 @Entity
 @Table(name = "events")
 public class Event extends AuditableEntity {
-    
+
     @Column(nullable = false)
     private String title;
-    
+
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
     @Column(nullable = false)
     private LocalDateTime startTime;
-    
+
     @Column(nullable = false)
     private LocalDateTime endTime;
 
     @ManyToOne
     private Subject subject;
 
-    private String location;
-    
+    // Remplacement de la localisation textuelle par une association avec l'entité Room
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @ManyToOne
+    @JoinColumn(name = "classe_id")
+    private Classe classe;
+
     @ManyToOne
     @JoinColumn(name = "created_by_id")
     private User createdBy;
-    
+
     @ManyToMany
     @JoinTable(
-        name = "event_participants",
-        joinColumns = @JoinColumn(name = "event_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
+            name = "event_participants",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventType type = EventType.EVENT;
-    
+
     private String backgroundColor;
+
     private String textColor;
+
+    private String location;
+
     private boolean allDay;
 
-    // Getters and setters
+    private boolean online;
+
+    // Champ pour la durée en minutes (pour les examens par exemple)
+    private Integer duration;
+
+    // Getters et setters
 
     public String getTitle() {
         return title;
@@ -81,12 +97,28 @@ public class Event extends AuditableEntity {
         this.endTime = endTime;
     }
 
-    public String getLocation() {
-        return location;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public Classe getClasse() {
+        return classe;
+    }
+
+    public void setClasse(Classe classe) {
+        this.classe = classe;
     }
 
     public User getCreatedBy() {
@@ -137,11 +169,23 @@ public class Event extends AuditableEntity {
         this.allDay = allDay;
     }
 
-    public Subject getSubject() {
-        return subject;
-    }
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+    public boolean isOnline() { return online;}
+
+    public void setOnline(boolean online) { this.online = online; }
+
+    public String getLocation() {
+        return location;
     }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
 }

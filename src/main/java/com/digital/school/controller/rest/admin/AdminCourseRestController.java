@@ -14,6 +14,7 @@ import com.digital.school.service.ProfessorService;
 import com.digital.school.service.ClasseService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin/api/courses")
@@ -72,13 +73,13 @@ public class AdminCourseRestController {
             // Récupération des entités associées
             Subject subject = subjectService.findById(subjectId).orElseThrow(() -> new RuntimeException("Matière non trouvée"));
             Professor professor = professorService.findById(professorId).orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
-            Classe classe = classeService.findById(classId);
+            Optional<Classe> classe = classeService.findById(classId);
 
             // Construction de l'objet Course
             Course course = new Course();
             course.setSubject(subject);
             course.setProfessor(professor);
-            course.setClasse(classe);
+            course.setClasse(classe.orElse(null));
 
             // Vérification des valeurs null avant de les convertir en String
             course.setName(requestData.get("name") != null ? requestData.get("name").toString() : "Nom par défaut");

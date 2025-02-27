@@ -20,5 +20,5 @@ public interface UserService {
     boolean existsByEmail(String email);
     List<User> findByRole(RoleName roleName);
     List<Map<String, Object>> findProfessorsAsMap();
-
+    List<User> findUsersByIds(List<Long> ids);
 }

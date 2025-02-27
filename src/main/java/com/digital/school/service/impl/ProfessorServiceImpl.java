@@ -7,6 +7,7 @@ import com.digital.school.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +45,11 @@ public class ProfessorServiceImpl implements ProfessorService {
     @Override
     public List<Professor> findByClasse(Classe classe) {
         return professorRepository.findByClasse(classe);
+    }
+
+    @Override
+    public List<Professor> findProfessorsByClasseId(Long classeId) {
+        return professorRepository.findProfessorsByClasseId(classeId);
     }
 
 

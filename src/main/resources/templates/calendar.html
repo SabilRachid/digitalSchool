@@ -7,12 +7,12 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Emploi du Temps - Digital School</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    
+
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    
+
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
@@ -24,123 +24,196 @@
     <link rel="stylesheet" th:href="@{/css/components/calendar.css}">
 </head>
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    <div th:replace="~{fragments/topbar :: topbar}"></div>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div th:replace="~{fragments/topbar :: topbar}"></div>
 
-    <div class="calendar-container">
-        <!-- Sidebar -->
-        <div class="calendar-sidebar">
-            <div class="mini-calendar" id="miniCalendar"></div>
-            <div class="upcoming-events">
-                <h3>Prochains événements</h3>
-                <div id="upcomingEventsList"></div>
+<div class="calendar-container">
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="calendar-header">
+            <div class="calendar-title">
+                <h1>Emploi du Temps</h1>
             </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="calendar-header">
-                <div class="calendar-title">
-                    <h1>Emploi du Temps</h1>
-                </div>
-                <div class="calendar-filters">
-                    <div class="filter-group">
-                        <label>
-                            <input type="checkbox" checked id="showCourses">
-                            <span class="filter-label courses">
-                                <i class="fas fa-book"></i>
+            <div class="calendar-filters">
+                <div class="filter-group">
+                    <!-- Bouton d'ajout visible selon le rôle -->
+                    <button sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SECRETARY', 'ROLE_PROFESSOR')"
+                            class="btn btn-primary" onclick="openEventModal()">
+                        <i class="fas fa-plus"></i> Nouvel événement
+                    </button>
+                    <label>
+                        <input type="checkbox" checked id="showCourses" hidden="hidden">
+                        <span class="filter-label courses">
+                            <i class="fas fa-book"></i>
                                 Cours
-                            </span>
-                        </label>
-                        <label>
-                            <input type="checkbox" checked id="showEvents">
-                            <span class="filter-label events">
+                        </span>
+                    </label>
+                    <label>
+                        <input type="checkbox" checked id="showEvents" hidden="hidden">
+                        <span class="filter-label events">
                                 <i class="fas fa-calendar-day"></i>
                                 Événements
                             </span>
-                        </label>
-                        <label>
-                            <input type="checkbox" checked id="showExams">
-                            <span class="filter-label exams">
+                    </label>
+                    <label>
+                        <input type="checkbox" checked id="showExams" hidden="hidden">
+                        <span class="filter-label exams">
                                 <i class="fas fa-file-alt"></i>
                                 Examens
                             </span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="main-calendar" id="calendar"></div>
-        </div>
-    </div>
-
-    <!-- Event Modal -->
-    <div class="event-modal" id="eventModal">
-        <div class="event-modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Nouvel événement</h2>
-                <button type="button" class="modal-close" onclick="closeEventModal()">×</button>
-            </div>
-            <form id="eventForm">
-                <input type="hidden" id="eventId" name="id">
-                
-                <div class="form-group">
-                    <label for="title">Titre</label>
-                    <input type="text" id="title" name="title" class="form-input" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="type">Type</label>
-                        <select id="type" name="type" class="form-select" required>
-                            <option value="EVENT">Événement</option>
-                            <option value="EXAM">Examen</option>
-                            <option value="MEETING">Réunion</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Lieu</label>
-                        <input type="text" id="location" name="location" class="form-input">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="startDate">Date de début</label>
-                        <input type="datetime-local" id="startDate" name="startDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="endDate">Date de fin</label>
-                        <input type="datetime-local" id="endDate" name="endDate" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-input" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="allDay" name="allDay">
-                        <span>Toute la journée</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" checked id="showMeetings" hidden="hidden">
+                        <span class="filter-label meetings" >
+                                <i class="fas fa-users"></i>
+                                Réunions
+                            </span>
                     </label>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
-                </div>
-            </form>
+            </div>
         </div>
+
+        <div class="main-calendar" id="calendar"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
-    <script th:src="@{/js/calendar.js}"></script>
-    <script th:src="@{/js/topbar.js}"></script>
-    <script th:src="@{/js/sidebar.js}"></script>
-    
+    <!-- Sidebar -->
+    <div class="calendar-sidebar">
+        <div class="mini-calendar" id="miniCalendar"></div>
+        <div class="upcoming-events">
+            <h3>Prochains événements</h3>
+            <div id="upcomingEventsList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div class="event-modal" id="eventModal">
+    <div class="event-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Nouvel événement</h2>
+            <button type="button" class="modal-close" onclick="closeEventModal()">×</button>
+        </div>
+        <form id="eventForm">
+            <input type="hidden" id="eventId" name="id">
+
+            <div class="form-group">
+                <label for="title">Titre</label>
+                <input type="text" id="title" name="title" class="form-input" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" name="type" class="form-select" required
+                            onchange="handleEventTypeChange()">
+                        <!-- Options selon le rôle -->
+                        <option value="EVENT" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SECRETARY')">Événement</option>
+                        <option value="MEETING" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SECRETARY', 'ROLE_PROFESSOR')">Réunion</option>
+                        <option value="EXAM" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSOR')">Examen</option>
+                        <option value="COURSE" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_PROFESSOR')">Cours</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startDate">Date de début</label>
+                    <input type="datetime-local" id="startDate" name="startDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Date de fin</label>
+                    <input type="datetime-local" id="endDate" name="endDate" class="form-input" required>
+                </div>
+            </div>
+
+            <!-- Champs spécifiques aux cours et examens -->
+            <div id="courseFields" style="display: none;">
+                <div class="form-group">
+                    <label for="subject">Matière</label>
+                    <select id="subject" name="subject" class="form-select">
+                        <option value="">Sélectionner une matière</option>
+                        <!-- Options générées via Thymeleaf -->
+                        <option th:each="subject : ${subjects}" th:value="${subject.id}" th:text="${subject.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="classe">Classe</label>
+                    <select id="classe" name="classe" class="form-select">
+                        <option value="">Sélectionner une classe</option>
+                        <!-- Options générées via Thymeleaf -->
+                        <option th:each="classe : ${classes}" th:value="${classe.id}" th:text="${classe.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="room">Salle</label>
+                    <select id="room" name="room" class="form-select">
+                        <option value="">Sélectionner une salle</option>
+                        <!-- Options générées via Thymeleaf -->
+                        <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.name}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Champs spécifiques aux réunions -->
+            <div id="meetingFields" style="display: none;">
+                <div class="form-group">
+                    <label for="participants">Participants</label>
+                    <select id="participants" name="participants" class="form-select" multiple>
+                        <option value="ALL_PARENTS">Tous les parents</option>
+                        <option value="ALL_STUDENTS">Tous les élèves</option>
+                        <option value="ALL_PROFESSORS">Tous les professeurs</option>
+                        <option value="ALL_STAFF">Tout le personnel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="online" name="online">
+                        Réunion en ligne
+                    </label>
+                </div>
+            </div>
+
+            <!-- Champs spécifiques aux examens -->
+            <div id="examFields" style="display: none;">
+                <div class="form-group">
+                    <label for="duration">Durée (minutes)</label>
+                    <input type="number" id="duration" name="duration" class="form-input" min="15">
+                </div>
+            </div>
+
+            <!-- Champs communs -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Lieu</label>
+                <input type="text" id="location" name="location" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="allDay" name="allDay">
+                    <span>Toute la journée</span>
+                </label>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
+<script th:src="@{/js/calendar.js}"></script>
+<script th:src="@{/js/topbar.js}"></script>
+<script th:src="@{/js/sidebar.js}"></script>
 </body>
 </html>

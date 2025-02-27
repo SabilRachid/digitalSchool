@@ -124,6 +124,17 @@ public class RoomServiceImpl implements RoomService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Map<String, Object>> findAllBasicInfo() {
+        return roomRepository.findAll().stream()
+                .map(classe -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", classe.getId());
+                    map.put("name", classe.getName());
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
 
 
     @Override

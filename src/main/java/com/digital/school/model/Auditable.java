@@ -16,7 +16,7 @@ public class Auditable implements Serializable
     private static final long	serialVersionUID	= 5322674309593123145L;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="CREATED",nullable=true, updatable=false)
+    @Column(name="CREATED", nullable=true, updatable=false)
     private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)

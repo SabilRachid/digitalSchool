@@ -1,5 +1,7 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.repository.EventRepository;
+import com.digital.school.service.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.digital.school.model.Event;
 import com.digital.school.model.User;
-import com.digital.school.repository.EventRepository;
-import com.digital.school.service.EventService;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -51,11 +52,11 @@ public class EventServiceImpl implements EventService {
                     event.setBackgroundColor("#718096");
             }
         }
-        
+
         if (event.getTextColor() == null) {
             event.setTextColor("#FFFFFF");
         }
-        
+
         return eventRepository.save(event);
     }
 
@@ -82,7 +83,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> findUpcomingEvents(User user) {
         return eventRepository.findByStartTimeAfterAndParticipantsContainingOrderByStartTime(
-            LocalDateTime.now(), user);
+                LocalDateTime.now(), user);
     }
 
     @Override
@@ -117,22 +118,22 @@ public class EventServiceImpl implements EventService {
     @Override
     public long countUpcomingEvents(User user) {
         return eventRepository.countByStartTimeAfterAndParticipantsContaining(
-            LocalDateTime.now(), user);
+                LocalDateTime.now(), user);
     }
 
     @Override
     public Map<String, Long> getEventStatistics(User user, LocalDateTime start, LocalDateTime end) {
         Map<String, Long> stats = new HashMap<>();
-        
+
         stats.put("totalEvents", eventRepository.countByStartTimeBetweenAndParticipantsContaining(
-            start, end, user));
-        
+                start, end, user));
+
         stats.put("createdEvents", eventRepository.countByCreatedByAndStartTimeBetween(
-            user, start, end));
-        
+                user, start, end));
+
         stats.put("upcomingEvents", eventRepository.countByStartTimeAfterAndParticipantsContaining(
-            LocalDateTime.now(), user));
-        
+                LocalDateTime.now(), user));
+
         return stats;
     }
 }

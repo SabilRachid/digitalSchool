@@ -99,5 +99,10 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<User> findUsersByIds(List<Long> ids) {
+        return userRepository.findAllById(ids);
+    }
+
 
 }

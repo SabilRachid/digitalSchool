@@ -1,8 +1,9 @@
 package com.digital.school.service;
 
 import com.digital.school.dto.AttendanceRequest;
-import com.digital.school.model.*;
-import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.Attendance;
+import com.digital.school.model.Professor;
+import com.digital.school.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,40 +18,37 @@ public interface AttendanceService {
 
     Page<Attendance> findAll(Pageable pageable);
     List<Attendance> findAll();
-
-    /*Retourne la liste des présences sous forme de Map pour l'affichage, avec filtrage optionnel par classe et plage de dates.*/
-    List<Map<String, Object>> findAllAsMap(Long classId, LocalDate startDate, LocalDate endDate);
-
     Optional<Attendance> findById(Long id);
 
-    List<Attendance> findByStudent(User student);
+    /**
+     * Retourne les données groupées (par cours et par date)
+     * pour l'affichage, en s'appuyant sur la fiche Attendance
+     * et la collection de StudentAttendance.
+     */
+    List<Map<String, Object>> getGroupedAttendanceData(Professor professor, Long classId, LocalDate startDate, LocalDate endDate);
 
-    Map<String, Object> getGroupedAttendanceData(Professor professor, Long classId, LocalDate startDate, LocalDate endDate);
     Optional<Attendance> findByIdAndTeacher(Long id, Long teacherId);
 
-
-
-    /*Permet de justifier une absence (ou de modifier le justificatif) en mettant à jour le champ justification.
-     * Le justificatif peut être un texte et/ou un fichier.*/
+    /**
+     * Permet de justifier une fiche d'attendance globale (si applicable).
+     */
     Attendance justifyAttendance(Long attendanceId, String justificationText, MultipartFile justificationFile);
 
-
-
-
     Attendance save(Attendance attendance);
-    void saveAttendance(AttendanceRequest request);
-    void save(List<Attendance> attendanceList);
 
+    /**
+     * Sauvegarde ou met à jour la fiche d'attendance pour un cours à une date donnée,
+     * en créant ou en mettant à jour les enregistrements individuels (StudentAttendance).
+     */
+    Attendance saveAttendance(AttendanceRequest request);
+
+    void save(List<Attendance> attendanceList);
     void deleteById(Long id);
     boolean isTeacherAllowedToModify(Long teacherId, Long courseId);
     boolean existsById(Long id);
     List<Attendance> getAbsenceStatistics();
-
     ResponseEntity<?> getJustificationFile(Long id);
-
     Attendance validateJustification(Long id);
-
     Attendance rejectJustification(Long id);
-
     void sendAbsenceReminder(Long id);
 }

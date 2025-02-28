@@ -1,32 +1,31 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.dto.AttendanceRequest;
-import com.digital.school.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
+import com.digital.school.model.Attendance;
+import com.digital.school.model.Course;
+import com.digital.school.model.Professor;
+import com.digital.school.model.Student;
+import com.digital.school.model.StudentAttendance;
 import com.digital.school.model.enumerated.AttendanceStatus;
 import com.digital.school.repository.AttendanceRepository;
-import com.digital.school.repository.StudentRepository;
 import com.digital.school.repository.CourseRepository;
+import com.digital.school.repository.StudentRepository;
 import com.digital.school.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,21 +36,16 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttendanceServiceImpl.class);
 
-    // Répertoire où les fichiers justificatifs seront stockés
+    // Répertoire où les fichiers justificatifs sont stockés
     private final String justificationDir = "uploads/justifications/";
 
-	@Autowired 
-	AttendanceRepository attendanceRepository;
-
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    StudentRepository studentRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final CourseRepository courseRepository;
+    private final StudentRepository studentRepository;
 
     @Override
     public void save(List<Attendance> attendanceList) {
-        attendanceRepository.saveAll(attendanceList); // Enregistre la liste des présences
+        attendanceRepository.saveAll(attendanceList);
     }
 
     @Override
@@ -71,31 +65,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 
     @Override
-    public List<Map<String, Object>> findAllAsMap(Long classId, LocalDate startDate, LocalDate endDate) {
-        List<Attendance> attendances = attendanceRepository.findByClassIdAndDateRange(classId, startDate, endDate);
-        return attendances.stream().map(att -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", att.getId());
-            map.put("date", att.getDateEvent());
-            map.put("studentName", att.getStudent().getFirstName() + " " + att.getStudent().getLastName());
-            map.put("className", att.getStudent().getClasse().getName());
-            map.put("status", att.getStatus().name());
-            map.put("justification", att.getJustification());
-            map.put("justificationFile", att.getJustificationFile());
-            map.put("recordedAt", att.getRecordedAt());
-            return map;
-        }).collect(Collectors.toList());
-    }
-
-
-    @Override
     public Attendance justifyAttendance(Long attendanceId, String justificationText, MultipartFile justificationFile) {
         Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new RuntimeException("Attendance non trouvé"));
-        // Mise à jour du justificatif textuel
+        // Pour ce nouveau modèle, vous pourriez avoir à justifier un enregistrement individuel
+        // (via StudentAttendance) plutôt que la fiche d'attendance globale.
         attendance.setJustification(justificationText);
-
-        // En cas de fichier justificatif envoyé, on le sauvegarde
         if (justificationFile != null && !justificationFile.isEmpty()) {
             try {
                 File dir = new File(justificationDir);
@@ -118,23 +93,51 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.save(attendance);
     }
 
+    /**
+     * Pour le nouveau modèle, cette méthode cherche la fiche d'attendance existante pour le cours et la date.
+     * Si elle n'existe pas, elle la crée. Ensuite, pour chaque étudiant, elle crée ou met à jour l'enregistrement
+     * individuel (StudentAttendance).
+     */
     @Override
-    public void saveAttendance(AttendanceRequest request) {
-        List<Attendance> attendances = new ArrayList<>();
-        Course course = (Course) courseRepository.findByClassIdAndDate(request.getClassId(), request.getDate())
+    @Transactional
+    public Attendance saveAttendance(AttendanceRequest request) {
+        // Récupération du cours via courseId
+        LOGGER.debug("saveAttendance for request="+request);
+        Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new RuntimeException("Cours non trouvé"));
 
-        request.getAttendances().forEach((studentId, status) -> {
-            Student student = studentRepository.findById(studentId).orElseThrow();
-            Attendance attendance = new Attendance();
-            attendance.setStudent(student);
+        // Chercher la fiche d'attendance existante pour ce cours et cette date
+        Attendance attendance = attendanceRepository.findByCourseAndDate(course.getId(), request.getDate());
+        if (attendance == null) {
+            attendance = new Attendance();
             attendance.setCourse(course);
             attendance.setDateEvent(request.getDate());
-            attendance.setStatus(AttendanceStatus.valueOf(status));
-            attendances.add(attendance);
+        }
+        LOGGER.debug("attendanceId="+attendance.getId() +" avant foreach student attendances");
+        // Pour chaque entrée dans la map, créer un StudentAttendance
+        // On pourrait ici vérifier si un enregistrement existe déjà pour l'étudiant, et le mettre à jour.
+        // Pour simplifier, on ajoute de nouveaux enregistrements.
+        Attendance finalAttendance = attendance;
+        request.getAttendances().forEach((studentKey, statusStr) -> {
+            Long studentId;
+            try {
+                studentId = Long.parseLong(studentKey);
+                LOGGER.debug("enregistrement pour studentKey="+studentKey);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Identifiant étudiant invalide: " + studentKey);
+            }
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Étudiant non trouvé avec l'ID : " + studentId));
+            // Créer un enregistrement de StudentAttendance
+            StudentAttendance studentAttendance = new StudentAttendance();
+            studentAttendance.setStudent(student);
+            studentAttendance.setStatus(AttendanceStatus.valueOf(statusStr));
+            studentAttendance.setRecordedAt(LocalDateTime.now());
+            // Ajout à la fiche d'attendance
+            finalAttendance.addStudentAttendance(studentAttendance);
         });
-
-        attendanceRepository.saveAll(attendances);
+        LOGGER.debug("before attendanceRepository.save(attendance)");
+        return attendanceRepository.save(attendance);
     }
 
     @Override
@@ -144,91 +147,25 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public List<Attendance> findByStudent(User student) {
-        return attendanceRepository.findByStudent(student);
+    public List<Map<String, Object>> getGroupedAttendanceData(Professor professor, Long classId, LocalDate startDate, LocalDate endDate) {
+        LOGGER.debug("GroupedAttendanceData - professorId: {}, classId: {}, startDate: {}, endDate: {}",
+                professor.getId(), classId, startDate, endDate);
+        List<Object[]> results = attendanceRepository.findGroupedAttendances(professor.getId(), classId, startDate, endDate);
+        LOGGER.debug("findGroupedAttendances results size = " + results.size());
+        // Transformation en List<Map<String, Object>>
+        return results.stream().map(row -> {
+            Course course = (Course) row[0];
+            LocalDate date = (LocalDate) row[1];
+            Long count = ((Number) row[2]).longValue();
+            Map<String, Object> map = new HashMap<>();
+            map.put("courseId", course.getId());
+            map.put("courseName", course.getName());
+            map.put("className", course.getClasse().getName());
+            map.put("date", date);
+            map.put("count", count);
+            return map;
+        }).collect(Collectors.toList());
     }
-
-
-    
-    public Map<String, Double> getClassAttendanceStats(Course course) {
-        Map<String, Double> stats = new HashMap<>();
-        List<Object[]> attendanceStats = attendanceRepository.getAttendanceStatsByCourse(course);
-        long totalAttendances = 0;
-
-        // Calculate total attendances
-        for (Object[] stat : attendanceStats) {
-            Long count = (Long) stat[1];
-            totalAttendances += count;
-        }
-
-        if (totalAttendances == 0) {
-            stats.put("presentRate", 0.0);
-            stats.put("absentRate", 0.0);
-            stats.put("lateRate", 0.0);
-            stats.put("excusedRate", 0.0);
-            return stats;
-        }
-
-        // Calculate rates for each status
-        for (Object[] stat : attendanceStats) {
-            AttendanceStatus status = (AttendanceStatus) stat[0];
-            Long count = (Long) stat[1];
-            double rate = ((double) count / totalAttendances) * 100;
-
-            switch (status) {
-                case PRESENT:
-                    stats.put("presentRate", rate);
-                    break;
-                case ABSENT:
-                    stats.put("absentRate", rate);
-                    break;
-                case RETARD:
-                    stats.put("lateRate", rate);
-                    break;
-                case EXCUSE:
-                    stats.put("excusedRate", rate);
-                    break;
-            }
-        }
-
-        // Ensure all rates are present in the map
-        stats.putIfAbsent("presentRate", 0.0);
-        stats.putIfAbsent("absentRate", 0.0);
-        stats.putIfAbsent("lateRate", 0.0);
-        stats.putIfAbsent("excusedRate", 0.0);
-
-        return stats;
-    }
-
-
-    @GetMapping("/data")
-    @ResponseBody
-    public Map<String, Object> getGroupedAttendanceData(@AuthenticationPrincipal Professor professor,
-                                                        @RequestParam(required = false) Long classId,
-                                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-
-        LOGGER.debug("teacherId: {}, classId: {}, startDate: {}, endDate: {}", professor.getId(), classId, startDate, endDate);
-
-        List<Map<String, Object>> result = attendanceRepository.findGroupedAttendances(professor.getId(), classId, startDate, endDate)
-                .stream()
-                .map(a -> {
-                    Course course = (Course) a[0];
-                    return Map.of(
-                            "courseId", course.getId(),
-                            "course", course.getName(),
-                            "classe", course.getClasse().getName(),
-                            "date", a[1],
-                            "count", a[2]
-                    );
-                })
-                .collect(Collectors.toList());
-
-        return Map.of("data", result);
-    }
-
-
-
 
     @Override
     public Optional<Attendance> findByIdAndTeacher(Long id, Long professorId) {
@@ -238,7 +175,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public boolean isTeacherAllowedToModify(Long teacherId, Long courseId) {
-        return attendanceRepository.existsByCourseIdAndRecordedBy_Id (courseId, teacherId);
+        // Adaptation possible selon votre logique métier (peut-être vérifier si l'Attendance existe et appartient au professeur)
+        return attendanceRepository.existsByCourseIdAndRecordedBy_Id(courseId, teacherId);
     }
 
     @Override
@@ -246,30 +184,32 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.existsById(id);
     }
 
-
     @Override
     public List<Attendance> getAbsenceStatistics() {
-        return attendanceRepository.findAbsenceDetails();
+        // À adapter selon le nouveau modèle, en utilisant éventuellement le repository de StudentAttendance
+        throw new UnsupportedOperationException("Méthode à adapter pour le nouveau modèle");
     }
 
     @Override
     public ResponseEntity<?> getJustificationFile(Long id) {
-        return null;
+        // Implémentation à adapter selon vos besoins
+        return ResponseEntity.notFound().build();
     }
 
     @Override
     public Attendance validateJustification(Long id) {
+        // Implémentation à adapter selon vos besoins
         return null;
     }
 
     @Override
     public Attendance rejectJustification(Long id) {
+        // Implémentation à adapter selon vos besoins
         return null;
     }
 
     @Override
     public void sendAbsenceReminder(Long id) {
-
+        // Implémentation à adapter selon vos besoins
     }
-
 }

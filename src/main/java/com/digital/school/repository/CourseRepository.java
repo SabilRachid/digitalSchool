@@ -47,4 +47,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         @Query("SELECT c FROM Course c JOIN c.classe.students s WHERE s.id = :studentId AND c.date = :today ORDER BY c.startTime ASC")
         List<Course> findTodayCoursesForStudent(@Param("studentId") Long studentId, @Param("today") LocalDate today);
 
-    }
+        @Query("SELECT c FROM Course c WHERE c.professor.id = :professorId " +
+                "AND c.classe.id = :classId " +
+                "AND c.date = :date")
+        List<Course> findCoursesForProfessorByClassAndDate(@Param("professorId") Long professorId,
+                                                           @Param("classId") Long classId,
+                                                           @Param("date") LocalDate date);
+}

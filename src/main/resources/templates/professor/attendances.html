@@ -27,13 +27,8 @@
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
     <link rel="stylesheet" th:href="@{/css/components/modals.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
-
-
 </head>
-
-
 <body>
-
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 <div th:replace="~{fragments/topbar :: topbar}"></div>
 
@@ -68,18 +63,16 @@
         <table id="groupedAttendanceTable" class="table">
             <thead>
             <tr>
-                <th>Matière</th>
+                <th>Nom du cours</th>
                 <th>Classe</th>
                 <th>Date</th>
                 <th>Nombre d'élèves</th>
                 <th>Actions</th>
             </tr>
             </thead>
-
+            <tbody></tbody>
         </table>
     </div>
-
-
 </div>
 
 <!-- Modal d'Ajout d'une Feuille de Présence -->
@@ -93,18 +86,23 @@
             <div class="modal-body">
                 <form id="attendanceForm">
                     <div class="mb-3">
+                        <label for="attendanceDate" class="form-label">Date</label>
+                        <input type="date" id="attendanceDate" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="attendanceClass" class="form-label">Classe</label>
                         <select id="attendanceClass" class="form-select" required>
                             <option value="">Sélectionner une classe</option>
                             <option th:each="class : ${classes}" th:value="${class.id}" th:text="${class.name}"></option>
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label for="attendanceDate" class="form-label">Date</label>
-                        <input type="date" id="attendanceDate" class="form-control" required>
+                        <label for="attendanceCourse" class="form-label">Cours</label>
+                        <select id="attendanceCourse" class="form-select" required>
+                            <option value="">Sélectionner un cours</option>
+                            <option th:each="course : ${courses}" th:value="${course.id}" th:text="${course.name}"></option>
+                        </select>
                     </div>
-
                     <div id="studentsList" class="mb-3">
                         <h6>Liste des élèves</h6>
                         <div class="table-responsive">
@@ -121,7 +119,8 @@
                             </table>
                         </div>
                     </div>
-
+                    <!-- Bouton de saisie rapide -->
+                    <button type="button" class="btn btn-secondary" id="quickMarkAll">Saisie Rapide (Tous présents)</button>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                 </form>
             </div>
@@ -129,7 +128,6 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -144,7 +142,5 @@
 <script th:src="@{/js/sidebar.js}"></script>
 <script th:src="@{/js/topbar.js}"></script>
 <script th:src="@{/js/professor/attendances.js}"></script>
-
-
 </body>
 </html>

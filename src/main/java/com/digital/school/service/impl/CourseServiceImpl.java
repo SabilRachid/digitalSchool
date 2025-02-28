@@ -4,6 +4,7 @@ import com.digital.school.model.*;
 import com.digital.school.repository.*;
 import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository courseRepository;
-    private final SubjectRepository subjectRepository;
-    private final ProfessorRepository professorRepository;
-    private final ClasseRepository classeRepository;
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private SubjectRepository subjectRepository;
+    @Autowired
+    private ProfessorRepository professorRepository;
+    @Autowired
+    private ClasseRepository classeRepository;
+    @Autowired
+    private AttendanceRepository attendanceRepository;
 
     @Override
     public Page<Course> findAll(Pageable pageable) {
@@ -65,7 +72,17 @@ public class CourseServiceImpl implements CourseService {
         course.setProfessor(professor);
         course.setClasse(classe);
 
-        return courseRepository.save(course);
+        // Sauvegarder le cours
+        Course savedCourse = courseRepository.save(course);
+
+        // Création automatique de l'entité Attendance associée
+        Attendance attendance = new Attendance();
+        attendance.setCourse(savedCourse);
+        // On définit la date de l'attendance à la date du cours, ou à aujourd'hui si non précisée
+        attendance.setDateEvent(savedCourse.getDate() != null ? savedCourse.getDate() : LocalDate.now());
+        attendanceRepository.save(attendance);
+
+        return savedCourse;
     }
 
     @Override
@@ -277,6 +294,10 @@ public class CourseServiceImpl implements CourseService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<Course> findCoursesForProfessorByClassAndDate(Long professorId, Long classId, LocalDate date) {
+        return courseRepository.findCoursesForProfessorByClassAndDate(professorId, classId, date);
+    }
 
 
 }

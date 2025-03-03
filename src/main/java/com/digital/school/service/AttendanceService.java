@@ -1,9 +1,9 @@
 package com.digital.school.service;
 
+import com.digital.school.dto.AttendanceDTO;
 import com.digital.school.dto.AttendanceRequest;
 import com.digital.school.model.Attendance;
 import com.digital.school.model.Professor;
-import com.digital.school.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ public interface AttendanceService {
      * Sauvegarde ou met à jour la fiche d'attendance pour un cours à une date donnée,
      * en créant ou en mettant à jour les enregistrements individuels (StudentAttendance).
      */
-    Attendance saveAttendance(AttendanceRequest request);
+    AttendanceDTO saveAttendance(AttendanceRequest request);
 
     void save(List<Attendance> attendanceList);
     void deleteById(Long id);
@@ -51,4 +51,6 @@ public interface AttendanceService {
     Attendance validateJustification(Long id);
     Attendance rejectJustification(Long id);
     void sendAbsenceReminder(Long id);
+
+    List<Map<String, Object>> getStudentAttendances(Long attendanceId);
 }

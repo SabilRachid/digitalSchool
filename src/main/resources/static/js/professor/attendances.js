@@ -1,5 +1,7 @@
 class AttendancesPage extends AdminPage {
     constructor() {
+        // Récupérer la date d'aujourd'hui au format yyyy-MM-dd
+        const today = new Date().toISOString().split("T")[0];
         super({
             tableId: 'groupedAttendanceTable',
             modalId: 'addAttendanceModal',
@@ -10,37 +12,38 @@ class AttendancesPage extends AdminPage {
                 { data: 'className' },
                 { data: 'date' },
                 { data: 'count' },
-                { data: null, defaultContent: '' }
+                { data: 'status' },
+                {
+                    data: null,
+                    defaultContent: '<button class="btn btn-sm btn-primary btn-saisie">Saisir</button>',
+                    orderable: false
+                }
             ],
             ajaxConfig: {
-                url: "/professor/api/attendances/data",
+                // Afficher par défaut les fiches dont la date est <= aujourd'hui
+                url: `/professor/api/attendances/data?endDate=${today}`,
                 type: "GET",
                 dataSrc: "data"
             }
         });
         console.log("DataTable instance:", this.table);
-        console.debug("Configuration DataTable:", this.config);
-        // Chargement initial de la liste des classes
+        // Flag pour empêcher la double soumission
+        this.isSubmitting = false;
         this.loadClasses();
         this.initEventListeners();
     }
 
-    // Récupère et charge la liste des classes pour alimenter les sélecteurs
     async loadClasses() {
         try {
             console.debug("Appel à /professor/api/attendances/classes/list");
             const response = await fetch('/professor/api/attendances/classes/list');
-            if (!response.ok) {
-                throw new Error('Erreur lors du chargement des classes');
-            }
+            if (!response.ok) throw new Error('Erreur lors du chargement des classes');
             const classes = await response.json();
             console.log("📌 Classes chargées :", classes);
             const selectFilter = document.getElementById('classFilter');
-            const selectForm = document.getElementById('attendanceClass');
-            if (selectFilter && selectForm) {
+            if (selectFilter) {
                 const options = classes.map(classe => `<option value="${classe.id}">${classe.name}</option>`).join('');
                 selectFilter.innerHTML += options;
-                selectForm.innerHTML += options;
                 console.debug("Options ajoutées aux sélecteurs de classes");
             }
         } catch (error) {
@@ -48,60 +51,9 @@ class AttendancesPage extends AdminPage {
         }
     }
 
-    // Ouvre le modal et pré-remplit la date, puis charge les étudiants et cours si une classe est sélectionnée
-    openNewAttendanceModal() {
-        console.debug("Ouverture du modal", this.modalId);
-        const modalEl = document.getElementById(this.modalId);
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-        // Affecter la date du jour (format yyyy-MM-dd)
-        const today = new Date().toISOString().split("T")[0];
-        document.getElementById("attendanceDate").value = today;
-        console.debug("Date par défaut affectée :", today);
-        // Vider la liste des étudiants avant chargement
-        document.getElementById("studentsTableBody").innerHTML = "";
-        const classId = document.getElementById("attendanceClass").value;
-        console.debug("Classe sélectionnée lors de l'ouverture du modal :", classId);
-        if (classId) {
-            this.loadStudents(classId);
-            this.loadCourses(classId, today);
-        }
-    }
-
-    // Charge la liste des cours pour une classe et une date donnés
-    async loadCourses(classId, date) {
-        if (!classId || !date) {
-            console.warn("loadCourses: classId ou date manquant");
-            return;
-        }
-        try {
-            const url = `/professor/api/attendances/courses?classId=${classId}&date=${date}`;
-            console.debug("Appel à loadCourses avec URL :", url);
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Erreur lors du chargement des cours');
-            }
-            const courses = await response.json();
-            console.log("📌 Cours chargés :", courses);
-            const selectCourse = document.getElementById('attendanceCourse');
-            if (selectCourse) {
-                selectCourse.innerHTML = `<option value="">Sélectionner un cours</option>`;
-                if (courses.length === 0) {
-                    this.showNotification("Aucun cours n'est disponible pour cette classe à cette date", "warning");
-                    console.warn("Aucun cours disponible pour classId =", classId, "et date =", date);
-                } else {
-                    selectCourse.innerHTML += courses.map(course =>
-                        `<option value="${course.id}">${course.name}</option>`
-                    ).join('');
-                    console.debug("Cours ajoutés au sélecteur");
-                }
-            }
-        } catch (error) {
-            console.error('🚨 Erreur dans loadCourses:', error);
-        }
-    }
-
-    // Charge la liste des étudiants pour la classe sélectionnée
+    /**
+     * Charge la liste des étudiants pour une classe donnée.
+     */
     async loadStudents(classId) {
         if (!classId) {
             console.warn("loadStudents: classId manquant");
@@ -111,9 +63,7 @@ class AttendancesPage extends AdminPage {
             const url = `/professor/api/attendances/students/${classId}`;
             console.debug("Appel à loadStudents avec URL :", url);
             const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Erreur lors du chargement des étudiants');
-            }
+            if (!response.ok) throw new Error('Erreur lors du chargement des étudiants');
             const students = await response.json();
             console.log("📌 Étudiants chargés :", students);
             const tbody = document.getElementById('studentsTableBody');
@@ -122,11 +72,11 @@ class AttendancesPage extends AdminPage {
                     <tr>
                         <td>${student.firstName} ${student.lastName}</td>
                         <td>
-                            <!-- Utilisation de data-student-id pour éviter la sérialisation automatique -->
                             <select data-student-id="${student.id}" class="form-select">
                                 <option value="">Absent</option>
                                 <option value="PRESENT">Présent</option>
                                 <option value="RETARD">Retard</option>
+                                <option value="EXCUSE">Excusé</option>
                             </select>
                         </td>
                     </tr>
@@ -138,104 +88,163 @@ class AttendancesPage extends AdminPage {
         }
     }
 
-    // Bouton de saisie rapide : coche tous les élèves comme "Présent"
+    /**
+     * Charge les enregistrements existants de StudentAttendance pour une fiche d'attendance donnée.
+     */
+    async loadStudentAttendances(attendanceId) {
+        try {
+            const url = `/professor/api/attendances/${attendanceId}/student-attendance`;
+            console.debug("Chargement des StudentAttendance via URL :", url);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Erreur lors du chargement des StudentAttendance');
+            const studentAttendances = await response.json();
+            console.log("📌 StudentAttendance chargés :", studentAttendances);
+            // Assurez-vous que les étudiants sont déjà chargés
+            setTimeout(() => {
+                studentAttendances.forEach(sa => {
+                    const selector = `#studentsTableBody select[data-student-id="${sa.studentId}"]`;
+                    const select = document.querySelector(selector);
+                    if (select) {
+                        console.debug(`Mise à jour du select pour studentId ${sa.studentId} avec la valeur ${sa.status}`);
+                        select.value = sa.status;
+                    } else {
+                        console.warn(`Aucun select trouvé pour studentId ${sa.studentId} (sélecteur utilisé: ${selector}).`);
+                    }
+                });
+            }, 100); // délai de 100ms (ajustable selon vos besoins)
+        } catch (error) {
+            console.error("🚨 Erreur dans loadStudentAttendances:", error);
+        }
+    }
+
     quickMarkAll() {
-        console.debug("Activation de la saisie rapide pour marquer tous les élèves comme présents");
+        console.debug("quickMarkAll() déclenché");
         document.querySelectorAll("#studentsTableBody select").forEach(select => {
             select.value = "PRESENT";
         });
     }
 
-    // Initialisation des écouteurs d'événements
     initEventListeners() {
         console.debug("Initialisation des écouteurs d'événements");
 
-        // Filtres de la DataTable
-        document.getElementById("applyFilters")?.addEventListener("click", () => {
-            let classId = document.getElementById("classFilter")?.value;
-            let startDate = document.getElementById("startDateFilter")?.value;
-            let endDate = document.getElementById("endDateFilter")?.value;
-            console.debug("Application des filtres avec classId:", classId, "startDate:", startDate, "endDate:", endDate);
-            this.table.ajax.url(`/professor/api/attendances/data?classId=${classId}&startDate=${startDate}&endDate=${endDate}`).load();
-        });
-
-        // Suppression d'une feuille de présence
-        document.addEventListener("click", (event) => {
-            if (event.target.closest(".delete-attendance")) {
-                const id = event.target.closest(".delete-attendance").dataset.id;
-                console.debug("Demande de suppression pour l'id:", id);
-                if (confirm("Êtes-vous sûr de vouloir supprimer cette feuille de présence ?")) {
-                    this.deleteAttendance(id);
+        // Attacher un unique écouteur pour la soumission du formulaire
+        const attendanceForm = document.getElementById("attendanceForm");
+        if (attendanceForm) {
+            attendanceForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                if (this.isSubmitting) {
+                    console.warn("Soumission déjà en cours, annulation de la nouvelle soumission");
+                    return;
                 }
-            }
+                this.isSubmitting = true;
+                const submitButton = attendanceForm.querySelector("button[type='submit']");
+                if (submitButton) submitButton.disabled = true;
+                console.debug("Form submit event déclenché");
+                try {
+                    await this.saveAttendance();
+                } finally {
+                    if (submitButton) submitButton.disabled = false;
+                    this.isSubmitting = false;
+                }
+            });
+        }
+
+        // Appliquer automatiquement les filtres dès qu'ils changent
+        const classFilter = document.getElementById("classFilter");
+        const startDateFilter = document.getElementById("startDateFilter");
+        const endDateFilter = document.getElementById("endDateFilter");
+        if (classFilter) {
+            classFilter.addEventListener("change", () => this.applyFilters());
+        }
+        if (startDateFilter) {
+            startDateFilter.addEventListener("change", () => this.applyFilters());
+        }
+        if (endDateFilter) {
+            endDateFilter.addEventListener("change", () => this.applyFilters());
+        }
+
+        // Bouton d'action dans chaque ligne pour ouvrir le modal de saisie
+        $('#groupedAttendanceTable tbody').on('click', 'button.btn-saisie', (event) => {
+            const rowData = this.table.row($(event.currentTarget).closest('tr')).data();
+            console.debug("Ligne sélectionnée pour saisie:", rowData);
+            this.openAttendanceModal(rowData);
         });
 
-        // Changement de la classe dans le formulaire
-        document.getElementById("attendanceClass")?.addEventListener("change", (event) => {
-            let classId = event.target.value;
-            let date = document.getElementById("attendanceDate").value;
-            console.debug("Changement de classe dans le formulaire :", classId, "avec date :", date);
-            this.loadStudents(classId);
-            this.loadCourses(classId, date);
-        });
-
-        // Changement de date pour recharger les cours
-        document.getElementById("attendanceDate")?.addEventListener("change", (event) => {
-            let date = event.target.value;
-            let classId = document.getElementById("attendanceClass").value;
-            console.debug("Changement de date :", date, "pour classId :", classId);
-            this.loadCourses(classId, date);
-        });
-
-        // Bouton de saisie rapide pour marquer tous les élèves comme présents
-        document.getElementById("quickMarkAll")?.addEventListener("click", () => {
-            this.quickMarkAll();
-        });
-
-        // Soumission du formulaire d'ajout de présence
-        document.getElementById("attendanceForm")?.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            console.debug("Soumission du formulaire d'attendance");
-            await this.saveAttendance();
-        });
+        // Attacher l'écouteur pour le bouton "Tous présents" dans le modal
+        const quickMarkAllBtn = document.getElementById("quickMarkAll");
+        if (quickMarkAllBtn) {
+            quickMarkAllBtn.addEventListener("click", () => {
+                console.debug("Bouton Tous présents cliqué");
+                this.quickMarkAll();
+            });
+        }
     }
 
-    // Sauvegarde la feuille de présence via une requête POST
+    applyFilters() {
+        let classId = document.getElementById("classFilter")?.value;
+        let startDate = document.getElementById("startDateFilter")?.value;
+        let endDate = document.getElementById("endDateFilter")?.value;
+        console.debug("Application automatique des filtres avec classId:", classId, "startDate:", startDate, "endDate:", endDate);
+        this.table.ajax.url(`/professor/api/attendances/data?classId=${classId}&startDate=${startDate}&endDate=${endDate}`).load();
+    }
+
+    /**
+     * Ouvre le modal pour saisir ou mettre à jour les StudentAttendance.
+     * Les informations (courseId, courseName, className, date, attendanceId, classId) proviennent de la ligne sélectionnée.
+     */
+    async openAttendanceModal(rowData) {
+        console.debug("Ouverture du modal pour saisie - courseId:", rowData.courseId, "date:", rowData.date);
+        document.getElementById("modalCourseName").value = rowData.courseName;
+        document.getElementById("modalCourseName").dataset.courseId = rowData.courseId;
+        document.getElementById("modalClassName").value = rowData.className;
+        document.getElementById("modalDate").value = rowData.date;
+        if (rowData.attendanceId) {
+            document.getElementById("modalAttendanceId").value = rowData.attendanceId;
+            // Charger les StudentAttendance existants pour pré-sélectionner les statuts
+            await this.loadStudentAttendances(rowData.attendanceId);
+        } else {
+            document.getElementById("modalAttendanceId").value = "";
+        }
+        if (rowData.classId) {
+            await this.loadStudents(rowData.classId);
+        } else {
+            console.warn("classId non présent dans rowData");
+        }
+        const modalEl = document.getElementById(this.modalId);
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    /**
+     * Enregistre les StudentAttendance saisis dans le modal.
+     * Récupère courseId, date, et attendanceId depuis le modal, et construit l'objet JSON.
+     */
     async saveAttendance() {
         const form = document.getElementById(this.formId);
         if (!form) {
             console.warn("saveAttendance: formulaire introuvable");
             return;
         }
+        const courseId = Number(document.getElementById("modalCourseName").dataset.courseId);
+        const date = document.getElementById("modalDate").value;
+        const attendanceIdValue = document.getElementById("modalAttendanceId").value;
+        const attendanceId = attendanceIdValue ? Number(attendanceIdValue) : null;
 
-        // Récupération et conversion des valeurs
-        const classId = Number(document.getElementById("attendanceClass").value);
-        const courseField = document.getElementById("attendanceCourse");
-        const courseIdValue = courseField.value;
-        if (!courseIdValue) {
-            this.showNotification("Veuillez sélectionner un cours", "error");
-            console.warn("saveAttendance: aucun cours sélectionné");
-            return;
-        }
-        const courseId = Number(courseIdValue);
-        const date = document.getElementById("attendanceDate").value;
-        console.debug("Valeurs récupérées:", { classId, courseId, date });
+        console.debug("Données globales du modal:", { attendanceId, courseId, date });
 
         let attendances = {};
-        // Parcourir tous les selects et récupérer la valeur avec data-student-id
         document.querySelectorAll("#studentsTableBody select").forEach(select => {
-            let studentId = select.dataset.studentId || (select.name && select.name.match(/\d+/)[0]);
+            let studentId = select.dataset.studentId;
             let status = select.value;
             attendances[studentId] = status || "ABSENT";
         });
         console.debug("Données attendances récupérées:", attendances);
 
-        const data = { classId, courseId, date, attendances };
+        const data = { attendanceId, courseId, date, attendances };
         console.log("📌 JSON envoyé :", JSON.stringify(data, null, 2));
 
         try {
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            console.debug("Envoi de la requête POST vers", this.apiEndpoint);
             const response = await fetch(this.apiEndpoint, {
                 method: "POST",
                 headers: {
@@ -244,57 +253,28 @@ class AttendancesPage extends AdminPage {
                 },
                 body: JSON.stringify(data)
             });
-
             if (!response.ok) {
                 const error = await response.json();
-                console.error("Réponse d'erreur de l'API:", error);
                 throw new Error(error.message || "Erreur lors de l'enregistrement");
             }
-
             console.debug("Requête POST réussie");
-            // Fermer le modal en utilisant l'instance existante
             const modalEl = document.getElementById(this.modalId);
             const modalInstance = bootstrap.Modal.getInstance(modalEl);
             if (modalInstance) {
                 modalInstance.hide();
-                console.debug("Modal fermé via instance existante");
             } else {
                 new bootstrap.Modal(modalEl).hide();
-                console.debug("Modal fermé en créant une nouvelle instance");
             }
             this.table.ajax.reload();
-            this.showNotification("Feuille de présence ajoutée avec succès", "success");
+            this.showNotification("Saisie des présences effectuée avec succès", "success");
         } catch (error) {
             console.error("🚨 Erreur dans saveAttendance:", error);
             this.showNotification(error.message, "error");
         }
     }
-
-    // Suppression d'une feuille de présence via une requête DELETE
-    async deleteAttendance(id) {
-        try {
-            console.debug("Suppression de l'attendance avec id:", id);
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            const response = await fetch(`${this.apiEndpoint}/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "X-CSRF-TOKEN": csrfToken
-                }
-            });
-            if (!response.ok) {
-                throw new Error("Erreur lors de la suppression");
-            }
-            console.debug("Suppression réussie");
-            this.table.ajax.reload();
-            this.showNotification("Feuille de présence supprimée avec succès", "success");
-        } catch (error) {
-            console.error("🚨 Erreur dans deleteAttendance:", error);
-            this.showNotification(error.message, "error");
-        }
-    }
 }
 
-// Initialisation de la page une fois le DOM entièrement chargé
+// Initialisation une fois le DOM entièrement chargé
 document.addEventListener("DOMContentLoaded", function() {
     window.attendancePage = new AttendancesPage();
     console.debug("AttendancesPage initialisée", window.attendancePage);

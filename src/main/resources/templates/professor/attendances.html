@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Feuilles de Présences Groupées</title>
+    <title>Fiches de Présence - Saisie des StudentAttendance</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/topbar.css}">
-    <link rel="stylesheet" th:href="@{/css/components/tables.css}">
+    <link rel="stylesheet" th:href="@{/css/components/com.css}">
     <link rel="stylesheet" th:href="@{/css/components/datatable-custom.css}">
     <link rel="stylesheet" th:href="@{/css/components/forms.css}">
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
@@ -35,11 +35,8 @@
 <div class="dashboard-container">
     <div class="dashboard-header">
         <h3 class="dashboard-title">
-            <i class="fas fa-calendar-check"></i> Feuilles de Présence
+            <i class="fas fa-calendar-check"></i> Fiches de Présence
         </h3>
-        <button class="btn btn-primary" onclick="window.attendancePage.openNewAttendanceModal()">
-            <i class="fas fa-plus"></i> Nouvelle Feuille de Présence
-        </button>
     </div>
 
     <!-- Filtres -->
@@ -49,16 +46,14 @@
             <option value="">Toutes</option>
             <option th:each="class : ${classes}" th:value="${class.id}" th:text="${class.name}"></option>
         </select>
-
         <label>Date de début :</label>
         <input type="date" id="startDateFilter">
-
         <label>Date de fin :</label>
         <input type="date" id="endDateFilter">
-
         <button class="btn btn-secondary" id="applyFilters">Appliquer</button>
     </div>
 
+    <!-- DataTable -->
     <div class="content-card">
         <table id="groupedAttendanceTable" class="table">
             <thead>
@@ -66,7 +61,8 @@
                 <th>Nom du cours</th>
                 <th>Classe</th>
                 <th>Date</th>
-                <th>Nombre d'élèves</th>
+                <th>Nombre d'enregistrements</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -75,34 +71,34 @@
     </div>
 </div>
 
-<!-- Modal d'Ajout d'une Feuille de Présence -->
+<!-- Modal de saisie des StudentAttendance -->
 <div class="modal fade" id="addAttendanceModal" tabindex="-1" aria-labelledby="addAttendanceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lxl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addAttendanceModalLabel">Nouvelle Feuille de Présence</h5>
+                <h5 class="modal-title" id="addAttendanceModalLabel">Saisie des Présences</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <form id="attendanceForm">
-                    <div class="mb-3">
-                        <label for="attendanceDate" class="form-label">Date</label>
-                        <input type="date" id="attendanceDate" class="form-control" required>
+                    <!-- Champ caché pour l'ID de la fiche d'attendance -->
+                    <input type="hidden" id="modalAttendanceId">
+                    <!-- Informations globales en lecture seule -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Cours</label>
+                            <input type="text" id="modalCourseName" class="form-control" readonly data-course-id="">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Classe</label>
+                            <input type="text" id="modalClassName" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Date</label>
+                            <input type="date" id="modalDate" class="form-control" readonly>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="attendanceClass" class="form-label">Classe</label>
-                        <select id="attendanceClass" class="form-select" required>
-                            <option value="">Sélectionner une classe</option>
-                            <option th:each="class : ${classes}" th:value="${class.id}" th:text="${class.name}"></option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="attendanceCourse" class="form-label">Cours</label>
-                        <select id="attendanceCourse" class="form-select" required>
-                            <option value="">Sélectionner un cours</option>
-                            <option th:each="course : ${courses}" th:value="${course.id}" th:text="${course.name}"></option>
-                        </select>
-                    </div>
+                    <!-- Zone de saisie des StudentAttendance -->
                     <div id="studentsList" class="mb-3">
                         <h6>Liste des élèves</h6>
                         <div class="table-responsive">
@@ -114,13 +110,12 @@
                                 </tr>
                                 </thead>
                                 <tbody id="studentsTableBody">
-                                <!-- Liste des élèves chargée via AJAX -->
+                                <!-- Chargement via AJAX -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <!-- Bouton de saisie rapide -->
-                    <button type="button" class="btn btn-secondary" id="quickMarkAll">Saisie Rapide (Tous présents)</button>
+                    <button type="button" class="btn btn-secondary" id="quickMarkAll">Tous présents</button>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                 </form>
             </div>

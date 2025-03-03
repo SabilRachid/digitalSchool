@@ -21,13 +21,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
      * Récupère les données groupées pour l'affichage (par cours et par date),
      * en comptant le nombre d'enregistrements individuels (StudentAttendance) pour chaque fiche.
      */
-    @Query("SELECT a.course, a.dateEvent, COUNT(sa) " +
+    @Query("SELECT a.id as id, a.course, a.dateEvent, a.status ,COUNT(sa) " +
             "FROM Attendance a LEFT JOIN a.studentAttendances sa " +
             "WHERE a.course.professor.id = :professorId " +
             "AND (:classeId IS NULL OR a.course.classe.id = :classeId) " +
             "AND (a.dateEvent >= COALESCE(:startDate, CAST('1970-01-01' AS date))) " +
             "AND (a.dateEvent <= COALESCE(:endDate, CAST('2099-12-31' AS date))) " +
-            "GROUP BY a.course, a.dateEvent")
+            "GROUP BY a.id, a.course, a.dateEvent, a.status")
     List<Object[]> findGroupedAttendances(@Param("professorId") Long professorId,
                                           @Param("classeId") Long classeId,
                                           @Param("startDate") LocalDate startDate,

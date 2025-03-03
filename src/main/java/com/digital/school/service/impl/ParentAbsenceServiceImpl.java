@@ -1,13 +1,11 @@
 package com.digital.school.service.impl;
 
-import com.digital.school.model.Attendance;
 import com.digital.school.model.Document;
 import com.digital.school.model.ParentStudent;
-import com.digital.school.model.Professor;
 import com.digital.school.model.Student;
 import com.digital.school.model.StudentAttendance;
 import com.digital.school.model.User;
-import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.enumerated.StudentAttendanceStatus;
 import com.digital.school.model.enumerated.DocumentType;
 import com.digital.school.repository.AttendanceRepository;
 import com.digital.school.repository.DocumentRepository;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,7 +94,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
 
         // Mettre à jour l'enregistrement individuel : justifier et changer le statut
         absence.setJustification(reason);
-        absence.setStatus(AttendanceStatus.EXCUSE);
+        absence.setStatus(StudentAttendanceStatus.EXCUSE);
         studentAttendanceRepository.save(absence);
     }
 
@@ -111,7 +108,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
 
         // Statistiques générales en utilisant le repository de StudentAttendance
         stats.put("totalAbsences", studentAttendanceRepository.countByStudent(child));
-        stats.put("justifiedAbsences", studentAttendanceRepository.countByStudentAndStatus(child, AttendanceStatus.EXCUSE));
+        stats.put("justifiedAbsences", studentAttendanceRepository.countByStudentAndStatus(child, StudentAttendanceStatus.EXCUSE));
         stats.put("unjustifiedAbsences", studentAttendanceRepository.countUnjustifiedAbsences(child));
         stats.put("absenceRate", calculateAbsenceRate(child));
 
@@ -157,7 +154,7 @@ public class ParentAbsenceServiceImpl implements ParentAbsenceService {
     private double calculateAbsenceRate(Student student) {
         long totalSessions = studentAttendanceRepository.countByStudent(student);
         if (totalSessions == 0) return 0.0;
-        long absences = studentAttendanceRepository.countByStudentAndStatus(student, AttendanceStatus.ABSENT);
+        long absences = studentAttendanceRepository.countByStudentAndStatus(student, StudentAttendanceStatus.ABSENT);
         return (double) absences / totalSessions * 100;
     }
 }

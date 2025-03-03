@@ -1,7 +1,8 @@
 package com.digital.school.controller.rest.professor;
 
-import com.digital.school.dto.UserDTO;
+import com.digital.school.dto.AttendanceDTO;
 import com.digital.school.dto.AttendanceRequest;
+import com.digital.school.dto.UserDTO;
 import com.digital.school.model.Attendance;
 import com.digital.school.model.Course;
 import com.digital.school.model.Professor;
@@ -20,7 +21,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,7 +51,7 @@ public class ProfessorAttendanceRestController {
         return classeService.findAllBasicInfo();
     }
 
-    // Nouvel endpoint : récupération des cours du professeur pour une classe donnée et une date donnée
+    // Récupération des cours du professeur pour une classe donnée et une date donnée (utile pour la gestion du modal)
     @GetMapping("/courses")
     @ResponseBody
     public List<Map<String, Object>> getCoursesForProfessor(
@@ -62,6 +65,7 @@ public class ProfessorAttendanceRestController {
                 .collect(Collectors.toList());
     }
 
+    // Retourne les fiches d'attendance groupées pour les cours du jour et passés.
     @GetMapping("/data")
     @ResponseBody
     public List<Map<String, Object>> getGroupedAttendanceData(
@@ -72,17 +76,40 @@ public class ProfessorAttendanceRestController {
 
         LOGGER.debug("GroupedAttendanceData - teacherId: {}, classId: {}, startDate: {}, endDate: {}",
                 professor.getId(), classId, startDate, endDate);
-        List<Map<String, Object>> groupedData = attendanceService.getGroupedAttendanceData(professor, classId, startDate, endDate);
-        return groupedData;
+        return attendanceService.getGroupedAttendanceData(professor, classId, startDate, endDate);
     }
 
     @GetMapping("/students/{classId}")
     @ResponseBody
-    public List<UserDTO> getStudentsByClass(@PathVariable Long classId) {
-        LOGGER.debug("getStudentsByClass - classId: {}, students count: {}",
-                classId, studentService.getStudentsDtoByClasseId(classId).size());
-        return studentService.getStudentsDtoByClasseId(classId);
+    public List<Map<String, Object>> getStudentsByClass(@PathVariable Long classId) {
+        LOGGER.debug("getStudentsByClass - classId: {}", classId);
+        // Récupération d'une liste de UserDTO depuis le service
+        List<UserDTO> students = studentService.getStudentsDtoByClasseId(classId);
+        // Transformation en liste de Map
+        return students.stream()
+                .map(dto -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", dto.getId());
+                    map.put("firstName", dto.getFirstName());
+                    map.put("lastName", dto.getLastName());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
     }
+
+
+    /**
+     * Endpoint pour récupérer les enregistrements individuels de StudentAttendance pour une fiche d'attendance.
+     * L'endpoint doit renvoyer une liste d'objets contenant au moins studentId et status.
+     */
+    @GetMapping("/{attendanceId}/student-attendance")
+    public List<Map<String, Object>> getStudentAttendances(@PathVariable Long attendanceId) {
+        LOGGER.debug("getStudentAttendances - attendanceId: {}", attendanceId);
+        // Le service renvoie ici une liste de Map (par exemple : [{ "studentId": 39, "status": "ABSENT" }, ...])
+        return attendanceService.getStudentAttendances(attendanceId);
+    }
+
 
     @GetMapping("/{id}")
     @ResponseBody
@@ -93,16 +120,22 @@ public class ProfessorAttendanceRestController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * POST endpoint pour saisir ou mettre à jour les enregistrements individuels (StudentAttendance)
+     * pour une fiche d'attendance déjà existante (ou à créer) correspondant à un cours et une date.
+     * Les informations (courseId, date, et la map attendances) proviennent du modal déclenché depuis la DataTable.
+     */
     @PostMapping
     @ResponseBody
     public ResponseEntity<?> createAttendance(@AuthenticationPrincipal Professor professor,
-                                              @Valid @RequestBody AttendanceRequest request) {
-
+                                              @RequestBody AttendanceRequest request) {
+        LOGGER.debug("==>createAttendance request : {}", request);
         try {
-            LOGGER.debug("createAttendance request : {}", request);
-            Attendance savedAttendance = attendanceService.saveAttendance(request);
+            LOGGER.debug("courseId Request = {}", request.getCourseId());
+            AttendanceDTO savedAttendance = attendanceService.saveAttendance(request);
             return ResponseEntity.ok(savedAttendance);
         } catch (Exception e) {
+            LOGGER.error("Erreur dans createAttendance", e);
             return ResponseEntity.badRequest()
                     .body(Map.of("message", "Erreur: " + e.getMessage()));
         }
@@ -138,7 +171,7 @@ public class ProfessorAttendanceRestController {
                                               @AuthenticationPrincipal Professor professor) {
         try {
             Attendance attendance = attendanceService.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Feuille de présence introuvable"));
+                    .orElseThrow(() -> new RuntimeException("Fiche d'attendance introuvable"));
 
             if (!attendanceService.isTeacherAllowedToModify(professor.getId(), attendance.getCourse().getId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)

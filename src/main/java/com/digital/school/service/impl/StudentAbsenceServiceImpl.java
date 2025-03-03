@@ -4,7 +4,7 @@ import com.digital.school.model.Document;
 import com.digital.school.model.Student;
 import com.digital.school.model.StudentAttendance;
 import com.digital.school.model.User;
-import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.enumerated.StudentAttendanceStatus;
 import com.digital.school.model.enumerated.DocumentType;
 import com.digital.school.repository.DocumentRepository;
 import com.digital.school.repository.ParentStudentRepository;
@@ -94,7 +94,7 @@ public class StudentAbsenceServiceImpl implements StudentAttendanceService {
 
         // Mettre à jour le statut de l'enregistrement individuel d'absence
         absence.setJustification(reason);
-        absence.setStatus(AttendanceStatus.EXCUSE);
+        absence.setStatus(StudentAttendanceStatus.EXCUSE);
         studentAttendanceRepository.save(absence);
 
         return justification;
@@ -115,7 +115,7 @@ public class StudentAbsenceServiceImpl implements StudentAttendanceService {
 
         long totalAbsences = absences.size();
         long justifiedAbsences = absences.stream()
-                .filter(sa -> sa.getStatus() == AttendanceStatus.EXCUSE)
+                .filter(sa -> sa.getStatus() == StudentAttendanceStatus.EXCUSE)
                 .count();
         long unjustifiedAbsences = totalAbsences - justifiedAbsences;
 
@@ -135,7 +135,7 @@ public class StudentAbsenceServiceImpl implements StudentAttendanceService {
     @Override
     public boolean isAbsenceJustified(Long studentAttendanceId) {
         return studentAttendanceRepository.findById(studentAttendanceId)
-                .map(absence -> absence.getStatus() == AttendanceStatus.EXCUSE)
+                .map(absence -> absence.getStatus() == StudentAttendanceStatus.EXCUSE)
                 .orElse(false);
     }
 
@@ -151,7 +151,7 @@ public class StudentAbsenceServiceImpl implements StudentAttendanceService {
     private double calculateAbsenceRate(Student student) {
         long totalSessions = studentAttendanceRepository.countByStudent(student);
         if (totalSessions == 0) return 0.0;
-        long absences = studentAttendanceRepository.countByStudentAndStatus(student, AttendanceStatus.ABSENT);
+        long absences = studentAttendanceRepository.countByStudentAndStatus(student, StudentAttendanceStatus.ABSENT);
         return (double) absences / totalSessions * 100;
     }
 }

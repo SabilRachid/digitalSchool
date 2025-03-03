@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.dto.AttendanceDTO;
 import com.digital.school.dto.AttendanceRequest;
 import com.digital.school.model.Attendance;
 import com.digital.school.model.Course;
@@ -7,6 +8,7 @@ import com.digital.school.model.Professor;
 import com.digital.school.model.Student;
 import com.digital.school.model.StudentAttendance;
 import com.digital.school.model.enumerated.AttendanceStatus;
+import com.digital.school.model.enumerated.StudentAttendanceStatus;
 import com.digital.school.repository.AttendanceRepository;
 import com.digital.school.repository.CourseRepository;
 import com.digital.school.repository.StudentRepository;
@@ -100,45 +102,93 @@ public class AttendanceServiceImpl implements AttendanceService {
      */
     @Override
     @Transactional
-    public Attendance saveAttendance(AttendanceRequest request) {
-        // Récupération du cours via courseId
-        LOGGER.debug("saveAttendance for request="+request);
-        Course course = courseRepository.findById(request.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Cours non trouvé"));
+    public AttendanceDTO saveAttendance(AttendanceRequest request) {
+        LOGGER.debug("saveAttendance called with request: {}", request);
 
-        // Chercher la fiche d'attendance existante pour ce cours et cette date
-        Attendance attendance = attendanceRepository.findByCourseAndDate(course.getId(), request.getDate());
-        if (attendance == null) {
-            attendance = new Attendance();
-            attendance.setCourse(course);
-            attendance.setDateEvent(request.getDate());
+        Attendance attendance;
+        if (request.getAttendanceId() != null) {
+            attendance = attendanceRepository.findById(request.getAttendanceId())
+                    .orElseThrow(() -> new RuntimeException("Fiche d'attendance non trouvée pour l'ID: " + request.getAttendanceId()));
+            LOGGER.debug("Fiche d'attendance récupérée via ID: {}", attendance.getId());
+        } else {
+            Course course = courseRepository.findById(request.getCourseId())
+                    .orElseThrow(() -> new RuntimeException("Cours non trouvé pour l'ID: " + request.getCourseId()));
+            attendance = attendanceRepository.findByCourseAndDate(course.getId(), request.getDate());
+            if (attendance == null) {
+                attendance = new Attendance();
+                attendance.setCourse(course);
+                attendance.setDateEvent(request.getDate());
+                LOGGER.debug("Création d'une nouvelle fiche d'attendance pour le cours ID {} à la date {}", course.getId(), request.getDate());
+            } else {
+                LOGGER.debug("Fiche d'attendance existante trouvée (ID: {}) pour le cours ID {} à la date {}",
+                        attendance.getId(), course.getId(), request.getDate());
+            }
         }
-        LOGGER.debug("attendanceId="+attendance.getId() +" avant foreach student attendances");
-        // Pour chaque entrée dans la map, créer un StudentAttendance
-        // On pourrait ici vérifier si un enregistrement existe déjà pour l'étudiant, et le mettre à jour.
-        // Pour simplifier, on ajoute de nouveaux enregistrements.
+
+        // Pour chaque enregistrement dans la map, traiter ou créer un StudentAttendance
         Attendance finalAttendance = attendance;
         request.getAttendances().forEach((studentKey, statusStr) -> {
             Long studentId;
             try {
                 studentId = Long.parseLong(studentKey);
-                LOGGER.debug("enregistrement pour studentKey="+studentKey);
+                LOGGER.debug("Traitement pour l'étudiant avec ID: {}", studentKey);
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Identifiant étudiant invalide: " + studentKey);
+                throw new RuntimeException("Identifiant étudiant invalide: " + studentKey, e);
             }
+            // Récupération de l'étudiant
             Student student = studentRepository.findById(studentId)
-                    .orElseThrow(() -> new RuntimeException("Étudiant non trouvé avec l'ID : " + studentId));
-            // Créer un enregistrement de StudentAttendance
-            StudentAttendance studentAttendance = new StudentAttendance();
-            studentAttendance.setStudent(student);
-            studentAttendance.setStatus(AttendanceStatus.valueOf(statusStr));
-            studentAttendance.setRecordedAt(LocalDateTime.now());
-            // Ajout à la fiche d'attendance
-            finalAttendance.addStudentAttendance(studentAttendance);
+                    .orElseThrow(() -> new RuntimeException("Étudiant non trouvé pour l'ID: " + studentId));
+
+            Optional<StudentAttendance> existing = finalAttendance.getStudentAttendances().stream()
+                    .filter(sa -> sa.getStudent().getId().equals(studentId))
+                    .findFirst();
+
+            if (existing.isPresent()) {
+                StudentAttendance sa = existing.get();
+                sa.setStatus(StudentAttendanceStatus.valueOf(statusStr));
+                sa.setRecordedAt(LocalDateTime.now());
+                LOGGER.debug("Mise à jour de StudentAttendance existant pour l'étudiant ID: {}", studentId);
+            } else {
+                StudentAttendance studentAttendance = new StudentAttendance();
+                studentAttendance.setStudent(student);
+                studentAttendance.setStatus(StudentAttendanceStatus.valueOf(statusStr));
+                studentAttendance.setRecordedAt(LocalDateTime.now());
+                finalAttendance.addStudentAttendance(studentAttendance);
+                LOGGER.debug("Ajout d'un nouveau StudentAttendance pour l'étudiant ID: {}", studentId);
+            }
         });
-        LOGGER.debug("before attendanceRepository.save(attendance)");
-        return attendanceRepository.save(attendance);
+
+        // Déterminer le statut global de la fiche
+        // Récupérer le nombre total d'élèves dans la classe du cours
+        int totalStudents = studentRepository.countByClasse(attendance.getCourse().getClasse().getId());
+        if (request.getAttendances() != null && request.getAttendances().size() == totalStudents) {
+            attendance.setStatus(AttendanceStatus.COMPLETED);
+            LOGGER.debug("Fiche d'attendance marquée COMPLETED (tous les élèves traités)");
+        } else {
+            attendance.setStatus(AttendanceStatus.NOT_COMPLETED);
+            LOGGER.debug("Fiche d'attendance marquée NOT_COMPLETED (il manque des enregistrements)");
+        }
+
+        LOGGER.debug("Avant sauvegarde, fiche d'attendance: {}", finalAttendance);
+        Attendance savedAttendance = attendanceRepository.save(finalAttendance);
+        LOGGER.debug("Fiche d'attendance sauvegardée avec ID: {}", savedAttendance.getId());
+
+        AttendanceDTO dto = toAttendanceDTO(savedAttendance);
+        LOGGER.debug("DTO généré: {}", dto);
+        return dto;
     }
+
+    private AttendanceDTO toAttendanceDTO(Attendance attendance) {
+        AttendanceDTO dto = new AttendanceDTO();
+        dto.setId(attendance.getId());
+        dto.setCourseName(attendance.getCourse().getName());
+        dto.setDate(attendance.getDateEvent());
+        dto.setStudentAttendanceCount(
+                attendance.getStudentAttendances() != null ? attendance.getStudentAttendances().size() : 0
+        );
+        return dto;
+    }
+
 
     @Override
     @Transactional
@@ -154,18 +204,38 @@ public class AttendanceServiceImpl implements AttendanceService {
         LOGGER.debug("findGroupedAttendances results size = " + results.size());
         // Transformation en List<Map<String, Object>>
         return results.stream().map(row -> {
-            Course course = (Course) row[0];
-            LocalDate date = (LocalDate) row[1];
-            Long count = ((Number) row[2]).longValue();
+            Long attendanceId = (Long) row[0];
+            Course course = (Course) row[1];
+            LocalDate date = (LocalDate) row[2];
+            String status = ((AttendanceStatus) row[3]).name();
+            Long count = ((Number) row[4]).longValue();
             Map<String, Object> map = new HashMap<>();
+            map.put("attendanceId", attendanceId);
             map.put("courseId", course.getId());
+            map.put("classId", course.getClasse().getId());
             map.put("courseName", course.getName());
             map.put("className", course.getClasse().getName());
             map.put("date", date);
             map.put("count", count);
+            map.put("status", status);
             return map;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<Map<String, Object>> getStudentAttendances(Long attendanceId) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new RuntimeException("Fiche d'attendance non trouvée pour l'ID: " + attendanceId));
+        return attendance.getStudentAttendances().stream()
+                .map(sa -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("studentId", sa.getStudent().getId());
+                    map.put("status", sa.getStatus().name());
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public Optional<Attendance> findByIdAndTeacher(Long id, Long professorId) {

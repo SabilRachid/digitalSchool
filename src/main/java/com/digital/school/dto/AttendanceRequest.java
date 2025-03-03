@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public class AttendanceRequest {
 
+    @NotNull(message = "attendanceId ne peut pas être nul")
+    private Long attendanceId; // facultatif
+
     @NotNull(message = "classId ne peut pas être nul")
     private Long classId;
 
@@ -71,10 +74,14 @@ public class AttendanceRequest {
         this.attendances = attendances;
     }
 
+    public Long getAttendanceId() { return attendanceId; }
+
+    public void setAttendanceId(Long attendanceId) { this.attendanceId = attendanceId; }
+
     @Override
     public String toString() {
         return "AttendanceRequest{" +
-                "classId=" + classId +
+                "attendanceId=" + attendanceId +
                 ", courseId=" + courseId +
                 ", date=" + date +
                 ", attendances=" + attendances +

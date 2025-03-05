@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Charge les devoirs via GET, en passant éventuellement une URL filtrée
-async function loadHomeworks(filterUrl = '/professor/homeworks') {
+async function loadHomeworks(filterUrl) {
     try {
         const response = await fetch(filterUrl, {
             method: 'GET',
@@ -36,7 +36,7 @@ function updateHomeworksUI(homeworks) {
         hwCard.className = 'homework-card';
         hwCard.innerHTML = `
             <div class="homework-header">
-                <span class="subject-badge">${hw.subject.name}</span>
+                <span class="subject-badge">${hw.subjectName}</span>
                 ${hw.status === 'SCHEDULED' ? `<span class="due-date"><i class="fas fa-calendar"></i> ${formatHomeworkDate(hw.dueDate)}</span>` : ''}
                 ${hw.status === 'IN_PROGRESS' ? `<span class="status-badge in-progress">En cours</span>` : ''}
                 ${hw.status === 'COMPLETED' ? `<span class="status-badge completed">Terminé</span>` : ''}
@@ -46,9 +46,9 @@ function updateHomeworksUI(homeworks) {
                 <p>${hw.description || ''}</p>
                 <div class="homework-details">
                     <span class="detail-item"><i class="fas fa-clock"></i> ${formatHomeworkDate(hw.dueDate)}</span>
-                    <span class="detail-item"><i class="fas fa-users"></i> ${hw.classe.name}</span>
+                    <span class="detail-item"><i class="fas fa-users"></i> ${hw.classeName}</span>
                 </div>
-                ${hw.status === 'IN_PROGRESS' ? `<button class="btn btn-info mt-2" onclick="openHomeworkGradeEntryModal(${hw.submissionId})"><i class="fas fa-edit"></i> Saisir notes</button>` : ''}
+                ${hw.status === 'IN_PROGRESS' && hw.submissionId ? `<button class="btn btn-info mt-2" onclick="openHomeworkGradeEntryModal(${hw.submissionId})"><i class="fas fa-edit"></i> Saisir notes</button>` : ''}
             </div>
             <div class="homework-footer">
                 ${hw.status === 'SCHEDULED' ? `
@@ -170,23 +170,30 @@ function closeHomeworkGradeEntryModal() {
 function initializeHomeworkFilters() {
     const filterForm = document.getElementById('homeworkFilterForm');
     if (!filterForm) return;
-    filterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(filterForm);
-        const month = formData.get('month');
-        const classe = formData.get('classe');
-        const subject = formData.get('subject');
-        let url = '/professor/api/homeworks?';
-        if (month) url += 'month=' + encodeURIComponent(month) + '&';
-        if (classe) url += 'classe=' + encodeURIComponent(classe) + '&';
-        if (subject) url += 'subject=' + encodeURIComponent(subject) + '&';
-        if (url.endsWith('&') || url.endsWith('?')) {
-            url = url.slice(0, -1);
-        }
-        // Redirection via GET pour que le contrôleur recharge la page avec les devoirs filtrés
-        window.location.href = url;
+
+    // Sélectionne tous les éléments de formulaire (inputs, selects, etc.)
+    const filterInputs = filterForm.querySelectorAll('input, select');
+
+    // Ajoute un écouteur de changement pour chaque champ
+    filterInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            const formData = new FormData(filterForm);
+            let url = '/professor/api/homeworks?';
+            const month = formData.get('month');
+            const classe = formData.get('classe');
+            const subject = formData.get('subject');
+            if (month) url += 'month=' + encodeURIComponent(month) + '&';
+            if (classe) url += 'classe=' + encodeURIComponent(classe) + '&';
+            if (subject) url += 'subject=' + encodeURIComponent(subject) + '&';
+            if (url.endsWith('&') || url.endsWith('?')) {
+                url = url.slice(0, -1);
+            }
+            // Recharge les devoirs via l'API sans recharger toute la page
+            loadHomeworks(url);
+        });
     });
 }
+
 
 // INITIALISATION DES GRAPHIQUES POUR DEVOIRS (si nécessaire)
 function initializeHomeworkCharts() {

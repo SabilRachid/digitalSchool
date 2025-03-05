@@ -1,8 +1,10 @@
 package com.digital.school.controller.rest.professor;
 
+import com.digital.school.dto.HomeworkDTO;
 import com.digital.school.model.Homework;
 import com.digital.school.model.Professor;
 import com.digital.school.service.HomeworkService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,20 +14,26 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/professor/api/homeworks")
 public class ProfessorHomeworkController {
 
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ProfessorHomeworkController.class);
+
     @Autowired
     private HomeworkService homeworkService;
 
     @PostMapping
-    public ResponseEntity<?> createHomework(@RequestBody Homework homework,
+    public ResponseEntity<?> createHomework(@RequestBody HomeworkDTO homeworkDTO,
                                             @AuthenticationPrincipal Professor professor) {
         try {
-            Homework createdHomework = homeworkService.createHomework(homework, professor.getId());
-            return ResponseEntity.ok(createdHomework);
+            LOGGER.debug("createHomework");
+            Homework createdHomework = homeworkService.createHomework(homeworkDTO, professor.getId());
+            HomeworkDTO responseDTO = homeworkService.convertToDTO(createdHomework);
+            LOGGER.debug("==> responseDTO : "+responseDTO.toString());
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                     Map.of("message", "Erreur lors de la création du devoir : " + e.getMessage())
@@ -61,6 +69,7 @@ public class ProfessorHomeworkController {
     public ResponseEntity<?> enterGrade(@RequestBody Map<String, Object> payload,
                                         @AuthenticationPrincipal Professor professor) {
         try {
+            LOGGER.debug("POST grade-entry");
             Long submissionId = Long.parseLong(payload.get("submissionId").toString());
             Double gradeValue = Double.parseDouble(payload.get("gradeValue").toString());
             String comment = payload.get("comment").toString();
@@ -80,7 +89,10 @@ public class ProfessorHomeworkController {
                                           @RequestParam(required = false) Long subject) {
         try {
             List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor.getId(), month, classe, subject);
-            return ResponseEntity.ok(homeworks);
+            List<HomeworkDTO> dtoList = homeworks.stream()
+                    .map(hw -> homeworkService.convertToDTO(hw))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                     Map.of("message", "Erreur lors du chargement des devoirs : " + e.getMessage())

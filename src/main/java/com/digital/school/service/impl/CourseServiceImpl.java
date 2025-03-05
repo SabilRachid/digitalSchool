@@ -1,6 +1,7 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.model.*;
+import com.digital.school.model.enumerated.AttendanceStatus;
 import com.digital.school.repository.*;
 import com.digital.school.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public Course save(Course course) {
+    public Course save(Course course, User user) {
         if (course.getSubject() == null || course.getProfessor() == null || course.getClasse() == null) {
             throw new IllegalArgumentException("Les ID de la matière, du professeur et de la classe sont obligatoires");
         }
@@ -78,6 +79,8 @@ public class CourseServiceImpl implements CourseService {
         // Création automatique de l'entité Attendance associée
         Attendance attendance = new Attendance();
         attendance.setCourse(savedCourse);
+        attendance.setStatus(AttendanceStatus.NOT_COMPLETED);
+        attendance.setRecordedBy(user); // Enregistrement de la présence par le professeur
         // On définit la date de l'attendance à la date du cours, ou à aujourd'hui si non précisée
         attendance.setDateEvent(savedCourse.getDate() != null ? savedCourse.getDate() : LocalDate.now());
         attendanceRepository.save(attendance);

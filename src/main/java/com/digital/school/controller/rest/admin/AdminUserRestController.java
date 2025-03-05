@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/api/users")
 public class AdminUserRestController {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AdminUserRestController.class);
+
     @Autowired
     private UserService userService;
 
@@ -73,6 +75,7 @@ public class AdminUserRestController {
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
         try {
+            LOGGER.debug("📌 Requête reçue : {}", userDTO);
             User user = createUserByRole(userDTO);
             User savedUser = userService.save(user);
             return ResponseEntity.ok(convertUserToMap(savedUser));
@@ -99,13 +102,16 @@ public class AdminUserRestController {
     // Méthode de lecture et suppression laissées inchangées...
 
     private User createUserByRole(UserDTO userDTO) {
+
+        LOGGER.debug("createUserByRole: {}", userDTO.toString());
         Set<RoleName> roles = userDTO.getRoles();
         User user;
 
         if (roles.contains(RoleName.ROLE_STUDENT)) {
             Student student = new Student();
-            student.setClasse(classeService.findById(userDTO.getId())
+            student.setClasse(classeService.findById(userDTO.getClasseId())
                     .orElseThrow(() -> new RuntimeException("Classe non trouvée")));
+            student.setRegistrationDate(java.time.LocalDateTime.now());
             user = student;
         } else if (roles.contains(RoleName.ROLE_PARENT)) {
             user = new Parent();
@@ -143,7 +149,7 @@ public class AdminUserRestController {
         if (user instanceof Student) {
             Student student = (Student) user;
             if (userDTO.getClasseId() != null) {
-                student.setClasse(classeService.findById(userDTO.getId())
+                student.setClasse(classeService.findById(userDTO.getClasseId())
                         .orElseThrow(() -> new RuntimeException("Classe non trouvée")));
             }
         }

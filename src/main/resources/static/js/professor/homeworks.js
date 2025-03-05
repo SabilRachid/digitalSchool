@@ -94,12 +94,13 @@ function initializeHomeworkForm() {
             const formData = new FormData(this);
             const data = {
                 title: formData.get('title'),
-                subject: { id: formData.get('subject') },
-                classe: { id: formData.get('classe') },
+                subjectId: formData.get('subject'),
+                classeId: formData.get('classe'),
                 dueDate: formData.get('dueDate'),
                 description: formData.get('description')
             };
-            const response = await fetch('/professor/homeworks', {
+            console.log("Form Data:", JSON.stringify(data));
+            const response = await fetch('/professor/api/homeworks', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ function initializeHomeworkFilters() {
         const month = formData.get('month');
         const classe = formData.get('classe');
         const subject = formData.get('subject');
-        let url = '/professor/homeworks?';
+        let url = '/professor/api/homeworks?';
         if (month) url += 'month=' + encodeURIComponent(month) + '&';
         if (classe) url += 'classe=' + encodeURIComponent(classe) + '&';
         if (subject) url += 'subject=' + encodeURIComponent(subject) + '&';

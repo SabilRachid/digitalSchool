@@ -16,7 +16,6 @@ public class Student extends User {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
-
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Parent parent; // Parent de l'élève
@@ -24,6 +23,14 @@ public class Student extends User {
     @ManyToOne
     @JoinColumn(name = "class_id")
     private Classe classe; // Classe de l'élève
+
+    // Constructeur par défaut requis par JPA
+    public Student() { }
+
+    // Constructeur avec identifiant
+    public Student(Long id) {
+        this.id = id;
+    }
 
     public String getSpecialNeeds() {
         return specialNeeds;

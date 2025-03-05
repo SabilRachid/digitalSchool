@@ -35,7 +35,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     private EventRepository eventRepository;
     
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private StudentAttendanceRepository studentAttendanceRepository;
 
     @Autowired
     private ClasseRepository classeRepository;
@@ -46,7 +46,7 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         StudentDashboardStats stats = new StudentDashboardStats();
         
         // Calculer le taux de présence
-        stats.setAttendanceRate(attendanceRepository.calculateAttendanceRate(student));
+        stats.setAttendanceRate(studentAttendanceRepository.calculateAttendanceRate(student));
         
         // Calculer la moyenne générale
         //gerer optional de student

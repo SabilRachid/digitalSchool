@@ -38,7 +38,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private ClasseRepository classeRepository;
 
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private StudentAttendanceRepository studentAttendanceRepository;
 
     @Autowired
     private PerformanceRepository performanceRepository;
@@ -168,9 +168,9 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         stats.put("availableSeats", classeRepository.countAvailableSeats());
 
         // Taux de présence moyen
-        stats.put("attendanceRate", attendanceRepository.getAverageAttendance());
-        stats.put("justifiedAbsencesRate", attendanceRepository.getJustifiedAbsencesRate());
-        stats.put("unjustifiedAbsencesRate", attendanceRepository.getUnjustifiedAbsencesRate());
+        stats.put("attendanceRate", studentAttendanceRepository.getAverageAttendance());
+        stats.put("justifiedAbsencesRate", studentAttendanceRepository.getJustifiedAbsencesRate());
+        stats.put("unjustifiedAbsencesRate", studentAttendanceRepository.getUnjustifiedAbsencesRate());
 
 
         return stats;

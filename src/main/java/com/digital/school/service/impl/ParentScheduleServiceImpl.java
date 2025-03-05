@@ -177,7 +177,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
                 .forEach(exam -> {
                     Map<String, Object> event = new HashMap<>();
                     event.put("type", "EXAM");
-                    event.put("title", exam.getName());
+                    event.put("title", exam.getTitle());
                     event.put("date", exam.getDate());
                     event.put("subject", exam.getSubject().getName());
                     events.add(event);

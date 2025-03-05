@@ -6,12 +6,7 @@ import com.digital.school.model.Student;
 import com.digital.school.model.StudentHomework;
 import com.digital.school.model.StudentSubmission;
 import com.digital.school.model.enumerated.StudentSubmissionStatus;
-import com.digital.school.repository.AttendanceRepository;
-import com.digital.school.repository.EventRepository;
-import com.digital.school.repository.ParentHomeworkRepository;
-import com.digital.school.repository.ParentStudentRepository;
-import com.digital.school.repository.StudentSubmissionRepository;
-import com.digital.school.repository.StudentHomeworkRepository;
+import com.digital.school.repository.*;
 import com.digital.school.repository.StudentSubmissionRepository;
 import com.digital.school.service.EmailService;
 import com.digital.school.service.ParentDashboardService;
@@ -38,7 +33,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     private StudentSubmissionRepository studentSubmissionRepository;
 
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private StudentAttendanceRepository studentAttendanceRepository;
 
     @Autowired
     private StudentHomeworkRepository studentHomeworkRepository;
@@ -76,7 +71,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
         // Vérifier les absences non justifiées
         for (Student child : children) {
-            long unjustifiedAbsences = attendanceRepository.countUnjustifiedAbsences(child);
+            long unjustifiedAbsences = studentAttendanceRepository.countUnjustifiedAbsences(child);
             if (unjustifiedAbsences > 0) {
                 Map<String, Object> alert = new HashMap<>();
                 alert.put("type", "ABSENCE");
@@ -285,7 +280,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     private double calculateAttendanceRate(Student student) {
-        return attendanceRepository.calculateAttendanceRate(student);
+        return studentAttendanceRepository.calculateAttendanceRate(student);
     }
 
     private int countPendingHomework(Student student) {
@@ -313,10 +308,10 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     private List<Map<String, Object>> getAbsenceDetails(Student student) {
-        return attendanceRepository.findAbsenceDetails(student);
+        return studentAttendanceRepository.findAbsenceDetails(student);
     }
 
     private List<Map<String, Object>> getLateDetails(Student student) {
-        return attendanceRepository.findLateDetails(student);
+        return studentAttendanceRepository.findLateDetails(student);
     }
 }

@@ -6,64 +6,41 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-
-
-
-
 @Embeddable
 public class Auditable implements Serializable
 {
     private static final long	serialVersionUID	= 5322674309593123145L;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="CREATED", nullable=true, updatable=false)
+    @Column(name = "created", updatable = false)
     private Date created;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="UPDATED")
+    @Column(name = "updated")
     private Date updated;
 
-
     @PrePersist
-    public void prePersist() {
-        if (this.created == null) {
-            this.created = new Date();
-        }
+    protected void onCreate() {
+        Date now = new Date();
+        this.created = now;
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        this.updated = new Date();
+    }
 
-    public Auditable(Date created)
-    {
-        this.created = created;
-    }
-    public Auditable()
-    {
-    }
-    public Date getCreated()
-    {
+    // Getters and setters
+    public Date getCreated() {
         return created;
     }
 
-    public void setCreated(Date created)
-    {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
-    public Date getUpdated()
-    {
+    public Date getUpdated() {
         return updated;
     }
 
-    public void setUpdated(Date updated)
-    {
+    public void setUpdated(Date updated) {
         this.updated = updated;
     }
-
-
-    public Date getLastModified()
-    {
-        return (updated!=null)?updated:created;
-    }
-
-
 }

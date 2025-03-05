@@ -9,8 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.digital.school.model.User;
-import com.digital.school.service.StudentAbsenceService;
+import com.digital.school.service.StudentAttendanceService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.Map;
 public class StudentAbsenceController {
 
     @Autowired
-    private StudentAbsenceService absenceService;
+    private StudentAttendanceService absenceService;
 
     @GetMapping
     public String showAbsences(@AuthenticationPrincipal Student student, Model model) {

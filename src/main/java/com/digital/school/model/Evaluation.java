@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @DiscriminatorColumn(name="evaluation_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Evaluation extends AuditableEntity {
 
-    @Column(nullable = false)
+
     private String name;
 
     @Column(nullable = false)
@@ -36,14 +36,6 @@ public abstract class Evaluation extends AuditableEntity {
     private EvaluationStatus status;
 
     // Getters and setters
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getTitle() {
         return title;
@@ -91,5 +83,17 @@ public abstract class Evaluation extends AuditableEntity {
 
     public void setStatus(EvaluationStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Evaluation{" +
+                ", title='" + title + '\'' +
+                ", dueDate=" + dueDate +
+                ", subjectName=" + subject.getName() +
+                ", professorUserName=" + professor.getUsername() +
+                ", classeName=" + classe.getName() +
+                ", status=" + status.name() +
+                '}';
     }
 }

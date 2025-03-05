@@ -28,7 +28,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     private ExamRepository examRepository;
 
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private StudentAttendanceRepository studentAttendanceRepository;
 
     @Autowired
     private ProfessorDashboardRepository professorDashboardRepository;
@@ -68,9 +68,8 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
         stats.put("upcomingExams", upcomingExams);
 
         // Calculate average attendance
-        double averageAttendance = attendanceRepository.calculateAverageAttendanceForProfessor(professor);
+        double averageAttendance = studentAttendanceRepository.calculateAverageAttendanceForProfessor(professor);
         stats.put("averageAttendance", Math.round(averageAttendance * 100));
-
         return stats;
     }
 

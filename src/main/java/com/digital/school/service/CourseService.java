@@ -44,7 +44,7 @@ public interface CourseService {
      * @param course le cours à sauvegarder
      * @return le cours sauvegardé
      */
-    Course save(Course course);
+    Course save(Course course, User user);
 
     /**
      * Supprime un cours par son identifiant.

@@ -1,13 +1,12 @@
 package com.digital.school.controller.rest.admin;
 
-import com.digital.school.model.Classe;
-import com.digital.school.model.Professor;
-import com.digital.school.model.Subject;
+import com.digital.school.model.*;
+import com.digital.school.model.enumerated.CourseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.digital.school.model.Course;
 import com.digital.school.service.CourseService;
 import com.digital.school.service.SubjectService;
 import com.digital.school.service.ProfessorService;
@@ -56,7 +55,7 @@ public class AdminCourseRestController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<?> createCourse(@RequestBody Map<String, Object> requestData) {
+    public ResponseEntity<?> createCourse(@RequestBody Map<String, Object> requestData, @AuthenticationPrincipal Administrator administrator) {
         LOGGER.debug("📌 Requête reçue : {}", requestData);
 
         try {
@@ -80,6 +79,7 @@ public class AdminCourseRestController {
             course.setSubject(subject);
             course.setProfessor(professor);
             course.setClasse(classe.orElse(null));
+            course.setStatus(CourseStatus.UPCOMING);
 
             // Vérification des valeurs null avant de les convertir en String
             course.setName(requestData.get("name") != null ? requestData.get("name").toString() : "Nom par défaut");
@@ -87,7 +87,7 @@ public class AdminCourseRestController {
             course.setRoom(requestData.get("room") != null ? requestData.get("room").toString() : "");
 
             // Sauvegarde du cours
-            Course savedCourse = courseService.save(course);
+            Course savedCourse = courseService.save(course, administrator);
             return ResponseEntity.ok(savedCourse);
         } catch (Exception e) {
             LOGGER.error("🚨 Erreur lors de la création du cours : {}", e.getMessage());
@@ -99,13 +99,13 @@ public class AdminCourseRestController {
 
     @PutMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+    public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody Course course, @AuthenticationPrincipal Administrator administrator) {
         try {
             if (!courseService.existsById(id)) {
                 return ResponseEntity.notFound().build();
             }
             course.setId(id);
-            Course updatedCourse = courseService.save(course);
+            Course updatedCourse = courseService.save(course, administrator);
             return ResponseEntity.ok(updatedCourse);
         } catch (Exception e) {
             return ResponseEntity.badRequest()

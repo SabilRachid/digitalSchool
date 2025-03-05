@@ -20,4 +20,11 @@ public class Homework extends Evaluation {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "Homework{" +
+                "description='" + description + '\'' +
+                "} " + super.toString();
+    }
 }

@@ -68,7 +68,7 @@ public class ProfessorCourseRestController {
                                                @AuthenticationPrincipal Professor professor) {
         // L'entité Course doit être liée au professeur connecté.
         course.setProfessor(professor);
-        Course created = courseService.save(course);
+        Course created = courseService.save(course, professor);
         return ResponseEntity.ok(created);
     }
 

@@ -39,6 +39,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Object[]> findRegistrationsAfter(@Param("startDate") LocalDateTime startDate);
 
 
+    @Query("SELECT COUNT(s) FROM Student s WHERE s.classe.id = :classeId")
+    int countByClasse(Long classeId);
+
+
     interface HomeworkRepository extends JpaRepository<Homework, Long> {
 
         Optional<Homework> findByIdAndProfessor(Long id, Professor professor);

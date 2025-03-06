@@ -10,13 +10,12 @@ import java.time.LocalDate;
 @DiscriminatorColumn(name="evaluation_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Evaluation extends AuditableEntity {
 
-
     private String name;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "due_date", nullable = false)
+    @Column(name = "due_date")
     private LocalDate dueDate;
 
     @ManyToOne(optional = false)
@@ -34,6 +33,9 @@ public abstract class Evaluation extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private EvaluationStatus status;
+
+    @Column(name = "maxScore", nullable = true)
+    private Double maxScore;
 
     // Getters and setters
 
@@ -85,6 +87,14 @@ public abstract class Evaluation extends AuditableEntity {
         this.status = status;
     }
 
+    public Double getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(Double maxScore) {
+        this.maxScore = maxScore;
+    }
+
     @Override
     public String toString() {
         return "Evaluation{" +
@@ -94,6 +104,7 @@ public abstract class Evaluation extends AuditableEntity {
                 ", professorUserName=" + professor.getUsername() +
                 ", classeName=" + classe.getName() +
                 ", status=" + status.name() +
+                ", maxScore=" + maxScore +
                 '}';
     }
 }

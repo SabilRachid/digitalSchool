@@ -1,11 +1,9 @@
 package com.digital.school.service.impl;
 
-import com.digital.school.model.Exam;
-import com.digital.school.model.Professor;
-import com.digital.school.model.Student;
-import com.digital.school.model.StudentSubmission;
-import com.digital.school.repository.ExamRepository;
-import com.digital.school.repository.StudentSubmissionRepository;
+import com.digital.school.dto.ExamDTO;
+import com.digital.school.model.*;
+import com.digital.school.model.enumerated.EvaluationStatus;
+import com.digital.school.repository.*;
 import com.digital.school.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +23,66 @@ public class ExamServiceImpl implements ExamService {
     private ExamRepository examRepository;
 
     @Autowired
+    private ProfessorRepository professorRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private ClasseRepository classeRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
     private StudentSubmissionRepository studentSubmissionRepository;
 
     @Override
-    public Exam createExam(Exam exam, Long professorId) {
-        // Liez l'examen au professeur selon votre logique métier
-        // Par exemple, si l'examen doit être lié au professeur
-        exam.setProfessor(new Professor(professorId)); // Supposons que Professor a un constructeur par ID
+    @Transactional
+    public Exam createExam(ExamDTO examDTO, Long professorId) {
+
+        Exam exam = new Exam();
+        // Affectation des champs simples
+        exam.setTitle(examDTO.getTitle());
+        exam.setDescription(examDTO.getDescription());
+        exam.setStartTime(examDTO.getStartTime());
+        exam.setEndTime(examDTO.getStartTime()
+                .plusMinutes(examDTO.getDuration()));
+        exam.setDuration(examDTO.getDuration());
+        exam.setStatus(EvaluationStatus.SCHEDULED); // Statut initial
+        exam.setMaxScore(examDTO.getMaxScore());
+
+        // Affecter la note maximale si le champ existe dans l'entité Exam
+        // exam.setMaxScore(examDTO.getMaxScore()); // Décommentez si l'entité possède ce champ
+
+        // Charger le professeur à partir du repository
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new RuntimeException("Professeur non trouvé avec l'ID " + professorId));
+        exam.setProfessor(professor);
+
+        // Charger le sujet à partir de son ID contenu dans examDTO
+        Subject subject = subjectRepository.findById(examDTO.getSubjectId())
+                .orElseThrow(() -> new RuntimeException("Sujet non trouvé avec l'ID " + examDTO.getSubjectId()));
+        exam.setSubject(subject);
+
+        // Charger la classe à partir de son ID contenu dans examDTO
+        Classe classe = classeRepository.findById(examDTO.getClasseId())
+                .orElseThrow(() -> new RuntimeException("Classe non trouvée avec l'ID " + examDTO.getClasseId()));
+        exam.setClasse(classe);
+
+        // Optionnel : charger la salle si l'ExamDTO fournit un identifiant de salle
+        if (examDTO.getRoomId() != null) {
+            Room room = roomRepository.findById(examDTO.getRoomId())
+                    .orElseThrow(() -> new RuntimeException("Salle non trouvée avec l'ID " + examDTO.getRoomId()));
+            exam.setRoom(room);
+        }
+
+        // Vous pouvez éventuellement calculer endTime à partir de startTime et de la durée
+        exam.setEndTime(exam.getStartTime().plusMinutes(exam.getDuration()));
+
         return examRepository.save(exam);
     }
+
 
     @Override
     public void publishExam(Long examId) {
@@ -112,6 +161,43 @@ public class ExamServiceImpl implements ExamService {
             return matches;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public ExamDTO convertToDTO(Exam exam) {
+        ExamDTO dto = new ExamDTO();
+        dto.setId(exam.getId());
+        dto.setTitle(exam.getTitle());
+        dto.setDescription(exam.getDescription());
+        dto.setStartTime(exam.getStartTime());
+        dto.setDuration(exam.getDuration());
+        dto.setMaxScore(exam.getMaxScore());
+
+        // Déduire la date d'examen à partir du startTime
+        if (exam.getStartTime() != null) {
+            dto.setExamDate(exam.getStartTime().toLocalDate());
+        }
+
+        // Affecter le nom de la salle si disponible
+        if (exam.getRoom() != null) {
+            dto.setRoomId(exam.getRoom().getId());
+        }
+
+        // Affecter les informations liées au sujet, professeur et classe
+        if (exam.getSubject() != null) {
+            dto.setSubjectId(exam.getSubject().getId());
+        }
+        if (exam.getProfessor() != null) {
+            dto.setProfessorName(exam.getProfessor().getFirstName() + " " + exam.getProfessor().getLastName());
+        }
+        if (exam.getClasse() != null) {
+            dto.setClasseId(exam.getClasse().getId());
+        }
+
+        dto.setStatus(exam.getStatus());
+
+        return dto;
+    }
+
 
 }
 

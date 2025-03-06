@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Charge les devoirs via GET, en passant éventuellement une URL filtrée
-async function loadHomeworks(filterUrl) {
+async function loadHomeworks(filterUrl = '/professor/api/homeworks') {
     try {
         const response = await fetch(filterUrl, {
             method: 'GET',
@@ -38,7 +38,7 @@ function updateHomeworksUI(homeworks) {
             <div class="homework-header">
                 <span class="subject-badge">${hw.subjectName}</span>
                 ${hw.status === 'SCHEDULED' ? `<span class="due-date"><i class="fas fa-calendar"></i> ${formatHomeworkDate(hw.dueDate)}</span>` : ''}
-                ${hw.status === 'IN_PROGRESS' ? `<span class="status-badge in-progress">En cours</span>` : ''}
+                ${hw.status === 'PUBLISHED' ? `<span class="status-badge in-progress">En cours</span>` : ''}
                 ${hw.status === 'COMPLETED' ? `<span class="status-badge completed">Terminé</span>` : ''}
             </div>
             <div class="homework-content">
@@ -48,14 +48,14 @@ function updateHomeworksUI(homeworks) {
                     <span class="detail-item"><i class="fas fa-clock"></i> ${formatHomeworkDate(hw.dueDate)}</span>
                     <span class="detail-item"><i class="fas fa-users"></i> ${hw.classeName}</span>
                 </div>
-                ${hw.status === 'IN_PROGRESS' && hw.submissionId ? `<button class="btn btn-info mt-2" onclick="openHomeworkGradeEntryModal(${hw.submissionId})"><i class="fas fa-edit"></i> Saisir notes</button>` : ''}
+                ${hw.status === 'PUBLISHED' && hw.submissionId ? `<button class="btn btn-info mt-2" onclick="openHomeworkGradeEntryModal(${hw.submissionId})"><i class="fas fa-edit"></i> Saisir notes</button>` : ''}
             </div>
             <div class="homework-footer">
                 ${hw.status === 'SCHEDULED' ? `
                     <button class="btn btn-primary" onclick="publishHomework(${hw.id})"><i class="fas fa-share"></i> Publier</button>
                     <button class="btn btn-secondary" onclick="editHomework(${hw.id})"><i class="fas fa-edit"></i> Modifier</button>
                 ` : ''}
-                ${hw.status === 'IN_PROGRESS' ? `<button class="btn btn-warning" onclick="endHomework(${hw.id})"><i class="fas fa-stop"></i> Terminer</button>` : ''}
+                ${hw.status === 'PUBLISHED' ? `<button class="btn btn-warning" onclick="endHomework(${hw.id})"><i class="fas fa-stop"></i> Terminer</button>` : ''}
                 ${hw.status === 'COMPLETED' ? `
                     <button class="btn btn-primary" onclick="viewHomeworkResults(${hw.id})"><i class="fas fa-chart-bar"></i> Résultats</button>
                     <button class="btn btn-secondary" onclick="downloadHomeworkReport(${hw.id})"><i class="fas fa-download"></i> Rapport</button>
@@ -64,7 +64,7 @@ function updateHomeworksUI(homeworks) {
         `;
         if (hw.status === 'SCHEDULED') {
             upcomingSection.appendChild(hwCard);
-        } else if (hw.status === 'IN_PROGRESS') {
+        } else if (hw.status === 'PUBLISHED') {
             inProgressSection.appendChild(hwCard);
         } else if (hw.status === 'COMPLETED') {
             completedSection.appendChild(hwCard);
@@ -228,6 +228,48 @@ function getSubjectColor(subject) {
     };
     return colors[subject] || '#6B7280';
 }
+
+// Fonction pour publier un devoir : change le statut (ex. de SCHEDULED à PUBLISHED)
+async function publishHomework(homeworkId) {
+    try {
+        const response = await fetch(`/professor/api/homeworks/${homeworkId}/publish`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la publication du devoir');
+        showNotification('Devoir publié avec succès', 'success');
+        // Recharge les devoirs pour actualiser l'affichage
+        loadHomeworks();
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Fonction pour terminer un devoir : change le statut à COMPLETED
+async function endHomework(homeworkId) {
+    try {
+        const response = await fetch(`/professor/api/homeworks/${homeworkId}/end`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la clôture du devoir');
+        showNotification('Devoir terminé avec succès', 'success');
+        // Recharge les devoirs pour actualiser l'affichage
+        loadHomeworks();
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+
 async function downloadHomeworkReport(homeworkId) {
     try {
         const response = await fetch(`/professor/api/homeworks/${homeworkId}/report`);

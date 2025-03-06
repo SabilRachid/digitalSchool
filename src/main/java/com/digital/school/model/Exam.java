@@ -25,6 +25,9 @@ public class Exam extends Evaluation {
     @JoinColumn(name = "room_id")
     private Room room;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     // Getters et setters
 
     public LocalDateTime getStartTime() {
@@ -62,5 +65,14 @@ public class Exam extends Evaluation {
     // Méthode dérivée pour obtenir la date de l'examen (basée sur startTime)
     public LocalDate getDate() {
         return startTime.toLocalDate();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+
     }
 }

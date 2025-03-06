@@ -1,9 +1,102 @@
 document.addEventListener('DOMContentLoaded', function() {
-    initializeForm();
-    initializeGradeEntryForm();
-    initializeCharts();
-    initializeFilters();
+    loadExams(); // Charge initialement tous les examens via GET
+    initializeForm();           // Pour la création d'un examen
+    initializeGradeEntryForm(); // Pour la saisie des notes
+    initializeCharts();         // Pour l'initialisation de graphiques si besoin
+    initializeFilters();        // Pour le filtrage dynamique
 });
+
+// Charge les examens via GET, éventuellement filtrés
+async function loadExams(filterUrl = '/professor/api/exams') {
+    try {
+        const response = await fetch(filterUrl, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!response.ok) throw new Error('Erreur lors du chargement des examens : ' + response.status);
+        const exams = await response.json();
+        updateExamsUI(exams);
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Met à jour l'affichage des examens selon leur statut
+function updateExamsUI(exams) {
+    const upcomingSection = document.getElementById('upcomingExamList');
+    const inProgressSection = document.getElementById('inProgressExamList');
+    const completedSection = document.getElementById('completedExamList');
+
+    upcomingSection.innerHTML = '';
+    inProgressSection.innerHTML = '';
+    completedSection.innerHTML = '';
+
+    exams.forEach(exam => {
+        const examCard = document.createElement('div');
+        examCard.className = 'exam-card';
+        examCard.innerHTML = `
+            <div class="exam-header">
+                <span class="subject-badge">${exam.subjectName}</span>
+                ${exam.status === 'SCHEDULED' ? `<span class="exam-date"><i class="fas fa-calendar"></i> ${formatExamDate(exam.startTime)}</span>` : ''}
+                ${exam.status === 'PUBLISHED' ? `<span class="status-badge in-progress">En cours</span>` : ''}
+                ${exam.status === 'COMPLETED' ? `<span class="status-badge completed">Terminé</span>` : ''}
+            </div>
+            <div class="exam-content">
+                <h3>${exam.title}</h3>
+                <p>${exam.description || ''}</p>
+                <div class="exam-details">
+                    <span class="detail-item"><i class="fas fa-clock"></i> ${exam.duration} minutes</span>
+                    <span class="detail-item"><i class="fas fa-users"></i> ${exam.classeName}</span>
+                </div>
+                ${exam.status === 'PUBLISHED' && exam.submissionId ?
+            `<button class="btn btn-info mt-2" onclick="openGradeEntryModal(${exam.submissionId})">
+                        <i class="fas fa-edit"></i> Saisir notes
+                     </button>` : ''}
+            </div>
+            <div class="exam-footer">
+                ${exam.status === 'SCHEDULED' ? `
+                    <button class="btn btn-primary" onclick="publishExam(${exam.id})">
+                        <i class="fas fa-share"></i> Publier
+                    </button>
+                    <button class="btn btn-secondary" onclick="editExam(${exam.id})">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                ` : ''}
+                ${exam.status === 'PUBLISHED' ?
+            `<button class="btn btn-warning" onclick="endExam(${exam.id})">
+                        <i class="fas fa-stop"></i> Terminer
+                    </button>` : ''}
+                ${exam.status === 'COMPLETED' ? `
+                    <button class="btn btn-primary" onclick="viewResults(${exam.id})">
+                        <i class="fas fa-chart-bar"></i> Résultats
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadReport(${exam.id})">
+                        <i class="fas fa-download"></i> Rapport
+                    </button>
+                ` : ''}
+            </div>
+        `;
+        if (exam.status === 'SCHEDULED') {
+            upcomingSection.appendChild(examCard);
+        } else if (exam.status === 'PUBLISHED') {
+            inProgressSection.appendChild(examCard);
+        } else if (exam.status === 'COMPLETED') {
+            completedSection.appendChild(examCard);
+        }
+    });
+}
+
+// Formate la date d'un examen à partir de startTime
+function formatExamDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
 
 // INITIALISATION DU FORMULAIRE DE CRÉATION D'EXAMEN
 function initializeForm() {
@@ -14,14 +107,16 @@ function initializeForm() {
         try {
             const formData = new FormData(this);
             const data = {
-                name: formData.get('name'),
-                subject: { id: formData.get('subject') },
-                classe: { id: formData.get('classe') },
-                examDate: formData.get('examDate'),
+                title: formData.get('title'),
+                subjectId: formData.get('subject'),
+                classeId: formData.get('classe'),
+                startTime: formData.get('examDate'),
                 duration: parseInt(formData.get('duration')),
                 description: formData.get('description'),
                 maxScore: parseFloat(formData.get('maxScore'))
+                // roomId peut être ajouté si vous utilisez un select pour la salle
             };
+            console.log("📌 JSON envoyé :", JSON.stringify(data, null, 2));
             const response = await fetch('/professor/api/exams', {
                 method: 'POST',
                 headers: {
@@ -71,7 +166,7 @@ function initializeGradeEntryForm() {
     });
 }
 
-// Ouverture/fermeture des modales
+// Fonction d'ouverture/fermeture des modales
 function openExamModal() {
     document.getElementById('examModal').classList.add('show');
 }
@@ -94,30 +189,44 @@ function initializeCharts() {
 }
 
 // INITIALISATION DU FORMULAIRE DE FILTRAGE
-// Au clic sur le bouton de filtre, on récupère les valeurs et on redirige vers une URL GET.
 function initializeFilters() {
     const filterForm = document.getElementById('examFilterForm');
     if (!filterForm) return;
+
+    // Ajoute un écouteur sur chaque changement de champ
+    const filterInputs = filterForm.querySelectorAll('input, select');
+    filterInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            const url = generateFilterUrl(filterForm);
+            loadExams(url);
+        });
+    });
+
+    // Écoute de la soumission du formulaire
     filterForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const formData = new FormData(filterForm);
-        const month = formData.get('month');
-        const classe = formData.get('classe');
-        const subject = formData.get('subject');
-        let url = '/professor/exams?';
-        if (month) url += 'month=' + encodeURIComponent(month) + '&';
-        if (classe) url += 'classe=' + encodeURIComponent(classe) + '&';
-        if (subject) url += 'subject=' + encodeURIComponent(subject) + '&';
-        // Supprime le dernier caractère '&' ou '?' si présent
-        if (url.endsWith('&') || url.endsWith('?')) {
-            url = url.slice(0, -1);
-        }
-        // Redirection via GET, le contrôleur récupère les paramètres et recharge la page
-        window.location.href = url;
+        const url = generateFilterUrl(filterForm);
+        loadExams(url);
     });
 }
 
-// Fonction utilitaire pour formater une date d'examen
+// Génère l'URL de filtrage à partir des valeurs du formulaire
+function generateFilterUrl(form) {
+    const formData = new FormData(form);
+    let url = '/professor/api/exams?';
+    const month = formData.get('month');
+    const classe = formData.get('classe');
+    const subject = formData.get('subject');
+    if (month) url += 'month=' + encodeURIComponent(month) + '&';
+    if (classe) url += 'classe=' + encodeURIComponent(classe) + '&';
+    if (subject) url += 'subject=' + encodeURIComponent(subject) + '&';
+    if (url.endsWith('&') || url.endsWith('?')) {
+        url = url.slice(0, -1);
+    }
+    return url;
+}
+
+// Fonction utilitaire pour formater la date d'un examen
 function formatExamDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -129,53 +238,44 @@ function formatExamDate(dateString) {
     });
 }
 
-// Utilitaires pour le graphique de progression (si besoin)
-function formatDate(date) {
-    return new Date(date).toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: 'short'
-    });
-}
-function generateDateLabels() {
-    const labels = [];
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(now);
-        date.setMonth(now.getMonth() - i);
-        labels.push(date.toLocaleDateString('fr-FR', { month: 'short' }));
-    }
-    return labels;
-}
-function getSubjectColor(subject) {
-    const colors = {
-        'Mathématiques': '#4F46E5',
-        'Français': '#059669',
-        'Histoire-Géo': '#D97706',
-        'Anglais': '#DC2626',
-        'SVT': '#4299E1',
-        'Physique-Chimie': '#8B5CF6'
-    };
-    return colors[subject] || '#6B7280';
-}
-
-// Téléchargement du rapport PDF d'un examen
-async function downloadReport(examId) {
+// Fonction pour publier un examen : change le statut en PUBLISHED
+async function publishExam(examId) {
     try {
-        const response = await fetch(`/professor/api/exams/${examId}/report`);
-        if (!response.ok) throw new Error('Erreur lors du téléchargement du rapport');
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `exam-report-${examId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const response = await fetch(`/professor/api/exams/${examId}/publish`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la publication de l\'examen');
+        showNotification('Examen publié avec succès', 'success');
+        loadExams();
     } catch (error) {
         showNotification(error.message, 'error');
     }
 }
+
+async function endExam(examId) {
+    try {
+        const response = await fetch(`/professor/api/exams/${examId}/end`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la clôture de l\'examen');
+        showNotification('Examen terminé avec succès', 'success');
+        // Recharge la liste des examens pour actualiser l'affichage
+        loadExams();
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
 
 // Affichage des notifications
 function showNotification(message, type = 'info') {
@@ -198,4 +298,23 @@ function showNotification(message, type = 'info') {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     }, 5000);
+}
+
+// Téléchargement du rapport PDF d'un examen
+async function downloadReport(examId) {
+    try {
+        const response = await fetch(`/professor/api/exams/${examId}/report`);
+        if (!response.ok) throw new Error('Erreur lors du téléchargement du rapport');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `exam-report-${examId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
 }

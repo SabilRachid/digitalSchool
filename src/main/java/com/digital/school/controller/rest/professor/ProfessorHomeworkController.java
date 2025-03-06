@@ -44,6 +44,7 @@ public class ProfessorHomeworkController {
     @PostMapping("/{id}/publish")
     public ResponseEntity<?> publishHomework(@PathVariable Long id) {
         try {
+            LOGGER.debug("POST publishHomework id="+id);
             homeworkService.publishHomework(id);
             return ResponseEntity.ok(Map.of("message", "Devoir publié avec succès"));
         } catch (Exception e) {

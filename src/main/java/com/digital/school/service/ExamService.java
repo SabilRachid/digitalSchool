@@ -1,6 +1,7 @@
 
 package com.digital.school.service;
 
+import com.digital.school.dto.ExamDTO;
 import com.digital.school.model.*;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface ExamService {
 
 
      /* Crée un nouvel examen et l'associe au professeur identifié par professorId.*/
-        Exam createExam(Exam exam, Long professorId);
+        Exam createExam(ExamDTO exam, Long professorId);
 
         /*Publie l'examen identifié par son ID.*/
         void publishExam(Long id);
@@ -35,6 +36,8 @@ public interface ExamService {
         List<Exam> findExamsByProfessor(Long id);
 
         List<Exam> findExamsByProfessor(Long professorId, String month, Long classe, Long subject);
+
+         ExamDTO convertToDTO(Exam exam);
 }
 
 

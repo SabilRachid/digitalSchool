@@ -19,16 +19,6 @@ public abstract class StudentSubmission extends AuditableEntity {
     @JoinColumn(name = "evaluation_id")
     private Evaluation evaluation;
 
-    public StudentSubmission() {}
-
-    public Evaluation getEvaluation() {
-        return evaluation;
-    }
-
-    public void setEvaluation(Evaluation evaluation) {
-        this.evaluation = evaluation;
-    }
-
     // Date de soumission (pour examen ou devoir)
     @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
@@ -56,7 +46,18 @@ public abstract class StudentSubmission extends AuditableEntity {
     @Column(name = "submission_status", nullable = false)
     private StudentSubmissionStatus status;
 
+
     // Getters & setters
+
+    public StudentSubmission() {}
+
+    public Evaluation getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(Evaluation evaluation) {
+        this.evaluation = evaluation;
+    }
 
     public Student getStudent() {
         return student;

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentDto {
+public class DocumentDTO {
 
 
 
@@ -23,8 +23,8 @@ public class DocumentDto {
     private String courseName; // Nom du cours associé
 
     // ✅ Convertir une entité `Resource` en DTO
-    public static DocumentDto fromEntity(Document document) {
-        return new DocumentDto(
+    public static DocumentDTO fromEntity(Document document) {
+        return new DocumentDTO(
                 document.getId(),
                 document.getName(),
                 document.getType().name(),
@@ -37,7 +37,7 @@ public class DocumentDto {
 
     // ✅ Convertir un DTO en entité `Resource`
     // ✅ Conversion DTO → Entité avec association du `Course`
-    public static Document toEntity(DocumentDto dto, Course course) {
+    public static Document toEntity(DocumentDTO dto, Course course) {
         Document document = new Document();
         document.setId(dto.getId());
         document.setName(dto.getName());

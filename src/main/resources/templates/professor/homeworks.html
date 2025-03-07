@@ -27,7 +27,6 @@
     <link rel="stylesheet" th:href="@{/css/components/tables.css}">
     <link rel="stylesheet" th:href="@{/css/components/datatable-custom.css}">
     <link rel="stylesheet" th:href="@{/css/components/forms.css}">
-    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
     <link rel="stylesheet" th:href="@{/css/components/modals.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
@@ -72,7 +71,7 @@
 
     <!-- Formulaire de filtrage -->
     <div class="filter-form">
-        <form id="homeworkFilterForm" onsubmit="applyHomeworkFilters(event)">
+        <form id="homeworkFilterForm">
             <input type="month" name="month" class="form-control" placeholder="Mois" th:value="${selectedMonth}">
             <select name="classe" class="form-control">
                 <option value="">Toutes les classes</option>
@@ -89,99 +88,32 @@
     <!-- Grille des devoirs -->
     <div class="homeworks-grid">
         <!-- Devoirs à venir -->
-        <div class="homework-section" id="upcomingHomework">
+        <div class="homework-section">
             <h2>À venir</h2>
-            <div class="homework-list">
-                <div th:each="hw : ${homeworks}" th:if="${hw.status.name() == 'SCHEDULED'}" class="homework-card">
-                    <div class="homework-header">
-                        <span class="subject-badge" th:text="${hw.subject.name}">Matière</span>
-                        <span class="due-date">
-                <i class="fas fa-calendar"></i>
-                <span th:text="${#temporals.format(hw.dueDate, 'dd/MM/yyyy HH:mm')}">Date</span>
-              </span>
-                    </div>
-                    <div class="homework-content">
-                        <h3 th:text="${hw.title}">Titre du devoir</h3>
-                        <p th:text="${hw.description}">Description</p>
-                        <div class="homework-details">
-                            <span class="detail-item"><i class="fas fa-clock"></i> <span th:text="${#temporals.format(hw.dueDate, 'dd/MM/yyyy')}">Date</span></span>
-                            <span class="detail-item"><i class="fas fa-users"></i> <span th:text="${hw.classe.name}">Classe</span></span>
-                        </div>
-                    </div>
-                    <div class="homework-footer">
-                        <button class="btn btn-primary" th:onclick="'publishHomework(' + ${hw.id} + ')'">
-                            <i class="fas fa-share"></i> Publier
-                        </button>
-                        <button class="btn btn-secondary" th:onclick="'editHomework(' + ${hw.id} + ')'">
-                            <i class="fas fa-edit"></i> Modifier
-                        </button>
-                    </div>
-                </div>
+            <div class="homework-list" id="upcomingHomework">
+                <!-- Contenu chargé dynamiquement par JS -->
+                zzzz
             </div>
         </div>
-
         <!-- Devoirs en cours -->
-        <div class="homework-section" id="inProgressHomework">
+        <div class="homework-section">
             <h2>En cours</h2>
-            <div class="homework-list">
-                <div th:each="hw : ${homeworks}" th:if="${hw.status.name() == 'IN_PROGRESS'}" class="homework-card">
-                    <div class="homework-header">
-                        <span class="subject-badge" th:text="${hw.subject.name}">Matière</span>
-                        <span class="status-badge in-progress">En cours</span>
-                    </div>
-                    <div class="homework-content">
-                        <h3 th:text="${hw.title}">Titre du devoir</h3>
-                        <div class="progress-info">
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 75%"></div>
-                            </div>
-                            <span>Temps restant: 45 minutes</span>
-                        </div>
-                        <!-- Bouton pour saisir les notes -->
-                        <button class="btn btn-info mt-2" th:onclick="'openHomeworkGradeEntryModal(' + ${hw.submissionId} + ')'">
-                            <i class="fas fa-edit"></i> Saisir notes
-                        </button>
-                    </div>
-                    <div class="homework-footer">
-                        <button class="btn btn-warning" th:onclick="'endHomework(' + ${hw.id} + ')'">
-                            <i class="fas fa-stop"></i> Terminer
-                        </button>
-                    </div>
-                </div>
+            <div class="homework-list" id="inProgressHomework">
+                <!-- Contenu chargé dynamiquement par JS -->
             </div>
         </div>
-
+        <!-- Devoirs à noter -->
+        <div class="homework-section">
+            <h2>Devoirs à noter</h2>
+            <div class="homework-list" id="toBeGradedHomework">
+                <!-- Les examens non notés seront ajoutés ici par JavaScript -->
+            </div>
+        </div>
         <!-- Devoirs terminés -->
-        <div class="homework-section" id="completedHomework">
+        <div class="homework-section" >
             <h2>Terminés</h2>
-            <div class="homework-list">
-                <div th:each="hw : ${homeworks}" th:if="${hw.status.name() == 'COMPLETED'}" class="homework-card">
-                    <div class="homework-header">
-                        <span class="subject-badge" th:text="${hw.subject.name}">Matière</span>
-                        <span class="status-badge completed">Terminé</span>
-                    </div>
-                    <div class="homework-content">
-                        <h3 th:text="${hw.title}">Titre du devoir</h3>
-                        <div class="results-summary">
-                            <div class="result-item">
-                                <span class="label">Moyenne</span>
-                                <span class="value">14.5/20</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="label">Participants</span>
-                                <span class="value">28/30</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="homework-footer">
-                        <button class="btn btn-primary" th:onclick="'viewHomeworkResults(' + ${hw.id} + ')'">
-                            <i class="fas fa-chart-bar"></i> Résultats
-                        </button>
-                        <button class="btn btn-secondary" th:onclick="'downloadHomeworkReport(' + ${hw.id} + ')'">
-                            <i class="fas fa-download"></i> Rapport
-                        </button>
-                    </div>
-                </div>
+            <div class="homework-list" id="completedHomework">
+                <!-- Contenu chargé dynamiquement par JS -->
             </div>
         </div>
     </div>
@@ -244,8 +176,7 @@
         </div>
         <form id="gradeEntryHomeworkForm">
             <div class="modal-body">
-                <!-- Champ caché pour l'identifiant de la soumission -->
-                <input type="hidden" id="homeworkSubmissionId" name="homeworkSubmissionId" value="">
+                <input type="hidden" id="homeworkSubmissionId" name="homeworkSubmissionId">
                 <div class="form-group">
                     <label for="homeworkGradeValue">Note (sur 20)</label>
                     <input type="number" id="homeworkGradeValue" name="homeworkGradeValue" min="0" max="20" step="0.1" required>
@@ -307,7 +238,7 @@
                     </tr>
                     </thead>
                     <tbody id="resultsTableBody">
-                    <!-- Rempli dynamiquement -->
+                    <!-- Contenu chargé dynamiquement -->
                     </tbody>
                 </table>
             </div>

@@ -1,11 +1,9 @@
 package com.digital.school.controller;
 
 import com.digital.school.dto.EventDTO;
-import com.digital.school.model.Classe;
-import com.digital.school.model.Event;
+import com.digital.school.model.*;
+import com.digital.school.model.enumerated.CourseStatus;
 import com.digital.school.model.enumerated.EventType;
-import com.digital.school.model.Subject;
-import com.digital.school.model.User;
 import com.digital.school.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -88,7 +88,7 @@ public class CalendarController {
             map.put("location", event.getLocation());
             map.put("type", event.getType());
             map.put("description", event.getDescription());
-            map.put("duration", event.getDuration());
+            map.put("duration", getDuration(event.getStartTime(), event.getEndTime()));
             map.put("subjectName", event.getSubject() != null ? event.getSubject().getName() : null);
             map.put("roomName", event.getRoom() != null ? event.getRoom().getName() : null);
             map.put("classeName", event.getClasse() != null ? event.getClasse().getName() : null);
@@ -124,18 +124,46 @@ public class CalendarController {
     public ResponseEntity<?> createEvent(@RequestBody EventDTO eventDTO, @AuthenticationPrincipal User user) {
         LOGGER.debug("Création d'un événement : {}", eventDTO);
         try {
-            Event event = new Event();
+            Event event;
+            // Instanciation selon le type d'événement
+            if ("COURSE".equalsIgnoreCase(eventDTO.getType())) {
+                Course course = new Course();
+                event = course;
+                // Champs spécifiques aux cours
+                if (eventDTO.getProfessor() != null) {
+                    Long professorId = Long.parseLong(eventDTO.getProfessor().getId());
+                    Professor courseProfessor = professorService.findById(professorId)
+                            .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
+                    course.setProfessor(courseProfessor);
+                } else if (user instanceof Professor) {
+                    course.setProfessor((Professor) user);
+                }
+                // On suppose que le DTO fournit le statut spécifique aux cours
+                // Champs complémentaires pour Course
+                course.setStatus(CourseStatus.UPCOMING);
+                course.setDate(LocalDateTime.parse(eventDTO.getStartTime()).toLocalDate());
+                //course.setResourceCount(eventDTO.getResourceCount()); // attend un int
+                //course.setOnlineLink(eventDTO.getOnlineLink());
+                //course.setCancellationReason(eventDTO.getCancellationReason());
+                //course.setInstructorNotes(eventDTO.getInstructorNotes());
+            } else if ("EXAM".equalsIgnoreCase(eventDTO.getType())) {
+                event = new Exam();
+            } else {
+                event = new Event();
+            }
+
+            // Propriétés communes pour tous les types d'événements
             event.setTitle(eventDTO.getTitle());
-            event.setType(EventType.valueOf(eventDTO.getType()));
+            event.setDescription(eventDTO.getDescription());
             event.setStartTime(LocalDateTime.parse(eventDTO.getStartTime()));
             event.setEndTime(LocalDateTime.parse(eventDTO.getEndTime()));
             event.setLocation(eventDTO.getLocation());
             event.setOnline(eventDTO.isOnline());
-            event.setDescription(eventDTO.getDescription());
             event.setAllDay(eventDTO.isAllDay());
+            event.setType(EventType.valueOf(eventDTO.getType().toUpperCase()));
 
-            // Pour les types COURSE et EXAM
-            if (List.of("COURSE", "EXAM").contains(eventDTO.getType())) {
+            // Pour COURSE et EXAM, on affecte le subject et la classe
+            if (List.of("COURSE", "EXAM").contains(eventDTO.getType().toUpperCase())) {
                 if (eventDTO.getSubject() != null) {
                     Long subjectId = Long.parseLong(eventDTO.getSubject().getId());
                     Subject subject = subjectService.findById(subjectId)
@@ -147,15 +175,17 @@ public class CalendarController {
                     Classe classe = classeService.findById(classeId)
                             .orElseThrow(() -> new RuntimeException("Classe non trouvée"));
                     event.setClasse(classe);
-                    // Ajouter tous les élèves de la classe
+
+                    // Pour COURSE et EXAM, ajouter les participants de la classe (élèves)
                     event.setParticipants(new HashSet<>(studentService.getStudentsByClasseId(classeId)));
-                    // Ajouter le professeur associé à la matière pour cette classe
+
+                    // Ajouter également les professeurs associés à la matière pour cette classe
                     professorService.findProfessorsByClasseId(classeId).stream()
-                            .filter(prof -> prof.getSubjects().contains(event.getSubject()))
+                            .filter(prof -> event.getSubject() != null && prof.getSubjects().contains(event.getSubject()))
                             .forEach(event.getParticipants()::add);
                 }
-            } else if ("MEETING".equals(eventDTO.getType())) {
-                // Pour les réunions, gérer les participants
+            } else if ("MEETING".equalsIgnoreCase(eventDTO.getType())) {
+                // Gestion spécifique pour les réunions
                 List<String> participantStrings = eventDTO.getParticipants();
                 List<Long> numericParticipants = new ArrayList<>();
                 boolean special = false;
@@ -172,12 +202,12 @@ public class CalendarController {
                     if (participantStrings != null && participantStrings.contains("ALL_PROFESSORS")) {
                         event.setParticipants(new HashSet<>(professorService.findAll()));
                     }
-                    // Vous pouvez gérer d'autres cas spéciaux ici.
+                    // Gérer d'autres cas spéciaux ici
                 } else {
                     event.setParticipants(new HashSet<>(userService.findUsersByIds(numericParticipants)));
                 }
             } else {
-                // Pour les autres types d'événements, gérer les participants via participantType
+                // Pour les autres types d'événements, gérer les participants via une méthode dédiée
                 handleParticipants(eventDTO, event);
             }
 
@@ -190,6 +220,7 @@ public class CalendarController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
 
     /**
      * Gère les participants en fonction du type d'événement.
@@ -260,5 +291,13 @@ public class CalendarController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+
+    public Integer getDuration(LocalDateTime startTime,LocalDateTime endTime) {
+        if (startTime != null && endTime != null) {
+            return (int) Duration.between(startTime, endTime).toMinutes();
+        }
+        return 0;
     }
 }

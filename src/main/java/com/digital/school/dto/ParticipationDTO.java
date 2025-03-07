@@ -7,7 +7,7 @@ import com.digital.school.model.enumerated.ParticipationType;
 
 import java.time.LocalDateTime;
 
-public class ParticipationDto {
+public class ParticipationDTO {
     private Long id;
     private String studentFirstName;
     private String studentLastName;
@@ -17,7 +17,7 @@ public class ParticipationDto {
     private ParticipationType participationType;
     private String feedback;
 
-    public ParticipationDto(Long id, String studentFirstName, String studentLastName, String subjectName, String className, LocalDateTime recordedAt, ParticipationType participationType, String feedback) {
+    public ParticipationDTO(Long id, String studentFirstName, String studentLastName, String subjectName, String className, LocalDateTime recordedAt, ParticipationType participationType, String feedback) {
         this.id = id;
         this.studentFirstName = studentFirstName;
         this.studentLastName = studentLastName;
@@ -29,8 +29,8 @@ public class ParticipationDto {
     }
 
 
-    public static ParticipationDto fromEntity(Participation participation) {
-        return new ParticipationDto(
+    public static ParticipationDTO fromEntity(Participation participation) {
+        return new ParticipationDTO(
                 participation.getId(),
                 participation.getStudent().getFirstName(),
                 participation.getStudent().getLastName(),

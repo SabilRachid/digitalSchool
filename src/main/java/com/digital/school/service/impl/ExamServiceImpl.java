@@ -3,6 +3,7 @@ package com.digital.school.service.impl;
 import com.digital.school.dto.ExamDTO;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.EvaluationStatus;
+import com.digital.school.model.enumerated.EventType;
 import com.digital.school.repository.*;
 import com.digital.school.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +26,9 @@ public class ExamServiceImpl implements ExamService {
 
     @Autowired
     private ProfessorRepository professorRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private SubjectRepository subjectRepository;
@@ -43,6 +48,7 @@ public class ExamServiceImpl implements ExamService {
 
         Exam exam = new Exam();
         // Affectation des champs simples
+        exam.setType(EventType.EXAM);
         exam.setTitle(examDTO.getTitle());
         exam.setDescription(examDTO.getDescription());
         exam.setStartTime(examDTO.getStartTime());
@@ -51,21 +57,12 @@ public class ExamServiceImpl implements ExamService {
         exam.setDuration(examDTO.getDuration());
         exam.setStatus(EvaluationStatus.SCHEDULED); // Statut initial
         exam.setMaxScore(examDTO.getMaxScore());
-
-        // Affecter la note maximale si le champ existe dans l'entité Exam
-        // exam.setMaxScore(examDTO.getMaxScore()); // Décommentez si l'entité possède ce champ
-
-        // Charger le professeur à partir du repository
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new RuntimeException("Professeur non trouvé avec l'ID " + professorId));
         exam.setProfessor(professor);
-
-        // Charger le sujet à partir de son ID contenu dans examDTO
         Subject subject = subjectRepository.findById(examDTO.getSubjectId())
                 .orElseThrow(() -> new RuntimeException("Sujet non trouvé avec l'ID " + examDTO.getSubjectId()));
         exam.setSubject(subject);
-
-        // Charger la classe à partir de son ID contenu dans examDTO
         Classe classe = classeRepository.findById(examDTO.getClasseId())
                 .orElseThrow(() -> new RuntimeException("Classe non trouvée avec l'ID " + examDTO.getClasseId()));
         exam.setClasse(classe);
@@ -77,8 +74,15 @@ public class ExamServiceImpl implements ExamService {
             exam.setRoom(room);
         }
 
-        // Vous pouvez éventuellement calculer endTime à partir de startTime et de la durée
-        exam.setEndTime(exam.getStartTime().plusMinutes(exam.getDuration()));
+
+        // Ajouter tous les élèves de la classe
+        exam.setParticipants(new HashSet<>(studentRepository.getStudentsByClasseId(examDTO.getClasseId())));
+
+        // Ajouter le professeur associé à la matière pour cette classe
+        professorRepository.findProfessorsByClasseId(examDTO.getClasseId()).stream()
+                .filter(prof -> prof.getSubjects().contains(exam.getSubject()))
+                .forEach(exam.getParticipants()::add);
+
 
         return examRepository.save(exam);
     }
@@ -171,6 +175,7 @@ public class ExamServiceImpl implements ExamService {
         dto.setStartTime(exam.getStartTime());
         dto.setDuration(exam.getDuration());
         dto.setMaxScore(exam.getMaxScore());
+        dto.setGraded(exam.isGraded());
 
         // Déduire la date d'examen à partir du startTime
         if (exam.getStartTime() != null) {

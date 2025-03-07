@@ -11,8 +11,10 @@ public class Homework extends Evaluation {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Getters and setters
+    @Column(nullable = true)
+    private int submittedCount=0;
 
+    // Getters and setters
     public String getDescription() {
         return description;
     }
@@ -21,10 +23,19 @@ public class Homework extends Evaluation {
         this.description = description;
     }
 
+    public int getSubmittedCount() {
+        return submittedCount;
+    }
+
+    public void setSubmittedCount(int submittedCount) {
+        this.submittedCount = submittedCount;
+    }
+
     @Override
     public String toString() {
         return "Homework{" +
                 "description='" + description + '\'' +
+                "submittedCount=" + submittedCount +
                 "} " + super.toString();
     }
 }

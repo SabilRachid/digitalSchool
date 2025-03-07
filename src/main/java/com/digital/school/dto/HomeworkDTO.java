@@ -13,6 +13,7 @@ public class HomeworkDTO {
     private Long classeId;
     private String professorName;
     private EvaluationStatus status;
+    private boolean graded;
 
     // Constructeurs
     public HomeworkDTO() {}
@@ -74,6 +75,9 @@ public class HomeworkDTO {
         this.professorName = professorName;
     }
 
+    public boolean isGraded() { return graded; }
+    public void setGraded(boolean graded) { this.graded = graded;}
+
     @Override
     public String toString() {
         return "HomeworkDTO{" +
@@ -84,6 +88,7 @@ public class HomeworkDTO {
                 ", classeId=" + classeId +
                 ", professorName='" + professorName + '\'' +
                 ", status=" + status +
+                ", graded=" + graded +
                 '}';
     }
 }

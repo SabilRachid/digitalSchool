@@ -1,6 +1,6 @@
 package com.digital.school.service.impl;
 
-import com.digital.school.dto.ParticipationDto;
+import com.digital.school.dto.ParticipationDTO;
 import com.digital.school.model.Participation;
 import com.digital.school.model.enumerated.ParticipationType;
 import com.digital.school.repository.ParticipationRepository;
@@ -50,9 +50,9 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     //donne moi une implementation de getAllParticipations
     @Override
-    public Collection<ParticipationDto> getAllParticipations() {
+    public Collection<ParticipationDTO> getAllParticipations() {
         return participationRepository.findAllProjected().stream()
-                .map(objects -> new ParticipationDto(
+                .map(objects -> new ParticipationDTO(
                         (Long) objects[0],
                         (String) objects[1],
                         (String) objects[2],
@@ -66,9 +66,9 @@ public class ParticipationServiceImpl implements ParticipationService {
     }
 
     @Override
-    public Collection<ParticipationDto> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId) {
+    public Collection<ParticipationDTO> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId) {
         return participationRepository.findByClassIdAndSubjectId(classId, subjectId).stream()
-                .map(objects -> new ParticipationDto(
+                .map(objects -> new ParticipationDTO(
                         (Long) objects[0],
                         (String) objects[1],
                         (String) objects[2],

@@ -5,30 +5,17 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "evaluations")
-@DiscriminatorColumn(name="evaluation_type", discriminatorType = DiscriminatorType.STRING)
-public abstract class Evaluation extends AuditableEntity {
-
-    private String name;
-
-    @Column(nullable = false)
-    private String title;
+@DiscriminatorValue("evaluations")
+@PrimaryKeyJoinColumn(name = "id")
+public abstract class Evaluation extends Event {
 
     @Column(name = "due_date")
     private LocalDate dueDate;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
-
-    @ManyToOne(optional = false)
     @JoinColumn(name = "professor_id")
     private Professor professor;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "class_id")
-    private Classe classe;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -37,16 +24,11 @@ public abstract class Evaluation extends AuditableEntity {
     @Column(name = "maxScore", nullable = true)
     private Double maxScore;
 
+    // Nouveau champ pour indiquer si l'évaluation est notée
+    @Column(name = "graded", nullable = true)
+    private boolean graded = false;
+
     // Getters and setters
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -54,29 +36,12 @@ public abstract class Evaluation extends AuditableEntity {
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
-
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
     public Professor getProfessor() {
         return professor;
     }
 
     public void setProfessor(Professor professor) {
         this.professor = professor;
-    }
-
-    public Classe getClasse() {
-        return classe;
-    }
-
-    public void setClasse(Classe classe) {
-        this.classe = classe;
     }
 
     public EvaluationStatus getStatus() {
@@ -95,16 +60,21 @@ public abstract class Evaluation extends AuditableEntity {
         this.maxScore = maxScore;
     }
 
+    public boolean isGraded() {
+        return graded;
+    }
+
+    public void setGraded(boolean graded) {
+        this.graded = graded;
+    }
+
     @Override
     public String toString() {
         return "Evaluation{" +
-                ", title='" + title + '\'' +
-                ", dueDate=" + dueDate +
-                ", subjectName=" + subject.getName() +
                 ", professorUserName=" + professor.getUsername() +
-                ", classeName=" + classe.getName() +
                 ", status=" + status.name() +
                 ", maxScore=" + maxScore +
+                ", graded=" + graded +
                 '}';
     }
 }

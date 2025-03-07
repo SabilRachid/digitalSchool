@@ -19,4 +19,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAvailableRooms(@Param("minCapacity") Integer minCapacity);
     
     boolean existsByName(String name);
+
+    Room findByName(String newRoom);
 }

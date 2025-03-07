@@ -6,9 +6,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "events")
+@DiscriminatorColumn(name = "event_type", discriminatorType = DiscriminatorType.STRING)
 public class Event extends AuditableEntity {
+
+    private String name;
 
     @Column(nullable = false)
     private String title;
@@ -48,7 +53,7 @@ public class Event extends AuditableEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EventType type = EventType.EVENT;
+    private EventType type;
 
     private String backgroundColor;
 
@@ -60,10 +65,16 @@ public class Event extends AuditableEntity {
 
     private boolean online;
 
-    // Champ pour la durée en minutes (pour les examens par exemple)
-    private Integer duration;
 
     // Getters et setters
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getTitle() {
         return title;
@@ -181,11 +192,5 @@ public class Event extends AuditableEntity {
         this.location = location;
     }
 
-    public Integer getDuration() {
-        return duration;
-    }
 
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
 }

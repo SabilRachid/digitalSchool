@@ -1,19 +1,30 @@
 package com.digital.school.repository;
 
 import com.digital.school.model.Student;
+import com.digital.school.model.enumerated.EventType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.digital.school.model.Event;
 import com.digital.school.model.User;
+import org.springframework.data.repository.query.Param;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
 
-    List<Event> findByStartTimeBetweenAndParticipantsContaining(
-            LocalDateTime start, LocalDateTime end, User participant);
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.startTime BETWEEN :start AND :end " +
+            "AND :user MEMBER OF e.participants " +
+            "AND e.type <> :excludedType")
+    List<Event> findByStartTimeBetweenAndParticipantsContainingAndTypeNot(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("user") User user,
+            @Param("excludedType") EventType excludedType);
+
 
     List<Event> findByStartTimeAfterAndParticipantsContainingOrderByStartTime(
             LocalDateTime startTime, User participant);

@@ -17,7 +17,9 @@ public class ExamDTO {
     private Long classeId;
     private String professorName;    // Nom de la classe
     private EvaluationStatus status; // Statut de l'examen (SCHEDULED, IN_PROGRESS, COMPLETED)
-    private double maxScore;         // Score maximum
+    private double maxScore;
+    private boolean graded;
+    // Score maximum
     // Constructeur vide
     public ExamDTO() {
     }
@@ -124,6 +126,14 @@ public class ExamDTO {
         this.maxScore = maxScore;
     }
 
+    public boolean isGraded() {
+        return graded;
+    }
+
+    public void setGraded(boolean graded) {
+        this.graded = graded;
+    }
+
 
     @Override
     public String toString() {
@@ -140,6 +150,7 @@ public class ExamDTO {
                 ", professorName='" + professorName + '\'' +
                 ", status=" + status +
                 ", maxScore=" + maxScore +
+                ", graded=" + graded +
                 '}';
     }
 }

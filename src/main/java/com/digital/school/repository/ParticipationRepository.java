@@ -1,6 +1,5 @@
 package com.digital.school.repository;
 
-import com.digital.school.dto.ParticipationDto;
 import com.digital.school.model.Participation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

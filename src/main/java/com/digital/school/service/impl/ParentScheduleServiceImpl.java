@@ -104,7 +104,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
             Map<String, Object> event = new HashMap<>();
             event.put("type", "EXAM");
             event.put("title", "Examen - " + exam.getSubject().getName());
-            event.put("date", exam.getDate());
+            event.put("date", exam.getStartTime().toLocalDate());
             event.put("subject", exam.getSubject().getName());
             events.add(event);
         });
@@ -178,7 +178,7 @@ public class ParentScheduleServiceImpl implements ParentScheduleService {
                     Map<String, Object> event = new HashMap<>();
                     event.put("type", "EXAM");
                     event.put("title", exam.getTitle());
-                    event.put("date", exam.getDate());
+                    event.put("date", exam.getStartTime().toLocalDate());
                     event.put("subject", exam.getSubject().getName());
                     events.add(event);
                 });

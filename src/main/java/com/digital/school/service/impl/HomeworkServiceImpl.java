@@ -3,6 +3,7 @@ package com.digital.school.service.impl;
 import com.digital.school.dto.HomeworkDTO;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.EvaluationStatus;
+import com.digital.school.model.enumerated.EventType;
 import com.digital.school.model.enumerated.StudentSubmissionStatus;
 import com.digital.school.repository.*;
 import com.digital.school.service.HomeworkService;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +38,9 @@ public class HomeworkServiceImpl implements HomeworkService {
     private ProfessorRepository professorRepository;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private ClasseRepository classeRepository;
 
     @Autowired
@@ -42,39 +48,42 @@ public class HomeworkServiceImpl implements HomeworkService {
 
 
     @Override
-    @Transactional(readOnly = false)
+    @Transactional
     public Homework createHomework(HomeworkDTO homeworkDTO, Long professorId) {
         // Conversion du DTO en entité
 
         LOGGER.debug("createHomework : "+homeworkDTO.toString());
         Homework homework = new Homework();
+        homework.setType(EventType.HOMEWORK);
         homework.setTitle(homeworkDTO.getTitle());
         homework.setDescription(homeworkDTO.getDescription());
+        homework.setStartTime(LocalDateTime.now());
+
+        homework.setEndTime(homeworkDTO.getDueDate().atStartOfDay());
         homework.setDueDate(homeworkDTO.getDueDate());
+        homework.setSubmittedCount(0);
+        homework.setStatus(EvaluationStatus.SCHEDULED);
+        homework.setGraded(false);
+        LOGGER.debug("before classes and subjects");
+
         Subject subject = subjectRepository.findById(homeworkDTO.getSubjectId())
                 .orElseThrow(() -> new RuntimeException("Sujet non trouvé"));
-        Classe classe = classeRepository.findById(homeworkDTO.getClasseId())
+                 Classe classe = classeRepository.findById(homeworkDTO.getClasseId())
                 .orElseThrow(() -> new RuntimeException("Classe non trouvée"));
         homework.setSubject(subject);
         homework.setClasse(classe);
-        // Vous devez charger et affecter les entités Subject, Professor et Classe selon vos besoins.
-        // Par exemple, vous pouvez utiliser d'autres services ou repository pour récupérer ces entités.
-        // Ici, nous fixons uniquement le statut initial.
-        homework.setStatus(EvaluationStatus.SCHEDULED);
-
-        Professor professor = professorRepository.findById(professorId)
+                Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
-        homework.setProfessor(professor);
+       homework.setProfessor(professor);
 
 
+        // Ajouter tous les élèves de la classe
+        homework.setParticipants(new HashSet<>(studentRepository.getStudentsByClasseId(homeworkDTO.getClasseId())));
 
-        LOGGER.debug("before save homework="+homework.toString());
-        // Sauvegarde dans la base de données
-
-
-        LOGGER.debug("Transaction active: " + TransactionSynchronizationManager.isActualTransactionActive());
-        LOGGER.debug("Transaction name: " + TransactionSynchronizationManager.getCurrentTransactionName());
-        LOGGER.debug("Transaction read-only: " + TransactionSynchronizationManager.isCurrentTransactionReadOnly());
+        // Ajouter le professeur associé à la matière pour cette classe
+        professorRepository.findProfessorsByClasseId(homeworkDTO.getClasseId()).stream()
+                .filter(prof -> prof.getSubjects().contains(homework.getSubject()))
+                .forEach(homework.getParticipants()::add);
 
         return homeworkRepository.save(homework);
 
@@ -170,6 +179,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         dto.setTitle(homework.getTitle());
         dto.setDescription(homework.getDescription());
         dto.setDueDate(homework.getDueDate());
+        dto.setGraded(homework.isGraded());
         // Ici, vous devez extraire le nom du sujet, du professeur et de la classe.
         // Par exemple :
         if (homework.getSubject() != null) {

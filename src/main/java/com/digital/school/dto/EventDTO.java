@@ -14,6 +14,7 @@ public class EventDTO {
     private NestedIdDTO subject; // pour cours/examen
     private NestedIdDTO room;    // pour cours/examen
     private NestedIdDTO classe;
+    private NestedIdDTO professor;
     private boolean online;// pour cours/examen
     private String participantType;
     private List<String> participants;
@@ -51,6 +52,9 @@ public class EventDTO {
 
     public NestedIdDTO getClasse() { return classe; }
     public void setClasse(NestedIdDTO classe) { this.classe = classe; }
+
+    public NestedIdDTO getProfessor() { return professor; }
+    public void setProfessor(NestedIdDTO professor) { this.professor = professor; }
 
     public boolean isOnline() { return online; }
 

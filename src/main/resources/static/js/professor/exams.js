@@ -23,15 +23,22 @@ async function loadExams(filterUrl = '/professor/api/exams') {
 
 // Met à jour l'affichage des examens selon leur statut
 function updateExamsUI(exams) {
+
     const upcomingSection = document.getElementById('upcomingExamList');
     const inProgressSection = document.getElementById('inProgressExamList');
+    const toBeGradedSection = document.getElementById('toBeGradedExamList');
     const completedSection = document.getElementById('completedExamList');
+
 
     upcomingSection.innerHTML = '';
     inProgressSection.innerHTML = '';
+    toBeGradedSection.innerHTML = '';
     completedSection.innerHTML = '';
 
+
     exams.forEach(exam => {
+        const examDate = new Date(exam.examDate);
+        const now = new Date();
         const examCard = document.createElement('div');
         examCard.className = 'exam-card';
         examCard.innerHTML = `
@@ -43,15 +50,15 @@ function updateExamsUI(exams) {
             </div>
             <div class="exam-content">
                 <h3>${exam.title}</h3>
-                <p>${exam.description || ''}</p>
+                <p>${exam.description || '' || exam.examDate}</p>
                 <div class="exam-details">
                     <span class="detail-item"><i class="fas fa-clock"></i> ${exam.duration} minutes</span>
                     <span class="detail-item"><i class="fas fa-users"></i> ${exam.classeName}</span>
                 </div>
-                ${exam.status === 'PUBLISHED' && exam.submissionId ?
-            `<button class="btn btn-info mt-2" onclick="openGradeEntryModal(${exam.submissionId})">
-                        <i class="fas fa-edit"></i> Saisir notes
-                     </button>` : ''}
+                ${exam.status === 'PUBLISHED' && now > examDate ?
+                `<button class="btn btn-info mt-2" onclick="openGradeEntryModal('1')">
+                            <i class="fas fa-edit"></i> Saisir notes
+                         </button>` : ''}
             </div>
             <div class="exam-footer">
                 ${exam.status === 'SCHEDULED' ? `
@@ -62,7 +69,7 @@ function updateExamsUI(exams) {
                         <i class="fas fa-edit"></i> Modifier
                     </button>
                 ` : ''}
-                ${exam.status === 'PUBLISHED' ?
+                ${exam.status === 'PUBLISHED' && exam.graded ?
             `<button class="btn btn-warning" onclick="endExam(${exam.id})">
                         <i class="fas fa-stop"></i> Terminer
                     </button>` : ''}
@@ -78,8 +85,10 @@ function updateExamsUI(exams) {
         `;
         if (exam.status === 'SCHEDULED') {
             upcomingSection.appendChild(examCard);
-        } else if (exam.status === 'PUBLISHED') {
+        } else if (exam.status === 'PUBLISHED' && now <= examDate) {
             inProgressSection.appendChild(examCard);
+        } else if (exam.status === 'PUBLISHED' && now > examDate) {
+            toBeGradedSection.appendChild(examCard);
         } else if (exam.status === 'COMPLETED') {
             completedSection.appendChild(examCard);
         }

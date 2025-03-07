@@ -1,6 +1,6 @@
 package com.digital.school.service;
 
-import com.digital.school.dto.ParticipationDto;
+import com.digital.school.dto.ParticipationDTO;
 import com.digital.school.model.Participation;
 import com.digital.school.model.enumerated.ParticipationLevel;
 
@@ -15,9 +15,9 @@ public interface ParticipationService {
     
     void deleteParticipation(Long id);
 
-    Collection<ParticipationDto> getAllParticipations();
+    Collection<ParticipationDTO> getAllParticipations();
 
-    Collection<ParticipationDto> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId);
+    Collection<ParticipationDTO> getParticipationsByClassIdAndSubjectId(Long classId, Long subjectId);
 
     Participation updateParticipation(Long id, Participation entity);
 

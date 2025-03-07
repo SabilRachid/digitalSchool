@@ -89,10 +89,12 @@ public class ProfessorHomeworkController {
                                           @RequestParam(required = false) Long classe,
                                           @RequestParam(required = false) Long subject) {
         try {
+            LOGGER.debug("GET Homeworks by filters :month="+month+", classeId="+classe+", subjectId="+subject);
             List<Homework> homeworks = homeworkService.findHomeworksByProfessor(professor.getId(), month, classe, subject);
             List<HomeworkDTO> dtoList = homeworks.stream()
                     .map(hw -> homeworkService.convertToDTO(hw))
                     .collect(Collectors.toList());
+            LOGGER.debug("dtoList="+dtoList);
             return ResponseEntity.ok(dtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(

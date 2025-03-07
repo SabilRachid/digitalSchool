@@ -1,5 +1,6 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.enumerated.EventType;
 import com.digital.school.repository.EventRepository;
 import com.digital.school.service.EventService;
 import org.springframework.stereotype.Service;
@@ -77,8 +78,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> findEventsByDateRange(LocalDateTime start, LocalDateTime end, User user) {
-        return eventRepository.findByStartTimeBetweenAndParticipantsContaining(start, end, user);
+        return eventRepository.findByStartTimeBetweenAndParticipantsContainingAndTypeNot(start, end, user, EventType.HOMEWORK);
     }
+
 
     @Override
     public List<Event> findUpcomingEvents(User user) {

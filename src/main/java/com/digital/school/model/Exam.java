@@ -10,11 +10,6 @@ import java.time.LocalDate;
 @PrimaryKeyJoinColumn(name = "id")
 public class Exam extends Evaluation {
 
-    @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
-
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
 
     // Durée de l'examen en minutes
     @Column(name = "duration", nullable = false)
@@ -29,22 +24,6 @@ public class Exam extends Evaluation {
     private String description;
 
     // Getters et setters
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
 
     public int getDuration() {
         return duration;
@@ -63,9 +42,7 @@ public class Exam extends Evaluation {
     }
 
     // Méthode dérivée pour obtenir la date de l'examen (basée sur startTime)
-    public LocalDate getDate() {
-        return startTime.toLocalDate();
-    }
+
 
     public String getDescription() {
         return description;

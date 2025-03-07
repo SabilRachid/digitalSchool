@@ -1,12 +1,11 @@
 package com.digital.school.controller;
 
-import com.digital.school.dto.ParticipationDto;
+import com.digital.school.dto.ParticipationDTO;
 import com.digital.school.model.*;
 import com.digital.school.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -87,7 +86,7 @@ public class ProfessorController {
     // Récupérer toutes les participations
     @GetMapping("/participations")
     public String showParticipations(HttpServletRequest request, Model model) {
-        List<ParticipationDto> participations = participationService.getAllParticipations().stream()
+        List<ParticipationDTO> participations = participationService.getAllParticipations().stream()
                 .collect(Collectors.toList());
         model.addAttribute("participations", participations);
         model.addAttribute("currentURI", request.getRequestURI());

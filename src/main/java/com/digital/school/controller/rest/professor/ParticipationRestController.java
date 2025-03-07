@@ -1,6 +1,6 @@
 package com.digital.school.controller.rest.professor;
 
-import com.digital.school.dto.ParticipationDto;
+import com.digital.school.dto.ParticipationDTO;
 import com.digital.school.model.Participation;
 import com.digital.school.service.ParticipationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,10 @@ public class ParticipationRestController {
      * Récupérer les participations d'une classe et d'une matière
      */
     @GetMapping("/by-class-subject")
-    public ResponseEntity<List<ParticipationDto>> getParticipationsByClassAndSubject(
+    public ResponseEntity<List<ParticipationDTO>> getParticipationsByClassAndSubject(
             @RequestParam Long classId,
             @RequestParam Long subjectId) {
-        List<ParticipationDto> participations = participationService.getParticipationsByClassIdAndSubjectId(classId, subjectId).stream()
+        List<ParticipationDTO> participations = participationService.getParticipationsByClassIdAndSubjectId(classId, subjectId).stream()
                 .collect(Collectors.toList());
         return ResponseEntity.ok(participations);
     }
@@ -41,13 +41,13 @@ public class ParticipationRestController {
      * Mettre à jour une participation existante
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ParticipationDto> updateParticipation(
+    public ResponseEntity<ParticipationDTO> updateParticipation(
             @PathVariable Long id,
-            @RequestBody ParticipationDto participationDto) {
+            @RequestBody ParticipationDTO participationDto) {
         Participation updatedParticipation = participationService.updateParticipation(id, participationDto.toEntity());
         //donne moi toEntity
 
-        return ResponseEntity.ok(ParticipationDto.fromEntity(updatedParticipation));
+        return ResponseEntity.ok(ParticipationDTO.fromEntity(updatedParticipation));
     }
 
     /**

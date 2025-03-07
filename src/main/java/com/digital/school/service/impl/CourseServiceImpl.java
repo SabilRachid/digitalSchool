@@ -33,6 +33,8 @@ public class CourseServiceImpl implements CourseService {
     private ClasseRepository classeRepository;
     @Autowired
     private AttendanceRepository attendanceRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
     @Override
     public Page<Course> findAll(Pageable pageable) {
@@ -82,7 +84,7 @@ public class CourseServiceImpl implements CourseService {
         attendance.setStatus(AttendanceStatus.NOT_COMPLETED);
         attendance.setRecordedBy(user); // Enregistrement de la présence par le professeur
         // On définit la date de l'attendance à la date du cours, ou à aujourd'hui si non précisée
-        attendance.setDateEvent(savedCourse.getDate() != null ? savedCourse.getDate() : LocalDate.now());
+        attendance.setDateEvent(savedCourse.getDate()    != null ? savedCourse.getDate() : LocalDate.now());
         attendanceRepository.save(attendance);
 
         return savedCourse;
@@ -234,7 +236,7 @@ public class CourseServiceImpl implements CourseService {
         if (!existingCourse.getProfessor().equals(professor)) {
             throw new RuntimeException("Vous n'êtes pas autorisé à modifier ce cours");
         }
-        existingCourse.setRoom(newRoom);
+        existingCourse.setRoom(roomRepository.findByName(newRoom));
         return courseRepository.save(existingCourse);
     }
 

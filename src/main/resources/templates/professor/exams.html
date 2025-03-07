@@ -31,6 +31,7 @@
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
     <link rel="stylesheet" th:href="@{/css/professor/exams.css}">
 
+
     <!-- Style additionnel pour le filtrage -->
     <style>
         .filter-form {
@@ -97,6 +98,13 @@
             <h2>En cours</h2>
             <div class="exam-list" id="inProgressExamList">
                 <!-- Contenu chargé dynamiquement par JS -->
+            </div>
+        </div>
+        <!-- Examens à noter -->
+        <div class="exam-section">
+            <h2>Examens à noter</h2>
+            <div class="exam-list" id="toBeGradedExamList">
+                <!-- Les examens non notés seront ajoutés ici par JavaScript -->
             </div>
         </div>
         <!-- Examens terminés -->

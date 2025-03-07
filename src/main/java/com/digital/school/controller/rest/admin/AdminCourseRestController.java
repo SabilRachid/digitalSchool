@@ -2,15 +2,13 @@ package com.digital.school.controller.rest.admin;
 
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.CourseStatus;
+import com.digital.school.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.digital.school.service.CourseService;
-import com.digital.school.service.SubjectService;
-import com.digital.school.service.ProfessorService;
-import com.digital.school.service.ClasseService;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +30,8 @@ public class AdminCourseRestController {
 
     @Autowired
     private ClasseService classeService;
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping("/data")
     @ResponseBody
@@ -72,6 +72,7 @@ public class AdminCourseRestController {
             // Récupération des entités associées
             Subject subject = subjectService.findById(subjectId).orElseThrow(() -> new RuntimeException("Matière non trouvée"));
             Professor professor = professorService.findById(professorId).orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
+            //Room room = roomService.findById(professorId).orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
             Optional<Classe> classe = classeService.findById(classId);
 
             // Construction de l'objet Course
@@ -84,7 +85,7 @@ public class AdminCourseRestController {
             // Vérification des valeurs null avant de les convertir en String
             course.setName(requestData.get("name") != null ? requestData.get("name").toString() : "Nom par défaut");
             course.setDescription(requestData.get("description") != null ? requestData.get("description").toString() : "");
-            course.setRoom(requestData.get("room") != null ? requestData.get("room").toString() : "");
+           // course.setRoom(requestData.get("room") != null ? requestData.get("room").toString() : "");
 
             // Sauvegarde du cours
             Course savedCourse = courseService.save(course, administrator);

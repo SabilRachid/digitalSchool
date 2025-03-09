@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    initializeExamGradeEntryForm();
     loadExams(); // Charge initialement tous les examens via GET
     initializeForm();           // Pour la création d'un examen
-    initializeGradeEntryForm(); // Pour la saisie des notes
     initializeCharts();         // Pour l'initialisation de graphiques si besoin
     initializeFilters();        // Pour le filtrage dynamique
 });
@@ -23,18 +23,15 @@ async function loadExams(filterUrl = '/professor/api/exams') {
 
 // Met à jour l'affichage des examens selon leur statut
 function updateExamsUI(exams) {
-
     const upcomingSection = document.getElementById('upcomingExamList');
     const inProgressSection = document.getElementById('inProgressExamList');
     const toBeGradedSection = document.getElementById('toBeGradedExamList');
     const completedSection = document.getElementById('completedExamList');
 
-
     upcomingSection.innerHTML = '';
     inProgressSection.innerHTML = '';
     toBeGradedSection.innerHTML = '';
     completedSection.innerHTML = '';
-
 
     exams.forEach(exam => {
         const examDate = new Date(exam.examDate);
@@ -50,15 +47,15 @@ function updateExamsUI(exams) {
             </div>
             <div class="exam-content">
                 <h3>${exam.title}</h3>
-                <p>${exam.description || '' || exam.examDate}</p>
+                <p>${exam.description || ''}</p>
                 <div class="exam-details">
                     <span class="detail-item"><i class="fas fa-clock"></i> ${exam.duration} minutes</span>
                     <span class="detail-item"><i class="fas fa-users"></i> ${exam.classeName}</span>
                 </div>
                 ${exam.status === 'PUBLISHED' && now > examDate ?
-                `<button class="btn btn-info mt-2" onclick="openGradeEntryModal('1')">
-                            <i class="fas fa-edit"></i> Saisir notes
-                         </button>` : ''}
+            `<button class="btn btn-info mt-2" onclick="openGradeEntryExamModal(${exam.id})">
+                        <i class="fas fa-edit"></i> Saisir notes
+                    </button>` : ''}
             </div>
             <div class="exam-footer">
                 ${exam.status === 'SCHEDULED' ? `
@@ -123,7 +120,6 @@ function initializeForm() {
                 duration: parseInt(formData.get('duration')),
                 description: formData.get('description'),
                 maxScore: parseFloat(formData.get('maxScore'))
-                // roomId peut être ajouté si vous utilisez un select pour la salle
             };
             console.log("📌 JSON envoyé :", JSON.stringify(data, null, 2));
             const response = await fetch('/professor/api/exams', {
@@ -144,52 +140,108 @@ function initializeForm() {
     });
 }
 
-// INITIALISATION DU FORMULAIRE DE SAISIE DES NOTES
-function initializeGradeEntryForm() {
-    const form = document.getElementById('gradeEntryForm');
+
+// Fonctions d'ouverture/fermeture des modals
+function openExamModal() {
+    document.getElementById('examModal').classList.add('show');
+}
+
+function closeExamModal() {
+    document.getElementById('examModal').classList.remove('show');
+    document.getElementById('examForm').reset();
+}
+
+// Ouvre le modal de saisie des notes pour l'examen et remplit dynamiquement la liste des étudiants
+function openGradeEntryExamModal(examId) {
+    console.log("Ouverture du modal de saisie des notes pour l'examen :", examId);
+    // Affiche le modal
+    const modal = document.getElementById('gradeEntryExamModal');
+    modal.classList.add('show');
+
+    // Stocke l'examId dans le champ caché
+    document.getElementById('examId').value = examId;
+
+    // Récupère la liste des étudiants de la classe pour cet examen.
+    // Cette partie est à adapter selon votre méthode d'obtention des étudiants.
+    // Par exemple, vous pouvez effectuer une requête AJAX pour obtenir ces données.
+    fetch(`/professor/api/exams/${examId}/students`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erreur lors de la récupération des étudiants");
+            }
+            return response.json();
+        })
+        .then(students => {
+            const container = document.getElementById('studentsGradesContainer');
+            container.innerHTML = ''; // Vider le conteneur
+            students.forEach(student => {
+                // Créez une ligne pour chaque étudiant
+                const div = document.createElement('div');
+                div.className = 'grade-entry-row';
+                div.innerHTML = `
+                    <span>${student.firstName} ${student.lastName}</span>
+                    <input type="number" name="grade_${student.id}" placeholder="Note" min="0" max="20" step="0.1" required>
+                    <input type="text" name="comment_${student.id}" placeholder="Commentaire (optionnel)">
+                `;
+                container.appendChild(div);
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            showNotification(error.message, 'error');
+        });
+}
+
+// Ferme le modal de saisie des notes pour l'examen
+function closeGradeEntryExamModal() {
+    const modal = document.getElementById('gradeEntryExamModal');
+    modal.classList.remove('show');
+    document.getElementById('gradeEntryExamForm').reset();
+}
+
+// Initialisation du formulaire de saisie des notes pour l'examen
+function initializeExamGradeEntryForm() {
+    const form = document.getElementById('gradeEntryExamForm');
     if (!form) return;
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         try {
-            const formData = new FormData(this);
-            const data = {
-                submissionId: formData.get('submissionId'),
-                gradeValue: parseFloat(formData.get('gradeValue')),
-                comment: formData.get('comment')
-            };
+            // Récupère l'examId
+            const examId = document.getElementById('examId').value;
+            // Rassemble les notes et commentaires pour chaque étudiant
+            const container = document.getElementById('studentsGradesContainer');
+            const inputs = container.querySelectorAll('input[type="number"]');
+            const gradesData = [];
+            inputs.forEach(input => {
+                const studentId = input.name.split('_')[1]; // suppose que le nom est "grade_{studentId}"
+                const gradeValue = parseFloat(input.value);
+                const commentInput = container.querySelector(`input[name="comment_${studentId}"]`);
+                const comment = commentInput ? commentInput.value : "";
+                gradesData.push({
+                    studentId: studentId,
+                    evaluationId: examId, // Utilisé ici comme l'ID de l'évaluation
+                    gradeValue: gradeValue,
+                    comment: comment
+                });
+            });
+            console.log("JSON envoyé pour la note d'examen :", JSON.stringify(gradesData, null, 2));
+            // Envoi via fetch (vous pouvez adapter l'URL et le format selon votre API)
             const response = await fetch('/professor/api/exams/grade-entry', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(gradesData)
             });
             if (!response.ok) throw new Error('Erreur lors de la saisie des notes');
-            closeGradeEntryModal();
-            showNotification('Notes enregistrées et élève notifié(e)', 'success');
+            closeGradeEntryExamModal();
+            showNotification('Notes enregistrées et élèves notifiés', 'success');
             setTimeout(() => location.reload(), 1500);
         } catch (error) {
             showNotification(error.message, 'error');
         }
     });
-}
-
-// Fonction d'ouverture/fermeture des modales
-function openExamModal() {
-    document.getElementById('examModal').classList.add('show');
-}
-function closeExamModal() {
-    document.getElementById('examModal').classList.remove('show');
-    document.getElementById('examForm').reset();
-}
-function openGradeEntryModal(submissionId) {
-    document.getElementById('gradeEntryModal').classList.add('show');
-    document.getElementById('submissionId').value = submissionId;
-}
-function closeGradeEntryModal() {
-    document.getElementById('gradeEntryModal').classList.remove('show');
-    document.getElementById('gradeEntryForm').reset();
 }
 
 // INITIALISATION DES GRAPHIQUES (si nécessaire)
@@ -201,8 +253,6 @@ function initializeCharts() {
 function initializeFilters() {
     const filterForm = document.getElementById('examFilterForm');
     if (!filterForm) return;
-
-    // Ajoute un écouteur sur chaque changement de champ
     const filterInputs = filterForm.querySelectorAll('input, select');
     filterInputs.forEach(input => {
         input.addEventListener('change', () => {
@@ -210,8 +260,6 @@ function initializeFilters() {
             loadExams(url);
         });
     });
-
-    // Écoute de la soumission du formulaire
     filterForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const url = generateFilterUrl(filterForm);
@@ -219,7 +267,6 @@ function initializeFilters() {
     });
 }
 
-// Génère l'URL de filtrage à partir des valeurs du formulaire
 function generateFilterUrl(form) {
     const formData = new FormData(form);
     let url = '/professor/api/exams?';
@@ -235,19 +282,28 @@ function generateFilterUrl(form) {
     return url;
 }
 
-// Fonction utilitaire pour formater la date d'un examen
-function formatExamDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 100);
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
     });
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
 }
 
-// Fonction pour publier un examen : change le statut en PUBLISHED
 async function publishExam(examId) {
     try {
         const response = await fetch(`/professor/api/exams/${examId}/publish`, {
@@ -278,38 +334,12 @@ async function endExam(examId) {
         });
         if (!response.ok) throw new Error('Erreur lors de la clôture de l\'examen');
         showNotification('Examen terminé avec succès', 'success');
-        // Recharge la liste des examens pour actualiser l'affichage
         loadExams();
     } catch (error) {
         showNotification(error.message, 'error');
     }
 }
 
-
-// Affichage des notifications
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="notification-close">&times;</button>
-    `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.classList.add('show'), 100);
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    });
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-}
-
-// Téléchargement du rapport PDF d'un examen
 async function downloadReport(examId) {
     try {
         const response = await fetch(`/professor/api/exams/${examId}/report`);

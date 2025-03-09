@@ -38,7 +38,10 @@ public class Document extends AuditableEntity {
     private String contentType;
 
     // Association générique pour lier le document à une entité (ex : cours, facture, bulletin, etc.)
+    @Column(name = "related_entity_id")
     private Long relatedEntityId;
+
+    @Column(name = "related_entity_type")
     private String relatedEntityType;
 
     // Propriétaire du document
@@ -153,6 +156,30 @@ public class Document extends AuditableEntity {
         this.sharedWith = sharedWith != null ? sharedWith : new HashSet<>();
     }
 
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -164,30 +191,5 @@ public class Document extends AuditableEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public long getFileSize() {
-        return fileSize;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +41,10 @@ public class ExamServiceImpl implements ExamService {
     private RoomRepository roomRepository;
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
+    private EvaluationRepository evaluationRepository;
+
+    @Autowired
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Override
     @Transactional
@@ -121,18 +125,28 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public StudentSubmission enterGrade(Long submissionId, Double gradeValue, String comment, Long professorId) {
-        // Récupérer la soumission d'examen par son identifiant
-        StudentSubmission submission = studentSubmissionRepository.findById(submissionId)
-                .orElseThrow(() -> new RuntimeException("Soumission non trouvée"));
-        // Vérifiez que le professeur a le droit de noter cette soumission
-        // (par exemple, en vérifiant que submission.getEvaluation().getProfessor().getId() == professorId)
-        submission.setValue(gradeValue);
-        submission.setComments(comment);
-        // Vous pouvez mettre à jour le status, par exemple passer de IN_PROGRESS à COMPLETED si nécessaire.
-        submission.setStatus(com.digital.school.model.enumerated.StudentSubmissionStatus.COMPLETED);
-        return studentSubmissionRepository.save(submission);
+    public EvaluationGrade enterGrade(Long evaluationId, Double gradeValue, String comment, Long professorId) {
+        // Récupérer l'évaluation (examen) par son ID
+        Evaluation evaluation = evaluationRepository.findById(evaluationId)
+                .orElseThrow(() -> new RuntimeException("Évaluation non trouvée"));
+
+        // Créer un objet EvaluationGrade
+        EvaluationGrade grade = new EvaluationGrade();
+        grade.setEvaluation(evaluation);
+        // Ici, selon votre logique, vous pouvez déterminer l'étudiant concerné.
+        // Par exemple, si vous avez l'information de l'étudiant dans le contexte ou le DTO.
+        // Pour cet exemple, supposons qu'il s'agit d'un étudiant actuellement connecté ou sélectionné.
+        // grade.setStudent(student);
+        grade.setGrade(gradeValue);
+        grade.setRemark(comment);
+        grade.setGradedAt(LocalDateTime.now());
+
+        // Mettez à jour l'état de l'évaluation si nécessaire (par exemple, passer 'graded' à true)
+        evaluation.setGraded(true);
+
+        return evaluationGradeRepository.save(grade);
     }
+
 
     @Override
     public List<Exam> findUpcomingExams(Student student) {

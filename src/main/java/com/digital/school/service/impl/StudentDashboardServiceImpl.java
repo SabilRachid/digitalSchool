@@ -23,10 +23,10 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
     private static final Logger LOGGER  = LoggerFactory.getLogger(StudentDashboardServiceImpl.class);
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
+    private EvaluationGradeRepository evaluationGradeRepository;
     
     @Autowired
-    private ParentHomeworkRepository homeworkRepository;
+    private HomeworkRepository homeworkRepository;
     
     @Autowired
     private LearningResourceRepository resourceRepository;
@@ -39,8 +39,8 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
 
     @Autowired
     private ClasseRepository classeRepository;
-    @Autowired
-    private StudentHomeworkRepository studentHomeworkRepository;
+
+
 
     public StudentDashboardStats getStudentStats(Student student) {
         StudentDashboardStats stats = new StudentDashboardStats();
@@ -50,32 +50,32 @@ public class StudentDashboardServiceImpl implements StudentDashboardService {
         
         // Calculer la moyenne générale
         //gerer optional de student
-        Double averageGrade = studentSubmissionRepository.calculateAverageGrade(student);
+        Double averageGrade = evaluationGradeRepository.calculateAverageGrade(student);
         stats.setAverageGrade(averageGrade != null ? averageGrade : 0.0);
         
         // Compter les devoirs en attente
-        stats.setPendingHomework(studentHomeworkRepository.countPendingHomework(student));
+        stats.setPendingHomework(homeworkRepository.countPendingHomework(student));
         
         // Compter les examens à venir
         stats.setUpcomingExams(eventRepository.countUpcomingExams(student));
 
         // Calculer le rang de l'élève
-        stats.setRank(studentSubmissionRepository.calculateStudentRank(student.getId(), student.getClasse().getId()));
+        stats.setRank(evaluationGradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId()));
 
         // Calculer le nombre d'elèves dans la classe
         stats.setTotalStudents(classeRepository.countStudents(student.getClasse().getId()));
 
         // calculer le successRate
-        stats.setSuccessRate(studentSubmissionRepository.calculateSuccessRate(student));
+        stats.setSuccessRate(evaluationGradeRepository.calculateSuccessRate(student));
 
         return stats;
     }
 
 
     @Override
-    public List<StudentSubmission> getRecentGrades(Student student) {
+    public List<EvaluationGrade> getRecentGrades(Student student) {
         Pageable pageable = (Pageable) PageRequest.of(0, 5, Sort.by("gradedAt").descending());
-        Page<StudentSubmission> pagedGrades = studentSubmissionRepository.findRecentGrades(student, pageable);
+        Page<EvaluationGrade> pagedGrades = evaluationGradeRepository.findRecentGrades(student, pageable);
         return pagedGrades.getContent();
     }
 

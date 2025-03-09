@@ -25,7 +25,7 @@ public class BulletinServiceImpl implements BulletinService {
     private ClasseRepository classeRepository;
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Autowired
     private PDFService pdfService;
@@ -46,7 +46,7 @@ public class BulletinServiceImpl implements BulletinService {
 
         period="1";
         // Récupérer les notes de la période
-        List<StudentSubmission> grades = studentSubmissionRepository.findByClasseAndPeriod(classe.getId(), period);
+        List<EvaluationGrade> grades = evaluationGradeRepository.findByClasseAndPeriod(classe.getId(), period);
 
         // Calculer les moyennes
         Map<String, Object> data = calculateAverages(grades);
@@ -101,7 +101,7 @@ public class BulletinServiceImpl implements BulletinService {
         }
     }
 
-    private Map<String, Object> calculateAverages(List<StudentSubmission> grades) {
+    private Map<String, Object> calculateAverages(List<EvaluationGrade> grades) {
         Map<String, Object> data = new HashMap<>();
 
         // Calcul des moyennes par élève et par matière
@@ -110,7 +110,7 @@ public class BulletinServiceImpl implements BulletinService {
             gradesByStudent
                     .computeIfAbsent(grade.getStudent().getId(), k -> new HashMap<>())
                     .computeIfAbsent(grade.getEvaluation().getSubject().getName(), k -> new ArrayList<>())
-                    .add(grade.getValue().doubleValue());
+                    .add(grade.getGrade().doubleValue());
         });
 
         // Calcul des moyennes
@@ -134,7 +134,7 @@ public class BulletinServiceImpl implements BulletinService {
         grades.stream()
                 .collect(Collectors.groupingBy(
                         grade -> grade.getEvaluation().getSubject().getName(),
-                        Collectors.averagingDouble(grade -> grade.getValue().doubleValue())
+                        Collectors.averagingDouble(grade -> grade.getGrade().doubleValue())
                 ))
                 .forEach(classAverages::put);
 

@@ -2,6 +2,7 @@ package com.digital.school.service;
 
 import com.digital.school.dto.HomeworkDTO;
 import com.digital.school.model.Homework;
+import com.digital.school.model.Parent;
 import com.digital.school.model.Professor;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
@@ -27,5 +28,15 @@ public interface HomeworkService {
     List<Homework> findPendingGradingByProfessor(Professor professor);
 
 
+    /** Récupère les devoirs de tous les enfants du parent, sous forme de liste de Map.*/
+    List<Map<String, Object>> getChildrenHomework(Parent parent);
 
+    /** Retourne les détails complets des devoirs d'un enfant, identifié par son ID.*/
+    Map<String, Object> getDetailedChildHomework(Long childId);
+
+    /** Retourne les statistiques associées aux devoirs d'un enfant (moyennes, taux d'achèvement, etc.).*/
+    Map<String, Object> getChildHomeworkStats(Long childId);
+
+    /** Envoie un rappel pour un devoir dont la soumission est en attente.*/
+    void sendHomeworkReminder(Long homeworkId);
 }

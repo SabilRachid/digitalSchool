@@ -31,4 +31,3 @@ public enum GradeType {
         return description;
     }
 }
-

@@ -4,7 +4,6 @@ import com.digital.school.dto.HomeworkDTO;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.EvaluationStatus;
 import com.digital.school.model.enumerated.EventType;
-import com.digital.school.model.enumerated.StudentSubmissionStatus;
 import com.digital.school.repository.*;
 import com.digital.school.service.HomeworkService;
 import org.slf4j.Logger;
@@ -14,12 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +29,7 @@ public class HomeworkServiceImpl implements HomeworkService {
     private HomeworkRepository homeworkRepository;
 
     @Autowired
-    private StudentHomeworkRepository studentHomeworkRepository;
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Autowired
     private ProfessorRepository professorRepository;
@@ -106,20 +103,22 @@ public class HomeworkServiceImpl implements HomeworkService {
         homeworkRepository.save(hw);
     }
 
+
     @Override
     public void enterGrade(Long submissionId, Double gradeValue, String comment, Long professorId) {
-        var submissionOpt = studentHomeworkRepository.findById(submissionId);
+        Optional<EvaluationGrade> submissionOpt = evaluationGradeRepository.findById(submissionId);
         if (submissionOpt.isEmpty()) {
             throw new RuntimeException("Soumission non trouvée");
         }
-        var submission = submissionOpt.get();
+        EvaluationGrade submission = submissionOpt.get();
         if (!submission.getEvaluation().getProfessor().getId().equals(professorId)) {
             throw new RuntimeException("Accès non autorisé");
         }
-        submission.setValue(gradeValue);
-        submission.setComments(comment);
-        submission.setStatus(StudentSubmissionStatus.COMPLETED);
-        studentHomeworkRepository.save(submission);
+        submission.setGrade(gradeValue);
+        submission.setRemark(comment);
+        submission.setSubmitted(true);
+        submission.setGradedAt(LocalDateTime.now());
+        evaluationGradeRepository.save(submission);
     }
 
     @Override
@@ -193,5 +192,58 @@ public class HomeworkServiceImpl implements HomeworkService {
         }
         dto.setStatus(homework.getStatus());
         return dto;
+    }
+
+    @Override
+    public List<Map<String, Object>> getChildrenHomework(Parent parent) {
+        // Supposons que le parent dispose d'une méthode getChildren() renvoyant ses enfants.
+        List<Student> children = (List<Student>) parent.getChildren();
+        return children.stream()
+                .map(child -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("childId", child.getId());
+                    // Ici, on récupère la liste des devoirs pour l'enfant via le repository
+                    map.put("homeworks", homeworkRepository.findByStudent(child));
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Object> getDetailedChildHomework(Long childId) {
+        Map<String, Object> details = new HashMap<>();
+        // Récupérer la liste des devoirs pour l'enfant identifié par childId
+       studentRepository.findById(childId)
+                .ifPresentOrElse(student -> {
+                    List<Homework> homeworks = homeworkRepository.findByStudent(student);
+                    details.put("homeworks", homeworks);
+                }, () -> {
+                    throw new RuntimeException("Enfant non trouvé");
+                });
+        // Vous pouvez ajouter ici d'autres informations détaillées (notes, feedback, etc.)
+        return details;
+    }
+
+    @Override
+    public Map<String, Object> getChildHomeworkStats(Long childId) {
+        Map<String, Object> stats = new HashMap<>();
+        // Exemple : nombre total de devoirs pour l'enfant
+        long total = homeworkRepository.countByStudentId(childId);
+        stats.put("totalHomeworks", total);
+        // Vous pouvez ajouter d'autres statistiques (moyenne des notes, taux d'achèvement, etc.)
+        return stats;
+    }
+
+    @Override
+    public void sendHomeworkReminder(Long homeworkId) {
+        // Implémentez ici la logique d'envoi d'un rappel (par e-mail ou SMS)
+        // Par exemple, récupérer le devoir, puis envoyer une notification.
+        Homework homework = homeworkRepository.findById(homeworkId)
+                .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
+        // Exemple : si le devoir est en attente et que sa date d'échéance est dépassée
+        if (homework.getDueDate().isBefore(LocalDate.now())) {
+            // Appelez ici votre service de notification (email, SMS, etc.)
+            // Exemple : notificationService.sendHomeworkReminder(homework);
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.digital.school.repository;
 import com.digital.school.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import com.digital.school.model.enumerated.ExamStatus;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;

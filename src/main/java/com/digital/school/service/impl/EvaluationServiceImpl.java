@@ -1,10 +1,10 @@
 package com.digital.school.service.impl;
 
 import com.digital.school.model.Evaluation;
+import com.digital.school.model.EvaluationGrade;
 import com.digital.school.model.Professor;
-import com.digital.school.model.StudentSubmission;
+import com.digital.school.repository.EvaluationGradeRepository;
 import com.digital.school.repository.EvaluationRepository;
-import com.digital.school.repository.StudentSubmissionRepository;
 import com.digital.school.service.EvaluationService;
 import com.digital.school.service.PDFService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,9 @@ public class EvaluationServiceImpl implements EvaluationService {
     private EvaluationRepository evaluationRepository;
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
-
-    @Autowired
     private PDFService pdfService;
+    @Autowired
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Override
     public Optional<Evaluation> findById(Long id) {
@@ -106,14 +105,14 @@ public class EvaluationServiceImpl implements EvaluationService {
     @Override
     public List<Map<String, Object>> findGradesForEvaluation(Long evaluationId) {
         // Récupère toutes les soumissions associées à l'évaluation
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByEvaluationId(evaluationId);
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByEvaluationId(evaluationId);
         // Transformation des soumissions en maps
         return submissions.stream()
-                .map(submission -> Map.<String, Object>of(
-                        "studentId", submission.getStudent().getId(),
-                        "studentName", submission.getStudent().getFirstName() + " " + submission.getStudent().getLastName(),
-                        "value", submission.getValue(),
-                        "comments", submission.getComments()
+                .map(evalGrade -> Map.<String, Object>of(
+                        "studentId", evalGrade.getStudent().getId(),
+                        "studentName", evalGrade.getStudent().getFirstName() + " " + evalGrade.getStudent().getLastName(),
+                        "value", evalGrade.getGrade(),
+                        "comments", evalGrade.getRemark()
                 ))
                 .collect(Collectors.toList());
 
@@ -127,15 +126,15 @@ public class EvaluationServiceImpl implements EvaluationService {
             Double value = Double.parseDouble(update.get("value").toString());
             String comments = update.get("comments") != null ? update.get("comments").toString() : null;
 
-            StudentSubmission submission = studentSubmissionRepository
+            EvaluationGrade evalGrade = evaluationGradeRepository
                     .findByEvaluationIdAndStudentId(evaluationId, studentId)
                     .orElseThrow(() -> new RuntimeException("Soumission non trouvée pour l'étudiant " + studentId));
 
-            submission.setValue(value);
-            submission.setComments(comments);
+            evalGrade.setGrade(value);
+            evalGrade.setRemark(comments);
             // Par exemple, vous pouvez mettre à jour le statut ici (si applicable)
             // submission.setStatus(StudentSubmissionStatus.COMPLETED);
-            studentSubmissionRepository.save(submission);
+            evaluationGradeRepository.save(evalGrade);
         }
     }
 

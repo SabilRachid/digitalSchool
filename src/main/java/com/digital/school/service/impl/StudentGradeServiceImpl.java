@@ -1,10 +1,14 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.EvaluationGrade;
 import com.digital.school.model.Student;
-import com.digital.school.model.StudentExam;
-import com.digital.school.model.StudentHomework;
-import com.digital.school.model.StudentSubmission;
-import com.digital.school.repository.StudentSubmissionRepository;
+import com.digital.school.model.Homework;
+import com.digital.school.model.Exam;
+import com.digital.school.repository.EvaluationGradeRepository;
+import com.digital.school.repository.EvaluationRepository;
+import com.digital.school.repository.EventRepository;
+import com.digital.school.repository.ParentStudentRepository;
+import com.digital.school.repository.StudentAttendanceRepository;
 import com.digital.school.service.PDFService;
 import com.digital.school.service.StudentGradeService;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,15 +29,27 @@ import java.util.stream.Collectors;
 public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Autowired
     private PDFService pdfService;
 
+    @Autowired
+    private ParentStudentRepository parentStudentRepository;
+
+    @Autowired
+    private StudentAttendanceRepository studentAttendanceRepository;
+
+    @Autowired
+    private EvaluationRepository evaluationRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
+
     @Override
     public List<Map<String, Object>> findRecentGrades(Student student) {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("gradedAt").descending());
-        Page<StudentSubmission> pagedGrades = studentSubmissionRepository.findRecentGrades(student, pageable);
+        Page<EvaluationGrade> pagedGrades = evaluationGradeRepository.findRecentGrades(student, pageable);
         return pagedGrades.getContent().stream()
                 .map(this::convertSubmissionToMap)
                 .collect(Collectors.toList());
@@ -41,9 +57,9 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public List<Map<String, Object>> findGradesBySubject(Student student) {
-        // On regroupe toutes les soumissions (devoirs et examens) par matière
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
-        List<StudentSubmission> filtered = submissions.stream()
+        // On récupère toutes les soumissions triées par date décroissante
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
+        List<EvaluationGrade> filtered = submissions.stream()
                 .filter(s -> s.getEvaluation() != null && s.getEvaluation().getSubject() != null)
                 .collect(Collectors.toList());
 
@@ -61,7 +77,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
                     .mapToDouble(m -> ((Number) m.get("value")).doubleValue())
                     .average().orElse(0.0);
             subjectData.put("average", avg);
-            // Pour l'exemple, on réutilise la même moyenne pour la classe
+            // Ici, on réutilise la moyenne calculée comme moyenne de classe (à adapter)
             subjectData.put("classAverage", avg);
             return subjectData;
         }).collect(Collectors.toList());
@@ -69,18 +85,20 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public List<Map<String, Object>> findHomeworkGrades(Student student) {
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
-        List<StudentSubmission> homeworkSubmissions = submissions.stream()
-                .filter(s -> s instanceof StudentHomework)
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
+        // Filtrer pour ne conserver que les évaluations de type Homework
+        List<EvaluationGrade> homeworkSubmissions = submissions.stream()
+                .filter(s -> s.getEvaluation() instanceof Homework)
                 .collect(Collectors.toList());
         return groupSubmissionsBySubject(homeworkSubmissions);
     }
 
     @Override
     public List<Map<String, Object>> findExamGrades(Student student) {
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
-        List<StudentSubmission> examSubmissions = submissions.stream()
-                .filter(s -> s instanceof StudentExam)
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
+        // Filtrer pour ne conserver que les évaluations de type Exam
+        List<EvaluationGrade> examSubmissions = submissions.stream()
+                .filter(s -> s.getEvaluation() instanceof Exam)
                 .collect(Collectors.toList());
         return groupSubmissionsBySubject(examSubmissions);
     }
@@ -88,16 +106,13 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public Map<String, Object> calculatePerformanceStats(Student student) {
         Map<String, Object> stats = new HashMap<>();
-        List<StudentSubmission> allSubmissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
+        List<EvaluationGrade> allSubmissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
 
         double average = calculateAverage(allSubmissions);
         stats.put("average", average);
 
-        int rank = studentSubmissionRepository.calculateStudentRank(
-                student.getId(),
-                student.getClasse().getId()
-        );
-        stats.put("rank", rank);
+        Integer rank = evaluationGradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId());
+        stats.put("rank", rank != null ? rank : 0);
 
         Map<String, List<Double>> progression = getGradesProgression(student);
         stats.put("progression", progression);
@@ -105,12 +120,10 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         Map<String, Double> subjectAverages = getSubjectAverages(student);
         stats.put("subjectAverages", subjectAverages);
 
-        // Ajout d'autres statistiques si nécessaire (ex: taux de réussite)
-        Double successRate = studentSubmissionRepository.calculateSuccessRate(student);
+        Double successRate = evaluationGradeRepository.calculateSuccessRate(student);
         stats.put("successRate", successRate != null ? successRate : 0.0);
 
-        // Moyenne générale (alternative)
-        Double overallAverage = studentSubmissionRepository.calculateAverageGrade(student);
+        Double overallAverage = evaluationGradeRepository.calculateAverageGrade(student);
         stats.put("averageGrade", overallAverage != null ? overallAverage : 0.0);
 
         return stats;
@@ -130,49 +143,46 @@ public class StudentGradeServiceImpl implements StudentGradeService {
 
     @Override
     public @NotNull Map<String, List<Double>> getGradesProgression(Student student) {
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
         return submissions.stream()
                 .collect(Collectors.groupingBy(
                         s -> s.getEvaluation().getSubject().getName(),
-                        Collectors.mapping(StudentSubmission::getValue, Collectors.toList())
+                        Collectors.mapping(EvaluationGrade::getGrade, Collectors.toList())
                 ));
     }
 
     @Override
     public int getStudentRank(Student student) {
-        return studentSubmissionRepository.calculateStudentRank(
-                student.getId(),
-                student.getClasse().getId()
-        );
+        Integer rank = evaluationGradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId());
+        return rank != null ? rank : 0;
     }
 
     @Override
     public Map<String, Double> getSubjectAverages(Student student) {
-        List<StudentSubmission> submissions = studentSubmissionRepository.findByStudentOrderByGradedAtDesc(student);
+        List<EvaluationGrade> submissions = evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student);
         return submissions.stream()
                 .collect(Collectors.groupingBy(
                         s -> s.getEvaluation().getSubject().getName(),
-                        Collectors.averagingDouble(StudentSubmission::getValue)
+                        Collectors.averagingDouble(EvaluationGrade::getGrade)
                 ));
     }
 
     // Méthode utilitaire pour convertir une soumission en Map simple (DTO)
-    private Map<String, Object> convertSubmissionToMap(StudentSubmission submission) {
+    private Map<String, Object> convertSubmissionToMap(EvaluationGrade submission) {
         Map<String, Object> map = new HashMap<>();
         map.put("evaluationTitle", submission.getEvaluation().getTitle());
-        map.put("dueDate", submission.getEvaluation().getDueDate()); // Vous pouvez formater la date si besoin
-        map.put("value", submission.getValue());
-        // Vous pouvez ajouter d'autres champs si nécessaire
+        map.put("dueDate", submission.getEvaluation().getDueDate());
+        map.put("value", submission.getGrade());
         return map;
     }
 
     // Méthode utilitaire pour grouper une liste de soumissions par matière et créer un DTO
-    private List<Map<String, Object>> groupSubmissionsBySubject(List<StudentSubmission> submissions) {
-        Map<String, List<StudentSubmission>> grouped = submissions.stream()
+    private List<Map<String, Object>> groupSubmissionsBySubject(List<EvaluationGrade> submissions) {
+        Map<String, List<EvaluationGrade>> grouped = submissions.stream()
                 .collect(Collectors.groupingBy(s -> s.getEvaluation().getSubject().getName()));
         return grouped.entrySet().stream().map(entry -> {
             String subject = entry.getKey();
-            List<StudentSubmission> subjectSubmissions = entry.getValue();
+            List<EvaluationGrade> subjectSubmissions = entry.getValue();
             double average = calculateAverage(subjectSubmissions);
             double classAverage = calculateClassAverage(subjectSubmissions);
             Map<String, Object> subjectData = new HashMap<>();
@@ -187,19 +197,19 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     }
 
     // Méthode utilitaire pour calculer la moyenne d'une liste de soumissions
-    private double calculateAverage(List<StudentSubmission> submissions) {
+    private double calculateAverage(List<EvaluationGrade> submissions) {
         if (submissions.isEmpty()) return 0.0;
         return submissions.stream()
-                .mapToDouble(StudentSubmission::getValue)
+                .mapToDouble(EvaluationGrade::getGrade)
                 .average()
                 .orElse(0.0);
     }
 
     // Méthode utilitaire pour calculer une moyenne de classe (implémentation basique)
-    private double calculateClassAverage(List<StudentSubmission> submissions) {
+    private double calculateClassAverage(List<EvaluationGrade> submissions) {
         if (submissions.isEmpty()) return 0.0;
         return submissions.stream()
-                .mapToDouble(StudentSubmission::getValue)
+                .mapToDouble(EvaluationGrade::getGrade)
                 .average()
                 .orElse(0.0);
     }

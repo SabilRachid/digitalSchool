@@ -1,23 +1,22 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.model.EvaluationGrade;
+import com.digital.school.model.Homework;
 import com.digital.school.model.Parent;
 import com.digital.school.model.ParentStudent;
 import com.digital.school.model.Student;
-import com.digital.school.model.StudentHomework;
-import com.digital.school.model.StudentSubmission;
-import com.digital.school.model.enumerated.StudentSubmissionStatus;
-import com.digital.school.repository.*;
-import com.digital.school.repository.StudentSubmissionRepository;
-import com.digital.school.service.EmailService;
+import com.digital.school.model.enumerated.EvaluationStatus;
+import com.digital.school.repository.EvaluationGradeRepository;
+import com.digital.school.repository.EvaluationRepository;
+import com.digital.school.repository.EventRepository;
+import com.digital.school.repository.ParentStudentRepository;
+import com.digital.school.repository.StudentAttendanceRepository;
+import com.digital.school.repository.HomeworkRepository;
 import com.digital.school.service.ParentDashboardService;
-import com.digital.school.service.ParentHomeworkService;
-import com.digital.school.service.SMSService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,17 +29,20 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     private ParentStudentRepository parentStudentRepository;
 
     @Autowired
-    private StudentSubmissionRepository studentSubmissionRepository;
-
-    @Autowired
     private StudentAttendanceRepository studentAttendanceRepository;
-
-    @Autowired
-    private StudentHomeworkRepository studentHomeworkRepository;
 
     @Autowired
     private EventRepository eventRepository;
 
+    // Utilisation de homeworkRepository pour gérer les devoirs (Homework)
+    @Autowired
+    private HomeworkRepository homeworkRepository;
+
+    @Autowired
+    private EvaluationRepository evaluationRepository;
+
+    @Autowired
+    private EvaluationGradeRepository evaluationGradeRepository;
 
     @Override
     public List<Map<String, Object>> getChildrenOverview(Parent parent) {
@@ -76,47 +78,39 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
                 Map<String, Object> alert = new HashMap<>();
                 alert.put("type", "ABSENCE");
                 alert.put("severity", "WARNING");
-                alert.put("message", String.format(
-                        "%s a %d absence(s) non justifiée(s)",
-                        child.getFirstName(),
-                        unjustifiedAbsences
-                ));
+                alert.put("message", String.format("%s a %d absence(s) non justifiée(s)",
+                        child.getFirstName(), unjustifiedAbsences));
                 alert.put("childId", child.getId());
                 alerts.add(alert);
             }
         }
 
-        // Vérifier les notes faibles
+        // Vérifier les notes faibles via EvaluationGradeRepository
         for (Student child : children) {
-            List<StudentSubmission> lowGrades = studentSubmissionRepository.findLowGrades(child);
+            List<EvaluationGrade> lowGrades = evaluationGradeRepository.findLowGrades(child);
             if (!lowGrades.isEmpty()) {
                 Map<String, Object> alert = new HashMap<>();
                 alert.put("type", "GRADE");
                 alert.put("severity", "WARNING");
-                alert.put("message", String.format(
-                        "%s a obtenu une note inférieure à 10 en %s",
+                alert.put("message", String.format("%s a obtenu une note inférieure à 10 en %s",
                         child.getFirstName(),
-                        lowGrades.get(0).getEvaluation().getSubject().getName()
-                ));
+                        lowGrades.get(0).getEvaluation().getSubject().getName()));
                 alert.put("childId", child.getId());
                 alerts.add(alert);
             }
         }
 
-        // Vérifier les devoirs en retard
+        // Vérifier les devoirs en retard via homeworkRepository
+        // Ici, on considère qu'un devoir est en retard si son statut est LATE
         for (Student child : children) {
-            // On utilise ici la méthode findByStudentAndStatusOrderByDueDateDesc pour obtenir les devoirs en attente
-            List<StudentHomework> lateHomework = studentHomeworkRepository
-                    .findByStudentAndStatusOrderByDueDateDesc(child, StudentSubmissionStatus.LATE);
-            if (!lateHomework.isEmpty()) {
+            List<Homework> lateHomeworks = homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(
+                    child, EvaluationStatus.PUBLISHED);
+            if (!lateHomeworks.isEmpty()) {
                 Map<String, Object> alert = new HashMap<>();
                 alert.put("type", "HOMEWORK");
                 alert.put("severity", "WARNING");
-                alert.put("message", String.format(
-                        "%s a %d devoir(s) en retard",
-                        child.getFirstName(),
-                        lateHomework.size()
-                ));
+                alert.put("message", String.format("%s a %d devoir(s) en retard",
+                        child.getFirstName(), lateHomeworks.size()));
                 alert.put("childId", child.getId());
                 alerts.add(alert);
             }
@@ -133,31 +127,18 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
                 .map(ParentStudent::getStudent)
                 .collect(Collectors.toList());
 
-        // Statistiques globales
         stats.put("totalChildren", children.size());
-        stats.put("averageAttendance",
-                children.stream()
-                        .mapToDouble(this::calculateAttendanceRate)
-                        .average()
-                        .orElse(0.0));
-        stats.put("averageGrade",
-                children.stream()
-                        .mapToDouble(this::calculateAverageGrade)
-                        .average()
-                        .orElse(0.0));
-
-        // Statistiques par enfant
-        stats.put("childrenStats", children.stream()
-                .map(child -> {
-                    Map<String, Object> childStats = new HashMap<>();
-                    childStats.put("id", child.getId());
-                    childStats.put("name", child.getFirstName());
-                    childStats.put("averageGrade", calculateAverageGrade(child));
-                    childStats.put("attendanceRate", calculateAttendanceRate(child));
-                    childStats.put("rank", calculateRank(child));
-                    return childStats;
-                })
-                .collect(Collectors.toList()));
+        stats.put("averageAttendance", children.stream().mapToDouble(this::calculateAttendanceRate).average().orElse(0.0));
+        stats.put("averageGrade", children.stream().mapToDouble(this::calculateAverageGrade).average().orElse(0.0));
+        stats.put("childrenStats", children.stream().map(child -> {
+            Map<String, Object> childStats = new HashMap<>();
+            childStats.put("id", child.getId());
+            childStats.put("name", child.getFirstName());
+            childStats.put("averageGrade", calculateAverageGrade(child));
+            childStats.put("attendanceRate", calculateAttendanceRate(child));
+            childStats.put("rank", calculateRank(child));
+            return childStats;
+        }).collect(Collectors.toList()));
 
         return stats;
     }
@@ -166,42 +147,35 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     public List<Map<String, Object>> getUpcomingEvents(Parent parent) {
         List<Map<String, Object>> events = new ArrayList<>();
 
-        // Récupérer les enfants du parent
         List<Student> children = parentStudentRepository.findByParent(parent).stream()
                 .map(ParentStudent::getStudent)
                 .collect(Collectors.toList());
 
         for (Student child : children) {
-            // Examens à venir
             eventRepository.findUpcomingExams(child).forEach(exam -> {
                 Map<String, Object> event = new HashMap<>();
                 event.put("type", "EXAM");
                 event.put("title", exam.getTitle());
-                event.put("date", exam.getStartTime());  // exam.getStartTime() est supposé être un LocalDateTime
+                event.put("date", exam.getStartTime());
                 event.put("childName", child.getFirstName());
                 event.put("subject", exam.getSubject().getName());
                 events.add(event);
             });
 
-            // Devoirs à rendre (pending homework)
-            // Utilisation de la méthode findByStudentAndStatusOrderByDueDateDesc pour les devoirs dont le statut est PENDING
-            studentHomeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, StudentSubmissionStatus.PENDING)
+            homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, EvaluationStatus.PUBLISHED)
                     .forEach(homework -> {
                         Map<String, Object> event = new HashMap<>();
                         event.put("type", "HOMEWORK");
-                        event.put("title", homework.getHomework().getTitle());
-                        // Conversion de dueDate (LocalDate) en LocalDateTime pour le tri
-                        LocalDateTime dueDateTime = homework.getHomework().getDueDate().atStartOfDay();
+                        event.put("title", homework.getTitle());
+                        LocalDateTime dueDateTime = homework.getDueDate().atStartOfDay();
                         event.put("date", dueDateTime);
                         event.put("childName", child.getFirstName());
-                        event.put("subject", homework.getHomework().getSubject().getName());
+                        event.put("subject", homework.getSubject().getName());
                         events.add(event);
                     });
         }
 
-        // Trier les événements par date
         events.sort((e1, e2) -> ((LocalDateTime) e1.get("date")).compareTo((LocalDateTime) e2.get("date")));
-
         return events;
     }
 
@@ -216,7 +190,6 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         performance.put("rank", calculateRank(child));
         performance.put("subjectAverages", calculateSubjectAverages(child));
         performance.put("progression", calculateProgression(child));
-
         return performance;
     }
 
@@ -230,7 +203,6 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         attendance.put("attendanceRate", calculateAttendanceRate(child));
         attendance.put("absences", getAbsenceDetails(child));
         attendance.put("lates", getLateDetails(child));
-
         return attendance;
     }
 
@@ -240,15 +212,13 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
-        return studentSubmissionRepository.findByStudentOrderByDateDesc(child).stream()
-                .map(submission -> {
+        return evaluationGradeRepository.findByStudentOrderByGradedAtDesc(child).stream()
+                .map(grade -> {
                     Map<String, Object> gradeMap = new HashMap<>();
-                    gradeMap.put("subject", submission.getEvaluation().getSubject().getName());
-                    gradeMap.put("value", submission.getValue());
-                    gradeMap.put("title", submission.getEvaluation().getTitle());
-                    gradeMap.put("date", submission.getGradedAt());
-                    // Supposons ici que getClassAverage() est défini dans StudentSubmission ou calculé
-                    gradeMap.put("classAverage", submission.getClassAverage());
+                    gradeMap.put("subject", grade.getEvaluation().getSubject().getName());
+                    gradeMap.put("value", grade.getGrade());
+                    gradeMap.put("title", grade.getEvaluation().getTitle());
+                    gradeMap.put("date", grade.getGradedAt());
                     return gradeMap;
                 })
                 .collect(Collectors.toList());
@@ -260,23 +230,23 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
                 .map(ParentStudent::getStudent)
                 .orElseThrow(() -> new RuntimeException("Enfant non trouvé"));
 
-        List<StudentHomework> homeworks = studentHomeworkRepository.findByStudent(child);
-
-        return homeworks.stream().map(homework -> {
-                    Map<String, Object> homeworkMap = new HashMap<>();
-                    homeworkMap.put("subject", homework.getHomework().getSubject().getName());
-                    homeworkMap.put("title", homework.getHomework().getTitle());
-                    homeworkMap.put("dueDate", homework.getHomework().getDueDate());
-                    homeworkMap.put("status", homework.getStatus());
-                    homeworkMap.put("grade", homework.getGradeType());
-                    return homeworkMap;
-                })
-                .collect(Collectors.toList());
+        List<Homework> homeworks = homeworkRepository.findByStudent(child);
+        return homeworks.stream().map(hw -> {
+            Map<String, Object> homeworkMap = new HashMap<>();
+            homeworkMap.put("subject", hw.getSubject().getName());
+            homeworkMap.put("title", hw.getTitle());
+            homeworkMap.put("dueDate", hw.getDueDate());
+            homeworkMap.put("status", hw.getStatus());
+           // homeworkMap.put("grade", hw.getGradeType()); // ou hw.getGrade() si nécessaire
+            return homeworkMap;
+        }).collect(Collectors.toList());
     }
 
     // Méthodes utilitaires
+
     private double calculateAverageGrade(Student student) {
-        return studentSubmissionRepository.calculateAverageGrade(student);
+        Double avg = evaluationGradeRepository.calculateAverageGrade(student);
+        return avg != null ? avg : 0.0;
     }
 
     private double calculateAttendanceRate(Student student) {
@@ -284,7 +254,9 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     private int countPendingHomework(Student student) {
-        return studentHomeworkRepository.countPendingHomework(student);
+        // Retourne le nombre de devoirs avec statut PENDING pour l'étudiant
+        return homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(student, EvaluationStatus.PUBLISHED)
+                .size();
     }
 
     private int countUpcomingExams(Student student) {
@@ -292,20 +264,30 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
     }
 
     private int calculateRank(Student student) {
-        Integer rank = studentSubmissionRepository.calculateStudentRank(
-                student.getId(),
-                student.getClasse().getId()
-        );
+        Integer rank = evaluationGradeRepository.calculateStudentRank(student.getId(), student.getClasse().getId());
         return rank != null ? rank : 0;
     }
 
     private Map<String, Double> calculateSubjectAverages(Student student) {
-        return studentSubmissionRepository.calculateSubjectAverages(student);
+        List<Object[]> results = evaluationGradeRepository.findSubjectAveragesByStudent(student);
+        Map<String, Double> averages = new HashMap<>();
+        for (Object[] row : results) {
+            String subject = (String) row[0];
+            Double average = (Double) row[1];
+            averages.put(subject, average);
+        }
+        return averages;
     }
 
     private Map<String, List<Double>> calculateProgression(Student student) {
-        return studentSubmissionRepository.calculateProgression(student);
+          return evaluationGradeRepository.findByStudentOrderByGradedAtDesc(student).stream()
+                .collect(Collectors.groupingBy(
+                        grade -> grade.getEvaluation().getSubject().getName(),
+                        Collectors.mapping(EvaluationGrade::getGrade, Collectors.toList())
+                ));
     }
+
+
 
     private List<Map<String, Object>> getAbsenceDetails(Student student) {
         return studentAttendanceRepository.findAbsenceDetails(student);

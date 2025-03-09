@@ -1,12 +1,10 @@
-
 package com.digital.school.service;
 
-import com.digital.school.dto.ExamDTO;
+import com.digital.school.dto.ExamDTO  ;
 import com.digital.school.model.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface ExamService {
 
@@ -30,7 +28,7 @@ public interface ExamService {
         byte[] generateExamReport(Long id);
 
         // Trouve les devoirs en attente pour un étudiant donné.
-        StudentSubmission enterGrade(Long submissionId, Double gradeValue, String comment, Long professorId);
+        EvaluationGrade enterGrade(Long submissionId, Double gradeValue, String comment, Long professorId);
 
         // Trouve les examens associés à un professeur identifié par son ID.
         List<Exam> findExamsByProfessor(Long id);

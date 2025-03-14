@@ -113,6 +113,10 @@
                 <i class="fas fa-user-check"></i>
                 <span>Présences</span>
             </a>
+            <a href="/professor/courses" class="nav-item" th:classappend="${currentURI == '/professor/courses' ? 'active' : ''}">
+                <i class="fas fa-tasks"></i>
+                <span>Cours</span>
+            </a>
             <a href="/professor/homeworks" class="nav-item" th:classappend="${currentURI == '/professor/homeworks' ? 'active' : ''}">
                 <i class="fas fa-tasks"></i>
                 <span>Devoirs</span>

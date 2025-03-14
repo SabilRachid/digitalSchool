@@ -56,7 +56,7 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
         stats.put("totalClasses", totalClasses);
 
         // Count pending homework
-        int pendingHomework = homeworkRepository.countPendingGradingByProfessor(professor, EvaluationStatus.PUBLISHED);
+        int pendingHomework = homeworkRepository.countPendingGradingByProfessor(professor, EvaluationStatus.UPCOMING);
         stats.put("pendingHomework", pendingHomework);
 
         // Count submissions today
@@ -86,9 +86,12 @@ public class ProfessorDashboardServiceImpl implements ProfessorDashboardService 
     public Map<String, Integer> getParticipationRate() {
         List<Object[]> results = professorDashboardRepository.getParticipationRate();
         Object[] row = results.get(0);
-        return Map.of("high", ((Number) row[0]).intValue(),
-                "medium", ((Number) row[1]).intValue(),
-                "low", ((Number) row[2]).intValue());
+        return Map.of(
+                "high", row[0] != null ? ((Number) row[0]).intValue() : 0,
+                "medium", row[1] != null ? ((Number) row[1]).intValue() : 0,
+                "low", row[2] != null ? ((Number) row[2]).intValue() : 0
+        );
+
     }
 
     public List<Map<String, Object>> getAverageProgression() {

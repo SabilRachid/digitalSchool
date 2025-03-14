@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
+    
      Optional<Student> findById(Long studentId); // Récupérer les élèves d'une classe
 
     @Query("SELECT s FROM Student s WHERE s.classe.id = :classId")
@@ -41,6 +43,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT COUNT(s) FROM Student s WHERE s.classe.id = :classeId")
     int countByClasse(Long classeId);
+
+    @Query("SELECT s FROM Student s WHERE s.classe.id = :id")
+    List<Student> findByClasseId(@Param("id") Long id);
 
 
     interface HomeworkRepository extends JpaRepository<Homework, Long> {

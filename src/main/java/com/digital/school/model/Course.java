@@ -39,6 +39,11 @@ public class Course extends Event {
     @Column(columnDefinition = "TEXT")
     private String instructorNotes;
 
+    // --- Nouvelle propriété Attendance ---
+    // Chaque cours possède une fiche d'attendance unique.
+    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Attendance attendance;
+
     // Getters et setters
 
     public LocalDate getDate() {
@@ -95,5 +100,13 @@ public class Course extends Event {
 
     public void setInstructorNotes(String instructorNotes) {
         this.instructorNotes = instructorNotes;
+    }
+
+    public Attendance getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(Attendance attendance) {
+        this.attendance = attendance;
     }
 }

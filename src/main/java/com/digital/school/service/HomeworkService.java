@@ -39,4 +39,6 @@ public interface HomeworkService {
 
     /** Envoie un rappel pour un devoir dont la soumission est en attente.*/
     void sendHomeworkReminder(Long homeworkId);
+
+    List<Map<String, Object>> getHomeworkGrades(Long id);
 }

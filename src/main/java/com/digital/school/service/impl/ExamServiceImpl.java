@@ -1,26 +1,42 @@
 package com.digital.school.service.impl;
 
+import com.digital.school.controller.rest.professor.ProfessorExamController;
 import com.digital.school.dto.ExamDTO;
+import com.digital.school.dto.ExamGradeEntryRequest;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.EvaluationStatus;
 import com.digital.school.model.enumerated.EventType;
 import com.digital.school.repository.*;
 import com.digital.school.service.ExamService;
+import org.slf4j.Logger;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.io.font.constants.StandardFonts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class ExamServiceImpl implements ExamService {
+
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExamServiceImpl.class);
 
     @Autowired
     private ExamRepository examRepository;
@@ -50,9 +66,12 @@ public class ExamServiceImpl implements ExamService {
     @Transactional
     public Exam createExam(ExamDTO examDTO, Long professorId) {
 
+        LOGGER.debug("createExam with elements professorId:" + professorId + " and examDTO"+examDTO);
+
         Exam exam = new Exam();
         // Affectation des champs simples
         exam.setType(EventType.EXAM);
+        exam.setGraded(false);
         exam.setTitle(examDTO.getTitle());
         exam.setDescription(examDTO.getDescription());
         exam.setStartTime(examDTO.getStartTime());
@@ -93,12 +112,35 @@ public class ExamServiceImpl implements ExamService {
 
 
     @Override
-    public void publishExam(Long examId) {
-        Exam exam = examRepository.findById(examId)
+    public void publishExam(Long evaluationId) {
+        LOGGER.debug("Service publishExam for evaluationId="+evaluationId);
+        Exam evaluation = examRepository.findById(evaluationId)
                 .orElseThrow(() -> new RuntimeException("Examen non trouvé"));
-        // Mettre à jour le status (ex: SCHEDULED -> PUBLISHED)
-        exam.setStatus(com.digital.school.model.enumerated.EvaluationStatus.PUBLISHED);
-        examRepository.save(exam);
+
+        // Mettre à jour le status (ex: SCHEDULED -> UPCOMING)
+        evaluation.setStatus(com.digital.school.model.enumerated.EvaluationStatus.UPCOMING);
+
+        // Récupération de la liste des étudiants de la classe associée à l'évaluation
+        Set<Student> students = evaluation.getClasse().getStudents();
+
+        // Pour chaque étudiant, s'il n'existe pas déjà une note enregistrée, on crée une entrée EvaluationGrade vide
+        for (Student student : students) {
+            LOGGER.debug("set Grade Evaluation for student="+student.toString());
+            Optional<EvaluationGrade> existingGrade = evaluationGradeRepository
+                    .findByEvaluationIdAndStudentId(evaluationId, student.getId());
+            if (existingGrade.isEmpty()) {
+                LOGGER.debug("create new EvaluationGrade");
+                EvaluationGrade grade = new EvaluationGrade();
+                grade.setEvaluation(evaluation);
+                grade.setStudent(student);
+                grade.setGrade(null); // ou 0.0 si vous préférez une valeur numérique par défaut
+                grade.setRemark("");
+                grade.setGradedAt(null);
+                evaluationGradeRepository.save(grade);
+            }
+        }
+
+        examRepository.save(evaluation);
     }
 
     @Override
@@ -112,17 +154,111 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Map<String, Object> getExamResults(Long examId) {
-        // Implémentez la logique pour calculer les résultats de l'examen
-        // Par exemple, calculer la moyenne, la note max, etc.
-        // Retournez un Map avec les informations nécessaires
-        throw new UnsupportedOperationException("Méthode non implémentée");
+        // Récupérer l'examen
+        Exam exam = examRepository.findById(examId)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé"));
+
+        // Récupérer toutes les notes liées à l'examen
+        List<EvaluationGrade> grades = evaluationGradeRepository.findByEvaluationId(examId);
+
+        // Calculer quelques statistiques simples
+        double average = grades.stream()
+                .mapToDouble(EvaluationGrade::getGrade)
+                .average().orElse(0);
+        double max = grades.stream()
+                .mapToDouble(EvaluationGrade::getGrade)
+                .max().orElse(0);
+        double min = grades.stream()
+                .mapToDouble(EvaluationGrade::getGrade)
+                .min().orElse(0);
+
+        // Préparer le résultat
+        Map<String, Object> results = new HashMap<>();
+        results.put("examTitle", exam.getTitle());
+        results.put("average", average);
+        results.put("max", max);
+        results.put("min", min);
+        results.put("totalSubmissions", grades.size());
+        // Vous pouvez ajouter d'autres statistiques ou détails (par exemple, distribution des notes)
+
+        return results;
     }
 
+
+
     @Override
-    public byte[] generateExamReport(Long examId) {
-        // Implémentez la génération du rapport PDF pour l'examen
-        throw new UnsupportedOperationException("Méthode non implémentée");
+    public byte[] generateExamReport(Long id) {
+        // Récupération de l'examen
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Examen non trouvé"));
+
+        // On suppose que l'examen possède une collection d'EvaluationGrade (les notes des élèves)
+        List<EvaluationGrade> grades = exam.getEvaluationGrades();
+
+        // Création du flux de sortie pour le PDF
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            // Chargement des polices
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+
+            // Format de date et heure
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            // Ajout du titre du rapport
+            document.add(new Paragraph("Rapport de l'examen").setFont(bold).setFontSize(16));
+            document.add(new Paragraph(" ")); // Espace
+
+            // Ajout des informations de l'examen
+            document.add(new Paragraph("Titre : " + exam.getTitle()).setFont(font).setFontSize(12));
+            document.add(new Paragraph("Matière : " + exam.getSubject().getName()).setFont(font).setFontSize(12));
+            document.add(new Paragraph("Classe : " + exam.getClasse().getName()).setFont(font).setFontSize(12));
+            document.add(new Paragraph("Date et heure de début : " + exam.getStartTime().format(dtf))
+                    .setFont(font).setFontSize(12));
+            document.add(new Paragraph("Durée : " + exam.getDuration() + " minutes").setFont(font).setFontSize(12));
+            document.add(new Paragraph(" ")); // Espace
+
+            // Création d'un tableau pour afficher les notes des élèves
+            float[] columnWidths = {200F, 80F, 200F};
+            Table table = new Table(columnWidths);
+
+            // Ajout des en-têtes du tableau avec un fond coloré
+            table.addHeaderCell(new Cell().add(new Paragraph("Élève").setFont(bold))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY));
+            table.addHeaderCell(new Cell().add(new Paragraph("Note").setFont(bold))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY));
+            table.addHeaderCell(new Cell().add(new Paragraph("Remarque").setFont(bold))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY));
+
+            // Remplissage du tableau avec les notes
+            for (EvaluationGrade eg : grades) {
+                String studentName = eg.getStudent().getFirstName() + " " + eg.getStudent().getLastName();
+                table.addCell(new Cell().add(new Paragraph(studentName).setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(String.valueOf(eg.getGrade())).setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(eg.getRemark() != null ? eg.getRemark() : "").setFont(font)));
+            }
+
+            // Ajout du tableau au document
+            document.add(table);
+
+            // Ajout d'une ligne de séparation et d'un message de pied de page
+            document.add(new Paragraph("-----------------------------------------------------").setFont(font).setFontSize(12));
+            document.add(new Paragraph("Ce rapport est généré automatiquement.").setFont(font).setFontSize(10));
+
+            // Fermeture du document
+            document.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la génération du rapport PDF", e);
+        }
+
+        return baos.toByteArray();
     }
+
 
     @Override
     public EvaluationGrade enterGrade(Long evaluationId, Double gradeValue, String comment, Long professorId) {
@@ -216,6 +352,76 @@ public class ExamServiceImpl implements ExamService {
 
         return dto;
     }
+
+    /**
+     * Récupère les notes déjà saisies pour un examen.
+     * Ici, nous supposons que l'examen (traité comme Evaluation) est identifié par examId.
+     */
+    @Override
+    public List<Map<String, Object>> getExamGrades(Long examId) {
+        List<EvaluationGrade> grades = evaluationGradeRepository.findByEvaluationId(examId);
+        return grades.stream().map(grade -> {
+            Map<String, Object> map = new HashMap<>();
+            Student student = grade.getStudent();
+            map.put("studentId", student.getId());
+            map.put("firstName", student.getFirstName());
+            map.put("lastName", student.getLastName());
+            map.put("grade", grade.getGrade());
+            map.put("comment", grade.getRemark());
+            return map;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Sauvegarde ou met à jour les notes saisies pour l'examen.
+     * Pour chaque entrée, vérifie si une note existe déjà pour cet étudiant et cet examen.
+     */
+    @Override
+    public void saveExamGrades(List<ExamGradeEntryRequest> gradeEntries, Long professorId) {
+        for (ExamGradeEntryRequest entry : gradeEntries) {
+            // Vérifier l'existence d'une note pour cet étudiant et cette évaluation
+            Optional<EvaluationGrade> opt = evaluationGradeRepository
+                    .findByEvaluationIdAndStudentId(entry.getEvaluationId(), entry.getStudentId());
+            EvaluationGrade grade;
+            if (opt.isPresent()) {
+                grade = opt.get();
+            } else {
+                grade = new EvaluationGrade();
+                // Utilisez des méthodes de repository ou EntityManager pour obtenir les références
+                // Exemple (à adapter selon votre implémentation) :
+                // grade.setEvaluation(examRepository.getReferenceById(entry.getEvaluationId()));
+                // grade.setStudent(studentRepository.getReferenceById(entry.getStudentId()));
+            }
+            // Mettre à jour la note, le commentaire et la date de saisie
+            grade.setGrade(entry.getGradeValue());
+            grade.setRemark(entry.getComment());
+            grade.setGradedAt(LocalDateTime.now());
+            evaluationGradeRepository.save(grade);
+        }
+    }
+
+    /**
+     * Publie la saisie finale des notes pour un examen.
+     * Vérifie que le nombre de notes saisies correspond au nombre d'étudiants inscrits à l'examen.
+     */
+    @Override
+    @Transactional
+    public void publishExamGrades(Long evaluationId, Long professorId) {
+        // Récupération de l'évaluation (examen ou devoir)
+        Evaluation evaluation = evaluationRepository.findById(evaluationId)
+                .orElseThrow(() -> new RuntimeException("Évaluation non trouvée"));
+
+        // Vérification que le professeur est autorisé à publier cette évaluation
+        if (!evaluation.getProfessor().getId().equals(professorId)) {
+            throw new RuntimeException("Accès non autorisé");
+        }
+
+
+        // Mise à jour du statut de l'évaluation (par exemple, passage à COMPLETED)
+        evaluation.setStatus(EvaluationStatus.COMPLETED);
+        evaluationRepository.save(evaluation);
+    }
+
 
 
 }

@@ -16,6 +16,27 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     // Récupère les cours d'un professeur (en utilisant l'entité Professor)
     List<Course> findByProfessor(Professor professor);
 
+
+    @Query("SELECT c FROM Course c " +
+            "WHERE c.professor.id = :professorId " +
+            "AND (:classe IS NULL OR c.classe.id = :classe) " +
+            "AND (:subject IS NULL OR c.subject.id = :subject)")
+    List<Course> findByProfessorIdAndClasseAndSubject(@Param("professorId") Long professorId,
+                                                      @Param("classe") Long classe,
+                                                      @Param("subject") Long subject);
+
+    @Query("SELECT c FROM Course c " +
+            "WHERE c.professor.id = :professorId " +
+            "AND (:classe IS NULL OR c.classe.id = :classe) " +
+            "AND (:subject IS NULL OR c.subject.id = :subject) " +
+            "AND c.startTime >= :start AND c.startTime < :end")
+    List<Course> findByProfessorIdAndClasseAndSubjectAndStartTimeBetween(@Param("professorId") Long professorId,
+                                                                         @Param("classe") Long classe,
+                                                                         @Param("subject") Long subject,
+                                                                         @Param("start") LocalDateTime start,
+                                                                         @Param("end") LocalDateTime end);
+
+
     // Récupère un cours pour une classe à une date précise (en comparant la date de startTime)
     @Query("SELECT c FROM Course c WHERE c.classe.id = :classId AND FUNCTION('DATE', c.startTime) = :date")
     Optional<Course> findByClassIdAndDate(@Param("classId") Long classId, @Param("date") LocalDate date);

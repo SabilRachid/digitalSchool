@@ -59,5 +59,15 @@ public class Student extends User {
     public LocalDateTime getRegistrationDate() { return registrationDate; }
 
     public void setRegistrationDate(LocalDateTime registrationDate) { this.registrationDate = registrationDate; }
+
+    @Override
+    public String toString() {
+        return super.toString() + "Student{" +
+                "specialNeeds='" + specialNeeds + '\'' +
+                ", registrationDate=" + registrationDate +
+                ", parent=" + parent +
+                ", classe=" + classe +
+                '}';
+    }
 }
 

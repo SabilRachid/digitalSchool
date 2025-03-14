@@ -1,5 +1,6 @@
 package com.digital.school.controller.rest.admin;
 
+import com.digital.school.dto.CourseDTO;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.CourseStatus;
 import com.digital.school.service.*;
@@ -87,9 +88,17 @@ public class AdminCourseRestController {
             course.setDescription(requestData.get("description") != null ? requestData.get("description").toString() : "");
            // course.setRoom(requestData.get("room") != null ? requestData.get("room").toString() : "");
 
+            CourseDTO courseDTO = new CourseDTO();
+            courseDTO.setTitle(course.getTitle());
+            courseDTO.setSubjectId(course.getSubject().getId());
+            courseDTO.setProfessorId(course.getProfessor().getId());
+            courseDTO.setClasseId(course.getClasse().getId());
+            courseDTO.setStartTime(course.getStartTime());
+            courseDTO.setEndTime(course.getEndTime());
+            courseDTO.setDescription(course.getDescription());
+            CourseDTO savedCourseDTO = courseService.createCourse(courseDTO, administrator);
             // Sauvegarde du cours
-            Course savedCourse = courseService.save(course, administrator);
-            return ResponseEntity.ok(savedCourse);
+            return ResponseEntity.ok(savedCourseDTO);
         } catch (Exception e) {
             LOGGER.error("🚨 Erreur lors de la création du cours : {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("message", "Erreur lors de la création: " + e.getMessage()));

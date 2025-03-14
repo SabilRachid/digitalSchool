@@ -23,7 +23,7 @@ public class EvaluationGrade extends AuditableEntity {
     private Student student;
 
     // La note attribuée par le professeur
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Double grade;
 
     // Nouvelle propriété pour le type de note, calculé à partir de grade

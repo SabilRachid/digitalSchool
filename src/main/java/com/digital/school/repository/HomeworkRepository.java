@@ -73,7 +73,7 @@ public interface HomeworkRepository extends JpaRepository<Homework, Long> {
                                 @Param("status") EvaluationStatus status);
 
     @Query("SELECT COUNT(h) FROM Homework h JOIN h.classe c JOIN c.students s " +
-            "WHERE s = :student AND h.status = com.digital.school.model.enumerated.EvaluationStatus.PUBLISHED")
+            "WHERE s = :student AND h.status = com.digital.school.model.enumerated.EvaluationStatus.UPCOMING")
     int countPendingHomework(@Param("student") Student student);
 
     @Query("SELECT h FROM Homework h JOIN h.classe c JOIN c.students s " +

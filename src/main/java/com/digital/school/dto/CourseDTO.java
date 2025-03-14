@@ -1,40 +1,62 @@
 package com.digital.school.dto;
 
+import com.digital.school.model.enumerated.CourseStatus;
+
 import java.time.LocalDateTime;
 
 public class CourseDTO {
-    private Long subject;
-    private Long professor;
-    private Long classe;
+    private Long id;
+    private String name;
+    private String title;
+    private Long subjectId;
+    private Long professorId;
+    private Long classeId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String room;
+    private CourseStatus status;
     private String description;
 
     // Getters et Setters à générer
 
-    public Long getSubject() {
-        return subject;
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
+
+    public CourseStatus getStatus() { return status; }
+    
+    public void setStatus(CourseStatus status) { this.status = status; }
+
+    public Long getSubjectId() {
+        return subjectId;
     }
 
-    public void setSubject(Long subject) {
-        this.subject = subject;
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 
-    public Long getProfessor() {
-        return professor;
+    public Long getProfessorId() {
+        return professorId;
     }
 
-    public void setProfessor(Long professor) {
-        this.professor = professor;
+    public void setProfessorId(Long professorId) {
+        this.professorId = professorId;
     }
 
-    public Long getClasse() {
-        return classe;
+    public Long getClasseId() {
+        return classeId;
     }
 
-    public void setClasse(Long classe) {
-        this.classe = classe;
+    public void setClasseId(Long classeId) {
+        this.classeId = classeId;
     }
 
     public LocalDateTime getStartTime() {

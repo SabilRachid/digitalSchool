@@ -3,6 +3,8 @@ package com.digital.school.model;
 import com.digital.school.model.enumerated.EvaluationStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "evaluations")
@@ -27,6 +29,10 @@ public abstract class Evaluation extends Event {
     // Nouveau champ pour indiquer si l'évaluation est notée
     @Column(name = "graded", nullable = true)
     private boolean graded = false;
+
+    // Ajout de la relation vers EvaluationGrade
+    @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EvaluationGrade> evaluationGrades = new ArrayList<>();
 
     // Getters and setters
     public LocalDate getDueDate() {
@@ -76,5 +82,13 @@ public abstract class Evaluation extends Event {
                 ", maxScore=" + maxScore +
                 ", graded=" + graded +
                 '}';
+    }
+
+    public List<EvaluationGrade> getEvaluationGrades() {
+        return evaluationGrades;
+    }
+
+    public void setEvaluationGrades(List<EvaluationGrade> evaluationGrades) {
+        this.evaluationGrades = evaluationGrades;
     }
 }

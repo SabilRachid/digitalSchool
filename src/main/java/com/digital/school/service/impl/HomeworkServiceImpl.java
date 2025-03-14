@@ -88,11 +88,36 @@ public class HomeworkServiceImpl implements HomeworkService {
 
 
     @Override
-    public void publishHomework(Long homeworkId) {
-        Homework hw = homeworkRepository.findById(homeworkId)
+    public void publishHomework(Long evaluationId) {
+        Homework evaluation = homeworkRepository.findById(evaluationId)
                 .orElseThrow(() -> new RuntimeException("Devoir non trouvé"));
-        hw.setStatus(EvaluationStatus.PUBLISHED);
-        homeworkRepository.save(hw);
+
+        // Mettre à jour le status (ex: SCHEDULED -> UPCOMING)
+        evaluation.setStatus(com.digital.school.model.enumerated.EvaluationStatus.UPCOMING);
+
+        // Récupération de la liste des étudiants de la classe associée à l'évaluation
+        Set<Student> students = evaluation.getClasse().getStudents();
+
+        // Pour chaque étudiant, s'il n'existe pas déjà une note enregistrée, on crée une entrée EvaluationGrade vide
+        for (Student student : students) {
+            LOGGER.debug("set Grade Evaluation for student="+student.toString());
+            Optional<EvaluationGrade> existingGrade = evaluationGradeRepository
+                    .findByEvaluationIdAndStudentId(evaluationId, student.getId());
+            if (existingGrade.isEmpty()) {
+                LOGGER.debug("create new EvaluationGrade");
+                EvaluationGrade grade = new EvaluationGrade();
+                grade.setEvaluation(evaluation);
+                grade.setStudent(student);
+                grade.setGrade(null); // ou 0.0 si vous préférez une valeur numérique par défaut
+                grade.setRemark("");
+                grade.setGradedAt(null);
+                evaluationGradeRepository.save(grade);
+            }
+        }
+
+        homeworkRepository.save(evaluation);
+
+
     }
 
     @Override
@@ -167,7 +192,7 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     @Override
     public List<Homework> findPendingGradingByProfessor(Professor professor) {
-        return homeworkRepository.findPendingGradingByProfessor(professor, EvaluationStatus.PUBLISHED);
+        return homeworkRepository.findPendingGradingByProfessor(professor, EvaluationStatus.UPCOMING);
     }
 
     @Override
@@ -246,4 +271,28 @@ public class HomeworkServiceImpl implements HomeworkService {
             // Exemple : notificationService.sendHomeworkReminder(homework);
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getHomeworkGrades(Long homeworkId) {
+        // Récupérer le devoir (Homework) par son identifiant
+        Homework homework = homeworkRepository.findById(homeworkId)
+                .orElseThrow(() -> new RuntimeException("Devoir non trouvé pour l'ID : " + homeworkId));
+
+        // Supposons que Homework étend Evaluation, utilisez l'ID de l'évaluation pour récupérer les notes
+        List<EvaluationGrade> grades = evaluationGradeRepository.findByEvaluationId(homework.getId());
+
+        // Conversion de chaque EvaluationGrade en Map<String, Object>
+        return grades.stream()
+                .map(grade -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("studentId", grade.getStudent().getId());
+                    map.put("firstName", grade.getStudent().getFirstName());
+                    map.put("lastName", grade.getStudent().getLastName());
+                    map.put("grade", grade.getGrade());
+                    map.put("comment", grade.getRemark());
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
+
 }

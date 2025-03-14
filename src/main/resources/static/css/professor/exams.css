@@ -212,12 +212,6 @@
 }
 
 /* Results Overview */
-.results-overview {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
 
 .results-chart {
     margin: 1.5rem 0;
@@ -226,6 +220,66 @@
 
 .results-table {
     margin-top: 1.5rem;
+}
+
+.results-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.result-item {
+    flex: 1 1 45%;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.result-item h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+    color: #555;
+}
+
+.result-item p {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+
+
+.grade-entry-row {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Espace entre les colonnes */
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.grade-entry-row .student-info span {
+    font-weight: bold;
+    width: 150px;
+    /* Vous pouvez ajouter d'autres styles si besoin, par exemple une largeur fixe ou un flex-grow */
+    flex: 0 0 200px;
+}
+
+.grade-entry-row .grade-input,
+.grade-entry-row .comment-input {
+    flex: 1;
+}
+
+.grade-entry-row .grade-input input,
+.grade-entry-row .comment-input input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 /* Responsive Design */
@@ -245,4 +299,5 @@
     .results-overview {
         grid-template-columns: 1fr;
     }
+
 }

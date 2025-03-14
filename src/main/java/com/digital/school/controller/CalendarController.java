@@ -3,6 +3,7 @@ package com.digital.school.controller;
 import com.digital.school.dto.EventDTO;
 import com.digital.school.model.*;
 import com.digital.school.model.enumerated.CourseStatus;
+import com.digital.school.model.enumerated.EvaluationStatus;
 import com.digital.school.model.enumerated.EventType;
 import com.digital.school.service.*;
 import org.slf4j.Logger;
@@ -148,6 +149,8 @@ public class CalendarController {
                 //course.setInstructorNotes(eventDTO.getInstructorNotes());
             } else if ("EXAM".equalsIgnoreCase(eventDTO.getType())) {
                 event = new Exam();
+
+
             } else {
                 event = new Event();
             }
@@ -162,6 +165,7 @@ public class CalendarController {
             event.setAllDay(eventDTO.isAllDay());
             event.setType(EventType.valueOf(eventDTO.getType().toUpperCase()));
 
+
             // Pour COURSE et EXAM, on affecte le subject et la classe
             if (List.of("COURSE", "EXAM").contains(eventDTO.getType().toUpperCase())) {
                 if (eventDTO.getSubject() != null) {
@@ -169,6 +173,7 @@ public class CalendarController {
                     Subject subject = subjectService.findById(subjectId)
                             .orElseThrow(() -> new RuntimeException("Matière non trouvée"));
                     event.setSubject(subject);
+
                 }
                 if (eventDTO.getClasse() != null) {
                     Long classeId = Long.parseLong(eventDTO.getClasse().getId());
@@ -180,9 +185,30 @@ public class CalendarController {
                     event.setParticipants(new HashSet<>(studentService.getStudentsByClasseId(classeId)));
 
                     // Ajouter également les professeurs associés à la matière pour cette classe
-                    professorService.findProfessorsByClasseId(classeId).stream()
-                            .filter(prof -> event.getSubject() != null && prof.getSubjects().contains(event.getSubject()))
-                            .forEach(event.getParticipants()::add);
+
+                    // Récupérer le professeur principal pour la classe et la matière
+                    Professor optProf = professorService.findProfessorsByClasseId(classeId).stream()
+                            .filter(p -> event.getSubject() != null && p.getSubjects().contains(event.getSubject()))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Professeur non trouvé"));
+
+                    // Affecter le professeur selon le type de l'événement
+                    if (event instanceof Evaluation) {
+                        // Pour les évaluations (ex. Exam) qui étendent Evaluation
+                        ((Evaluation) event).setProfessor(optProf);
+                        ((Evaluation) event).setStatus(EvaluationStatus.SCHEDULED);
+                        ((Evaluation) event).setGraded(false);
+                    } else if (event instanceof Course) {
+                        // Pour les cours qui ne sont pas une Evaluation, si Course possède un attribut professor
+                        ((Course) event).setProfessor(optProf);
+                        // Ici, vous pouvez éventuellement gérer un statut spécifique pour Course
+                    }
+
+                    // Ajouter le professeur aux participants
+                    event.getParticipants().add(optProf);
+
+
+
                 }
             } else if ("MEETING".equalsIgnoreCase(eventDTO.getType())) {
                 // Gestion spécifique pour les réunions

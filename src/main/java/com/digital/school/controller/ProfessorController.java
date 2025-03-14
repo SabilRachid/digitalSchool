@@ -177,6 +177,26 @@ public class ProfessorController {
     }
 
 
+    @GetMapping("/courses")
+    public String getCoursesForProfessor(HttpServletRequest request,
+                                           @AuthenticationPrincipal Professor professor,
+                                           @RequestParam(required = false) String month,
+                                           @RequestParam(required = false) Long classe,
+                                           @RequestParam(required = false) Long subject,
+                                           Model model) {
+        model.addAttribute("classes", classeService.findByProfessor(professor));
+        model.addAttribute("subjects", subjectService.findByProfessor(professor));
+        model.addAttribute("teacherId", professor.getId());
+        model.addAttribute("currentURI", request.getRequestURI());
+
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("selectedClasse", classe);
+        model.addAttribute("selectedSubject", subject);
+
+        return "professor/courses";
+    }
+
+
     @GetMapping("/resources")
     public String getJustificationPage(HttpServletRequest request,
                                        @AuthenticationPrincipal Professor professor,

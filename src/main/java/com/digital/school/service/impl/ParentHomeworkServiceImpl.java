@@ -169,7 +169,7 @@ public class ParentHomeworkServiceImpl implements ParentDashboardService {
                 events.add(event);
             });
 
-            homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, EvaluationStatus.PUBLISHED)
+            homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, EvaluationStatus.UPCOMING)
                     .forEach(homework -> {
                         Map<String, Object> event = new HashMap<>();
                         event.put("type", "HOMEWORK");

@@ -1,6 +1,7 @@
 package com.digital.school.service;
 
 import com.digital.school.dto.ExamDTO  ;
+import com.digital.school.dto.ExamGradeEntryRequest;
 import com.digital.school.model.*;
 
 import java.util.List;
@@ -36,6 +37,13 @@ public interface ExamService {
         List<Exam> findExamsByProfessor(Long professorId, String month, Long classe, Long subject);
 
          ExamDTO convertToDTO(Exam exam);
+
+         //Enregistrement de notes
+         List<Map<String, Object>> getExamGrades(Long examId);
+
+         void saveExamGrades(List<ExamGradeEntryRequest> gradeEntries, Long professorId);
+
+         void publishExamGrades(Long examId, Long professorId);
 }
 
 

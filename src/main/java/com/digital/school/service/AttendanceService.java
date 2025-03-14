@@ -7,6 +7,7 @@ import com.digital.school.model.Professor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -27,12 +28,15 @@ public interface AttendanceService {
      */
     List<Map<String, Object>> getGroupedAttendanceData(Professor professor, Long classId, LocalDate startDate, LocalDate endDate);
 
+    void recordAttendance(Map<String, Object> attendanceData);
+
     Optional<Attendance> findByIdAndTeacher(Long id, Long teacherId);
+
+    Attendance justifyAttendance(Long attendanceId, String justificationText, MultipartFile justificationFile);
 
     /**
      * Permet de justifier une fiche d'attendance globale (si applicable).
      */
-    Attendance justifyAttendance(Long attendanceId, String justificationText, MultipartFile justificationFile);
 
     Attendance save(Attendance attendance);
 
@@ -53,4 +57,6 @@ public interface AttendanceService {
     void sendAbsenceReminder(Long id);
 
     List<Map<String, Object>> getStudentAttendances(Long attendanceId);
+
+
 }

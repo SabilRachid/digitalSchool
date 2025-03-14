@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Devoirs - Digital School</title>
+    <title>Gestion des Cours - Digital School</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <!-- CSRF Tokens -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Vos CSS personnalisés -->
+
     <link rel="stylesheet" th:href="@{/css/digitalSchool.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/topbar.css}">
@@ -22,9 +23,10 @@
     <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
     <link rel="stylesheet" th:href="@{/css/components/modals.css}">
     <link rel="stylesheet" th:href="@{/css/components/alerts.css}">
-    <link rel="stylesheet" th:href="@{/css/professor/homeworks.css}">
-    <!-- Style additionnel pour le filtrage -->
+    <link rel="stylesheet" th:href="@{/css/professor/courses.css}">
+
     <style>
+        /* Styles supplémentaires pour le filtrage */
         .filter-form {
             display: flex;
             flex-wrap: wrap;
@@ -54,15 +56,15 @@
 
 <div class="dashboard-container">
     <div class="dashboard-header">
-        <h3 class="dashboard-title"><i class="fas fa-book"></i> Gestion des Devoirs</h3>
-        <button class="btn btn-primary" onclick="openHomeworkModal()">
-            <i class="fas fa-plus"></i> Nouveau Devoir
+        <h3 class="dashboard-title"><i class="fas fa-chalkboard-teacher"></i> Gestion des Cours</h3>
+        <button class="btn btn-primary" onclick="openCourseModal()">
+            <i class="fas fa-plus"></i> Nouveau Cours
         </button>
     </div>
 
     <!-- Formulaire de filtrage -->
     <div class="filter-form">
-        <form id="homeworkFilterForm">
+        <form id="courseFilterForm">
             <input type="month" name="month" class="form-control" placeholder="Mois" th:value="${selectedMonth}">
             <select name="classe" class="form-control">
                 <option value="">Toutes les classes</option>
@@ -76,50 +78,49 @@
         </form>
     </div>
 
-    <!-- Grille des devoirs -->
-    <div class="homeworks-grid">
-        <!-- Devoirs à venir -->
-        <div class="homework-section">
+    <div class="courses-grid">
+        <!-- Cours à venir -->
+        <div class="course-section">
             <h2>À venir</h2>
-            <div class="homework-list" id="upcomingHomework">
-                <!-- Contenu chargé dynamiquement par JS -->
+            <div class="course-list" id="upcomingCourseList">
+                <!-- Chargé dynamiquement par JS -->
             </div>
         </div>
-        <!-- Devoirs en cours -->
-        <div class="homework-section">
+        <!-- Cours en cours -->
+        <div class="course-section">
             <h2>En cours</h2>
-            <div class="homework-list" id="inProgressHomework">
-                <!-- Contenu chargé dynamiquement par JS -->
+            <div class="course-list" id="inProgressCourseList">
+                <!-- Chargé dynamiquement par JS -->
             </div>
         </div>
-        <!-- Devoirs à noter -->
-        <div class="homework-section">
-            <h2>Devoirs à noter</h2>
-            <div class="homework-list" id="toBeGradedHomework">
-                <!-- Contenu chargé dynamiquement par JS -->
+        <!-- Cours à noter (pour saisir la présence) -->
+        <div class="course-section">
+            <h2>Cours à noter</h2>
+            <div class="course-list" id="toBeAttendCourseList">
+                <!-- Chargé dynamiquement par JS -->
             </div>
         </div>
-        <!-- Devoirs terminés -->
-        <div class="homework-section">
+        <!-- Cours terminés -->
+        <div class="course-section">
             <h2>Terminés</h2>
-            <div class="homework-list" id="completedHomework">
-                <!-- Contenu chargé dynamiquement par JS -->
+            <div class="course-list" id="completedCourseList">
+                <!-- Chargé dynamiquement par JS -->
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal de création de devoir -->
-<div class="modal" id="homeworkModal">
+<!-- Modal de création de cours -->
+<div class="modal" id="courseModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Nouveau Devoir</h2>
-            <button class="modal-close" onclick="closeHomeworkModal()">&times;</button>
+            <h2>Nouveau Cours</h2>
+            <button class="modal-close" onclick="closeCourseModal()">&times;</button>
         </div>
-        <form id="homeworkForm">
+        <form id="courseForm">
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="title">Titre</label>
+                    <label for="title">Nom du cours</label>
                     <input type="text" id="title" name="title" required>
                 </div>
                 <div class="form-row">
@@ -140,8 +141,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="dueDate">Date de rendu</label>
-                        <input type="datetime-local" id="dueDate" name="dueDate" required>
+                        <label for="courseDate">Date du cours</label>
+                        <input type="date" id="courseDate" name="courseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="startTime">Heure de début</label>
+                        <input type="time" id="startTime" name="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">Heure de fin</label>
+                        <input type="time" id="endTime" name="endTime" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -150,92 +159,66 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeHomeworkModal()">Annuler</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCourseModal()">Annuler</button>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal de saisie des notes pour un devoir -->
-<div class="modal" id="gradeEntryHomeworkModal">
+<!-- Modal de saisie de présence pour un cours -->
+<!-- Modal de saisie de présence pour un cours -->
+<div class="modal" id="courseAttendanceModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Saisie des Notes pour le Devoir</h2>
-            <button class="modal-close" onclick="closeHomeworkGradeEntryModal()">&times;</button>
+            <h2>Saisie de présence</h2>
+            <button class="modal-close" onclick="closeCourseAttendanceModal()">&times;</button>
         </div>
-        <form id="gradeEntryHomeworkForm">
-            <div class="modal-body">
-                <!-- Identifiant du devoir (caché) -->
-                <input type="hidden" id="homeworkSubmissionId" name="homeworkSubmissionId">
-                <!-- Conteneur pour la liste des étudiants et leurs champs de note -->
-                <div id="studentsGradesContainer">
-                    <!-- Ce contenu sera généré dynamiquement -->
-                </div>
+        <form id="courseAttendanceForm">
+            <input type="hidden" id="courseId" name="courseId">
+            <div id="courseAttendanceBody">
+                <!-- Les lignes pour chaque étudiant seront générées dynamiquement -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeHomeworkGradeEntryModal()">Annuler</button>
-                <button type="submit" class="btn btn-primary">Enregistrer et notifier</button>
+                <button type="button" class="btn btn-secondary" onclick="selectAllAttendance()">Tous présents</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCourseAttendanceModal()">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Résultats pour les devoirs -->
-<div class="modal" id="resultsModal">
+
+<div id="courseDetailsModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Résultats du devoir : <span id="resultsHomeworkTitle"></span></h2>
-            <button class="modal-close" onclick="closeResultsModal()">&times;</button>
+            <h2>Détails du Cours</h2>
+            <button onclick="closeCourseDetailsModal()">×</button>
         </div>
-        <div class="modal-body">
-            <div class="results-overview">
-                <div class="result-item">
-                    <span class="label">Moyenne</span>
-                    <span class="value" id="resultsAverage"></span>
-                </div>
-                <div class="result-item">
-                    <span class="label">Note max</span>
-                    <span class="value" id="resultsMax"></span>
-                </div>
-                <div class="result-item">
-                    <span class="label">Note min</span>
-                    <span class="value" id="resultsMin"></span>
-                </div>
-                <div class="result-item">
-                    <span class="label">Total des soumissions</span>
-                    <span class="value" id="resultsTotalSubmissions"></span>
-                </div>
-            </div>
-            <div class="results-chart">
-                <canvas id="gradesDistributionChart"></canvas>
-            </div>
-            <div class="results-table">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Élève</th>
-                        <th>Note</th>
-                        <th>Commentaire</th>
-                    </tr>
-                    </thead>
-                    <tbody id="resultsTableBody">
-                    <!-- Contenu chargé dynamiquement -->
-                    </tbody>
-                </table>
-            </div>
+        <div id="courseDetailsBody" class="modal-body">
+            <!-- Les détails du cours seront affichés ici -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeCourseDetailsModal()">Fermer</button>
         </div>
     </div>
 </div>
+
 
 <!-- Inclusion des scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
 <script th:src="@{/js/admin/common.js}"></script>
 <script th:src="@{/js/sidebar.js}"></script>
 <script th:src="@{/js/topbar.js}"></script>
-<script th:src="@{/js/professor/homeworks.js}"></script>
+<script th:src="@{/js/professor/courses.js}"></script>
 </body>
 </html>

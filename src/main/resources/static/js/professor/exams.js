@@ -42,7 +42,8 @@ function updateExamsUI(exams) {
             <div class="exam-header">
                 <span class="subject-badge">${exam.subjectName}</span>
                 ${exam.status === 'SCHEDULED' ? `<span class="exam-date"><i class="fas fa-calendar"></i> ${formatExamDate(exam.startTime)}</span>` : ''}
-                ${exam.status === 'PUBLISHED' ? `<span class="status-badge in-progress">En cours</span>` : ''}
+                ${exam.status === 'UPCOMING' ? `<span class="status-badge in-progress">En cours</span>` : ''}
+                ${exam.status === 'UPCOMING'  && now > examDate ? `<span class="status-badge in-progress">A noter</span>` : ''}
                 ${exam.status === 'COMPLETED' ? `<span class="status-badge completed">Terminé</span>` : ''}
             </div>
             <div class="exam-content">
@@ -52,7 +53,7 @@ function updateExamsUI(exams) {
                     <span class="detail-item"><i class="fas fa-clock"></i> ${exam.duration} minutes</span>
                     <span class="detail-item"><i class="fas fa-users"></i> ${exam.classeName}</span>
                 </div>
-                ${exam.status === 'PUBLISHED' && now > examDate ?
+                ${exam.status === 'UPCOMING' && now > examDate ?
             `<button class="btn btn-info mt-2" onclick="openGradeEntryExamModal(${exam.id})">
                         <i class="fas fa-edit"></i> Saisir notes
                     </button>` : ''}
@@ -66,7 +67,7 @@ function updateExamsUI(exams) {
                         <i class="fas fa-edit"></i> Modifier
                     </button>
                 ` : ''}
-                ${exam.status === 'PUBLISHED' && exam.graded ?
+                ${exam.status === 'UPCOMING' && exam.graded ?
             `<button class="btn btn-warning" onclick="endExam(${exam.id})">
                         <i class="fas fa-stop"></i> Terminer
                     </button>` : ''}
@@ -82,9 +83,9 @@ function updateExamsUI(exams) {
         `;
         if (exam.status === 'SCHEDULED') {
             upcomingSection.appendChild(examCard);
-        } else if (exam.status === 'PUBLISHED' && now <= examDate) {
+        } else if (exam.status === 'UPCOMING' && now <= examDate) {
             inProgressSection.appendChild(examCard);
-        } else if (exam.status === 'PUBLISHED' && now > examDate) {
+        } else if (exam.status === 'UPCOMING' && now > examDate) {
             toBeGradedSection.appendChild(examCard);
         } else if (exam.status === 'COMPLETED') {
             completedSection.appendChild(examCard);
@@ -151,45 +152,72 @@ function closeExamModal() {
     document.getElementById('examForm').reset();
 }
 
-// Ouvre le modal de saisie des notes pour l'examen et remplit dynamiquement la liste des étudiants
+// Ouvre le modal et charge les notes existantes pour l'examen donné
 function openGradeEntryExamModal(examId) {
-    console.log("Ouverture du modal de saisie des notes pour l'examen :", examId);
-    // Affiche le modal
+    console.log("Ouverture du modal pour l'examen :", examId);
+    // Stocker l'ID de l'examen dans le champ caché
+    document.getElementById('examId').value = examId;
+
+    // Ouvrir le modal
     const modal = document.getElementById('gradeEntryExamModal');
     modal.classList.add('show');
 
-    // Stocke l'examId dans le champ caché
-    document.getElementById('examId').value = examId;
-
-    // Récupère la liste des étudiants de la classe pour cet examen.
-    // Cette partie est à adapter selon votre méthode d'obtention des étudiants.
-    // Par exemple, vous pouvez effectuer une requête AJAX pour obtenir ces données.
-    fetch(`/professor/api/exams/${examId}/students`)
+    // Requête pour récupérer la liste des étudiants de l'examen et leurs notes existantes (si elles existent)
+    fetch(`/professor/api/exams/${examId}/grades`)
         .then(response => {
             if (!response.ok) {
-                throw new Error("Erreur lors de la récupération des étudiants");
+                throw new Error("Erreur lors de la récupération des notes existantes");
             }
             return response.json();
         })
-        .then(students => {
-            const container = document.getElementById('studentsGradesContainer');
-            container.innerHTML = ''; // Vider le conteneur
-            students.forEach(student => {
-                // Créez une ligne pour chaque étudiant
-                const div = document.createElement('div');
-                div.className = 'grade-entry-row';
-                div.innerHTML = `
-                    <span>${student.firstName} ${student.lastName}</span>
-                    <input type="number" name="grade_${student.id}" placeholder="Note" min="0" max="20" step="0.1" required>
-                    <input type="text" name="comment_${student.id}" placeholder="Commentaire (optionnel)">
-                `;
-                container.appendChild(div);
-            });
+        .then(data => {
+            // data est un tableau d'objets contenant l'ID de l'étudiant, la note et le commentaire
+            // Par exemple : [{ studentId: 1, firstName: "Alice", lastName: "Dupont", grade: 15.0, comment: "Très bien" }, ...]
+            populateGradesContainer(data);
         })
         .catch(error => {
             console.error(error);
             showNotification(error.message, 'error');
         });
+}
+
+// Remplit le conteneur avec une ligne par étudiant
+function populateGradesContainer(studentsData) {
+    const container = document.getElementById('studentsGradesContainer');
+    container.innerHTML = ''; // Vider le conteneur
+    studentsData.forEach(student => {
+        const row = document.createElement('div');
+        row.className = 'grade-entry-row';
+        row.innerHTML = `
+            <div class="student-info">
+                <span>${student.firstName} ${student.lastName}</span>
+            </div>
+            <div class="grade-input">
+                <input type="number" name="grade_${student.studentId}" placeholder="Note (0-20)" min="0" max="20" step="0.1" value="${student.grade != null ? student.grade : ''}" required>
+            </div>
+            <div class="comment-input">
+                <input type="text" name="comment_${student.studentId}" placeholder="Remarque" value="${student.comment || ''}">
+            </div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+
+// Initialisation du formulaire de saisie des notes pour l'examen
+function initializeExamGradeEntryForm() {
+    const form = document.getElementById('gradeEntryExamForm');
+    if (!form) return;
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        // Appeler la fonction de sauvegarde partielle, puis notifier
+        await saveOrPublishGrades(false);
+    });
+}
+
+// Fonction de sauvegarde partielle des notes (sans publier)
+async function savePartialGrades() {
+    await saveOrPublishGrades(false);
 }
 
 // Ferme le modal de saisie des notes pour l'examen
@@ -199,50 +227,118 @@ function closeGradeEntryExamModal() {
     document.getElementById('gradeEntryExamForm').reset();
 }
 
-// Initialisation du formulaire de saisie des notes pour l'examen
-function initializeExamGradeEntryForm() {
-    const form = document.getElementById('gradeEntryExamForm');
-    if (!form) return;
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        try {
-            // Récupère l'examId
-            const examId = document.getElementById('examId').value;
-            // Rassemble les notes et commentaires pour chaque étudiant
-            const container = document.getElementById('studentsGradesContainer');
-            const inputs = container.querySelectorAll('input[type="number"]');
-            const gradesData = [];
-            inputs.forEach(input => {
-                const studentId = input.name.split('_')[1]; // suppose que le nom est "grade_{studentId}"
-                const gradeValue = parseFloat(input.value);
-                const commentInput = container.querySelector(`input[name="comment_${studentId}"]`);
-                const comment = commentInput ? commentInput.value : "";
-                gradesData.push({
-                    studentId: studentId,
-                    evaluationId: examId, // Utilisé ici comme l'ID de l'évaluation
-                    gradeValue: gradeValue,
-                    comment: comment
-                });
-            });
-            console.log("JSON envoyé pour la note d'examen :", JSON.stringify(gradesData, null, 2));
-            // Envoi via fetch (vous pouvez adapter l'URL et le format selon votre API)
-            const response = await fetch('/professor/api/exams/grade-entry', {
+function viewResults(examId) {
+    // Récupère les résultats de l'examen via l'API
+    fetch(`/professor/api/exams/${examId}/results`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des résultats: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remplissage du contenu du modal avec les données reçues
+            document.getElementById('resultsExamTitle').innerText = data.examTitle;
+            document.getElementById('resultsAverage').innerText = data.average;
+            document.getElementById('resultsMin').innerText = data.min;
+            document.getElementById('resultsMax').innerText = data.max;
+            document.getElementById('resultsTotalSubmissions').innerText = data.totalSubmissions;
+
+            // Vous pouvez également ajouter d'autres statistiques ici...
+
+            // Ouvrir le modal
+            document.getElementById('resultsModal').classList.add('show');
+        })
+        .catch(error => {
+            showNotification(error.message, 'error');
+        });
+}
+
+// Fonction pour fermer le modal des résultats
+function closeResultsModal() {
+    document.getElementById('resultsModal').classList.remove('show');
+}
+
+
+// Fonction de publication finale des notes
+async function publishGrades() {
+    // Vérifier que toutes les notes sont renseignées
+    if (!areAllGradesFilled()) {
+        showNotification("La saisie est incomplète. Veuillez renseigner toutes les notes avant de publier.", "warning");
+        return;
+    }
+    await saveOrPublishGrades(true);
+}
+
+// Fonction commune pour sauvegarder (partiellement ou publier)
+async function saveOrPublishGrades(publish) {
+    const examId = document.getElementById('examId').value;
+    const container = document.getElementById('studentsGradesContainer');
+    const rows = container.querySelectorAll('.grade-entry-row');
+    const gradesData = [];
+    let incomplete = false;
+    rows.forEach(row => {
+        // On récupère l'ID de l'étudiant à partir du nom de l'input grade
+        const gradeInput = row.querySelector('input[type="number"]');
+        const commentInput = row.querySelector('input[type="text"]');
+        const studentId = gradeInput.name.split('_')[1];
+        const gradeValue = gradeInput.value ? parseFloat(gradeInput.value) : null;
+        if (gradeValue === null) {
+            incomplete = true;
+        }
+        const comment = commentInput.value || "";
+        gradesData.push({
+            studentId: studentId,
+            evaluationId: examId, // Considéré comme l'ID de l'évaluation/examen
+            gradeValue: gradeValue,
+            comment: comment
+        });
+    });
+    // Envoi des données vers l'API
+    try {
+        const response = await fetch('/professor/api/exams/grade-entry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            },
+            body: JSON.stringify(gradesData)
+        });
+        if (!response.ok) throw new Error('Erreur lors de la saisie des notes');
+        if (publish) {
+            // Appeler l'endpoint pour publier les notes finales
+            const pubResponse = await fetch(`/professor/api/exams/${examId}/publish-grades`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
-                },
-                body: JSON.stringify(gradesData)
+                }
             });
-            if (!response.ok) throw new Error('Erreur lors de la saisie des notes');
-            closeGradeEntryExamModal();
-            showNotification('Notes enregistrées et élèves notifiés', 'success');
-            setTimeout(() => location.reload(), 1500);
-        } catch (error) {
-            showNotification(error.message, 'error');
+            if (!pubResponse.ok) throw new Error('Erreur lors de la publication des notes');
+            showNotification('Notes publiées avec succès', 'success');
+        } else {
+            showNotification('Notes sauvegardées avec succès', 'success');
         }
-    });
+        // Recharger la liste ou fermer le modal
+        closeGradeEntryExamModal();
+        // Optionnel : recharger la page ou mettre à jour l'interface
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
 }
+
+// Vérifie si tous les champs de note sont renseignés
+function areAllGradesFilled() {
+    const container = document.getElementById('studentsGradesContainer');
+    const gradeInputs = container.querySelectorAll('input[type="number"]');
+    for (let input of gradeInputs) {
+        if (!input.value || isNaN(parseFloat(input.value))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 // INITIALISATION DES GRAPHIQUES (si nécessaire)
 function initializeCharts() {

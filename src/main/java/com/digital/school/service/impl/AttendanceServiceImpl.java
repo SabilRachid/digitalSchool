@@ -11,11 +11,14 @@ import com.digital.school.model.enumerated.AttendanceStatus;
 import com.digital.school.model.enumerated.StudentAttendanceStatus;
 import com.digital.school.repository.AttendanceRepository;
 import com.digital.school.repository.CourseRepository;
+import com.digital.school.repository.StudentAttendanceRepository;
 import com.digital.school.repository.StudentRepository;
 import com.digital.school.service.AttendanceService;
+import com.digital.school.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +36,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AttendanceServiceImpl implements AttendanceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttendanceServiceImpl.class);
@@ -41,9 +43,16 @@ public class AttendanceServiceImpl implements AttendanceService {
     // Répertoire où les fichiers justificatifs sont stockés
     private final String justificationDir = "uploads/justifications/";
 
-    private final AttendanceRepository attendanceRepository;
-    private final CourseRepository courseRepository;
-    private final StudentRepository studentRepository;
+    @Autowired
+    AttendanceRepository attendanceRepository;
+    @Autowired
+    StudentAttendanceRepository studentAttendanceRepository;
+    @Autowired
+    CourseRepository courseRepository;
+    @Autowired
+    StudentRepository studentRepository;
+    @Autowired
+    StudentService studentService;
 
     @Override
     public void save(List<Attendance> attendanceList) {
@@ -153,7 +162,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 studentAttendance.setStudent(student);
                 studentAttendance.setStatus(StudentAttendanceStatus.valueOf(statusStr));
                 studentAttendance.setRecordedAt(LocalDateTime.now());
-                finalAttendance.addStudentAttendance(studentAttendance);
+               // finalAttendance.addStudentAttendance(studentAttendance);
                 LOGGER.debug("Ajout d'un nouveau StudentAttendance pour l'étudiant ID: {}", studentId);
             }
         });
@@ -234,6 +243,77 @@ public class AttendanceServiceImpl implements AttendanceService {
                     return map;
                 })
                 .collect(Collectors.toList());
+    }
+
+    /** Enregistre la présence pour un cours donné en fonction des données fournies.*/
+    @Override
+    public void recordAttendance(Map<String, Object> attendanceData) {
+        if (attendanceData == null || attendanceData.isEmpty()) {
+            throw new RuntimeException("Aucune donnée d'assiduité reçue.");
+        }
+
+        // Récupérer l'ID du cours
+        Object courseIdObj = attendanceData.get("courseId");
+        if (courseIdObj == null) {
+            throw new RuntimeException("L'identifiant du cours est manquant.");
+        }
+        Long courseId = Long.parseLong(courseIdObj.toString());
+
+        // Récupérer ou créer l'enregistrement d'assiduité pour le cours
+        Attendance attendanceRecord = attendanceRepository.findByCourseId(courseId)
+                .orElseGet(() -> {
+                    Attendance a = new Attendance();
+                    a.setCourse(courseRepository.findById(courseId)
+                            .orElseThrow(() -> new RuntimeException("Cours non trouvé")));
+                    a.setDateEvent(LocalDate.now());
+                    return a;
+                });
+        LOGGER.debug("attendanceRecord Réccupéré AttendanceId="+attendanceRecord.getId());
+
+        // Itérer sur les clés du map pour traiter les présences
+        attendanceData.forEach((key, value) -> {
+            LOGGER.debug("key="+key+", value="+value);
+            if (key.startsWith("attendance_")) {
+                // Extrait l'ID de l'étudiant depuis la clé
+                String studentIdStr = key.substring("attendance_".length());
+                LOGGER.debug("studentIdStr="+studentIdStr);
+                Long studentId = Long.parseLong(studentIdStr);
+
+                // Récupérer les informations associées à cet étudiant
+                String statusKey = "status_" + studentIdStr;
+                String justificationKey = "justification_" + studentIdStr;
+
+                LOGGER.debug("studentId="+studentId+", statusKey="+statusKey+", justificationKey="+justificationKey);
+                String statusStr = attendanceData.get(statusKey) != null
+                        ? attendanceData.get(statusKey).toString()
+                        : "PRESENT"; // On peut définir PRESENT par défaut si non spécifié
+
+                String justification = attendanceData.get(justificationKey) != null
+                        ? attendanceData.get(justificationKey).toString()
+                        : "";
+
+                // Récupérer l'étudiant (adapter selon votre service/repository)
+                Student student = studentService.findById(studentId)
+                        .orElseThrow(() -> new RuntimeException("Étudiant non trouvé avec l'ID " + studentId));
+
+                // Récupérer ou créer le StudentAttendance pour cet étudiant et ce cours
+                LOGGER.debug("findByAttendanceAndStudent: attendance={}, student={}", attendanceRecord.toString(), student);
+                StudentAttendance sa = studentAttendanceRepository.findByAttendanceAndStudent(attendanceRecord, student)
+                        .orElse(new StudentAttendance(student, StudentAttendanceStatus.valueOf(statusStr)));
+
+                LOGGER.debug("StudentAttendance find StudentAttendanceId="+sa.getId());
+
+                // Mettre à jour le statut et la justification
+                sa.setStatus(StudentAttendanceStatus.valueOf(statusStr));
+                sa.setJustification(justification);
+
+                // Ajouter ou mettre à jour l'enregistrement dans l'assiduité
+                studentAttendanceRepository.save(sa);
+            }
+        });
+
+        // Sauvegarder l'enregistrement d'assiduité
+        attendanceRepository.save(attendanceRecord);
     }
 
 

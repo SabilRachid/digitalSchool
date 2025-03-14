@@ -114,4 +114,18 @@ public class Attendance extends AuditableEntity {
     public void setStatus(AttendanceStatus status) {
         this.status = status;
     }
+
+
+    @Override
+    public String toString() {
+        return "Attendance{" +
+                "course=" + course +
+                ", dateEvent=" + dateEvent +
+                ", studentAttendances=" + studentAttendances +
+                ", justification='" + justification + '\'' +
+                ", justificationFile='" + justificationFile + '\'' +
+                ", recordedBy=" + recordedBy +
+                ", status=" + status +
+                "} " + super.toString();
+    }
 }

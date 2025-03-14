@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
@@ -36,4 +37,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     // Méthode d'existence (adaptée selon votre logique métier)
     boolean existsByCourseIdAndRecordedBy_Id(Long courseId, Long recordedById);
+
+    Optional<Attendance> findByCourseId(Long courseId);
 }

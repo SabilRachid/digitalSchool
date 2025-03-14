@@ -1,5 +1,6 @@
 package com.digital.school.repository;
 
+import com.digital.school.model.Attendance;
 import com.digital.school.model.Professor;
 import com.digital.school.model.Student;
 import com.digital.school.model.StudentAttendance;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface StudentAttendanceRepository extends JpaRepository<StudentAttendance, Long> {
 
@@ -90,5 +92,9 @@ public interface StudentAttendanceRepository extends JpaRepository<StudentAttend
     @Query("SELECT COALESCE((SUM(CASE WHEN sa.status = 'ABSENT' THEN 1 ELSE 0 END) * 100.0 / COUNT(sa)), 0.0) " +
             "FROM StudentAttendance sa WHERE sa.student = :student")
     double calculateAttendanceRate(@Param("student") Student student);
+
+    @Query("SELECT sa FROM StudentAttendance sa WHERE sa.attendance = :attendance AND sa.student = :student")
+    Optional<StudentAttendance> findByAttendanceAndStudent(@Param("attendance") Attendance attendance,
+                                                           @Param("student") Student student);
 
 }

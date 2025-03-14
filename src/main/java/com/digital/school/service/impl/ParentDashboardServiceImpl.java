@@ -104,7 +104,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
         // Ici, on considère qu'un devoir est en retard si son statut est LATE
         for (Student child : children) {
             List<Homework> lateHomeworks = homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(
-                    child, EvaluationStatus.PUBLISHED);
+                    child, EvaluationStatus.UPCOMING);
             if (!lateHomeworks.isEmpty()) {
                 Map<String, Object> alert = new HashMap<>();
                 alert.put("type", "HOMEWORK");
@@ -162,7 +162,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
                 events.add(event);
             });
 
-            homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, EvaluationStatus.PUBLISHED)
+            homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(child, EvaluationStatus.UPCOMING)
                     .forEach(homework -> {
                         Map<String, Object> event = new HashMap<>();
                         event.put("type", "HOMEWORK");
@@ -255,7 +255,7 @@ public class ParentDashboardServiceImpl implements ParentDashboardService {
 
     private int countPendingHomework(Student student) {
         // Retourne le nombre de devoirs avec statut PENDING pour l'étudiant
-        return homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(student, EvaluationStatus.PUBLISHED)
+        return homeworkRepository.findByStudentAndStatusOrderByDueDateDesc(student, EvaluationStatus.UPCOMING)
                 .size();
     }
 
